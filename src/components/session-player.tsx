@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, ChevronRight, Clock3, RotateCcw, XCircle } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useAppState } from "@/components/app-provider";
 import { ProgressBar } from "@/components/ui";
 import { scheduleReview } from "@/lib/fsrs/scheduler";
@@ -41,10 +41,13 @@ function updateGrammarProgress(progress: GrammarProgress[], exercise: SessionExe
 
 export function SessionPlayer() {
   const { state, setState, hydrated } = useAppState();
-  const sessionRef = useRef<SessionExercise[] | null>(null);
-  if (hydrated && !sessionRef.current) sessionRef.current = buildStudySession(state);
-  const session = sessionRef.current ?? [];
-  const startedAt = useRef(Date.now());
+  if (!hydrated) return <div className="card mx-auto max-w-3xl p-8"><div className="h-2 animate-pulse rounded-full bg-[#dce6e1]"/><div className="mt-8 h-8 w-3/4 animate-pulse rounded-lg bg-[#e8eeeb]"/><div className="mt-8 grid gap-3">{[1, 2, 3, 4].map((value) => <div key={value} className="h-14 animate-pulse rounded-xl bg-[#eef2f0]"/>)}</div><span className="sr-only">Loading your study session</span></div>;
+  return <HydratedSession initialState={state} setState={setState}/>;
+}
+
+function HydratedSession({ initialState, setState }: { initialState: ReturnType<typeof useAppState>["state"]; setState: ReturnType<typeof useAppState>["setState"] }) {
+  const [session] = useState(() => buildStudySession(initialState));
+  const [startedAt] = useState(() => Date.now());
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [checked, setChecked] = useState(false);
@@ -53,8 +56,6 @@ export function SessionPlayer() {
   const [mistakesCorrected, setMistakesCorrected] = useState(0);
   const [missedPrompts, setMissedPrompts] = useState<string[]>([]);
   const item = session[index];
-
-  if (!hydrated) return <div className="card mx-auto max-w-3xl p-8"><div className="h-2 animate-pulse rounded-full bg-[#dce6e1]"/><div className="mt-8 h-8 w-3/4 animate-pulse rounded-lg bg-[#e8eeeb]"/><div className="mt-8 grid gap-3">{[1, 2, 3, 4].map((value) => <div key={value} className="h-14 animate-pulse rounded-xl bg-[#eef2f0]"/>)}</div><span className="sr-only">Loading your study session</span></div>;
 
   if (!item) {
     const accuracy = session.length ? Math.round(correct / session.length * 100) : 0;
@@ -99,8 +100,8 @@ export function SessionPlayer() {
         grammarProgress = updateGrammarProgress(grammarProgress, item, masteryCorrect, effectiveRating, current.settings.desiredRetention);
       }
       const finished = index === session.length - 1;
-      const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
-      const finalCorrect = correct;
+      const minutes = Math.max(1, Math.round((Date.now() - startedAt) / 60_000));
+      const finalCorrect = correct + (isCorrect ? 1 : 0);
       const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct: finalCorrect, total: session.length, minutes, masteryDelta: finalCorrect > mistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
       const mistakeRecords = item.source === "mistakes" && masteryCorrect ? current.mistakes.map((mistake) => mistake.itemId === item.itemId ? { ...mistake, resolved: true } : mistake) : current.mistakes;
       return { ...current, vocabularyProgress, grammarProgress, mistakes: mistakeRecords, activities };

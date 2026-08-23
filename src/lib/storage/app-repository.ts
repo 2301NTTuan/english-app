@@ -8,6 +8,10 @@ const STORAGE_VERSION = 4;
 const isoOffset = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
 const defaultReview = (nextReview = new Date().toISOString()): AppState["vocabularyProgress"][number]["review"] => ({ difficulty: 5, stability: 1, state: "new", nextReview, scheduledDays: 0, elapsedDays: 0, reviewCount: 0, correctCount: 0, incorrectCount: 0, lapses: 0 });
 
+export function createEmptyAccountState(): AppState {
+  return { settings: { currentLevel: "B1", dailyTarget: 25, maxNewWordsPerDay: 10, maxNewGrammarTopicsPerDay: 1, desiredRetention: 0.9, interfaceLanguage: "en", showVietnamese: true }, vocabularyProgress: [], grammarProgress: [], mistakes: [], streak: 0, activities: [] };
+}
+
 export function createInitialState(): AppState {
   return {
     settings: { currentLevel: "B1", dailyTarget: 25, maxNewWordsPerDay: 10, maxNewGrammarTopicsPerDay: 1, desiredRetention: 0.9, interfaceLanguage: "en", showVietnamese: true }, streak: 7,
@@ -46,6 +50,7 @@ export function normalizeState(candidate: unknown): AppState {
 }
 
 export interface AppRepository { load(): AppState; save(state: AppState): boolean; clear(): void }
+export function hasLocalLearningState() { return typeof window !== "undefined" && Boolean(window.localStorage.getItem(KEY) || window.localStorage.getItem(LEGACY_KEY)); }
 export const localAppRepository: AppRepository = {
   load: () => {
     if (typeof window === "undefined") return createInitialState();

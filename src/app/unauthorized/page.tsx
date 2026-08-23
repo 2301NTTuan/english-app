@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function UnauthorizedPage() { return <div className="grid min-h-[70vh] place-items-center text-center"><div><div className="eyebrow">401</div><h1 className="mt-2 text-3xl font-extrabold">Sign in required</h1><p className="muted mt-2">Your session is missing or has expired.</p><Link className="btn-primary mt-5 inline-flex" href="/login">Go to sign in</Link></div></div>; }

@@ -1,0 +1,2551 @@
+You are now acting as the lead engineer responsible for turning the existing **English Mastery** application into a production-grade English learning platform.
+
+Repository:
+
+`/mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app`
+
+Environment:
+
+* Ubuntu on WSL2
+* Node.js through NVM
+* Existing Next.js + TypeScript application
+* Existing Git repository
+* Existing adaptive learning MVP
+* Existing local-state persistence
+* Existing Placement Test
+* Existing Personalized Learning Path
+* Existing FSRS/adaptive review
+* Existing Grammar/Vocabulary/Expressions architecture
+* Existing content validation
+* Existing automated tests
+
+This is no longer an MVP-only exercise.
+
+Treat this repository as a real product that should eventually be deployable for real users.
+
+Your responsibilities include:
+
+* product architecture
+* backend architecture
+* database design
+* authentication
+* authorization
+* API design
+* learning-engine correctness
+* vocabulary/grammar content architecture
+* security
+* privacy
+* observability
+* testing
+* CI/CD readiness
+* deployment readiness
+* performance
+* accessibility
+* backup/recovery
+* maintainability
+* production documentation
+
+Do NOT blindly rewrite the application.
+
+Audit the current implementation first and preserve good existing systems.
+
+---
+
+# 0. CORE PRODUCT VISION
+
+The application is:
+
+**English Mastery**
+
+A serious adaptive English-learning platform for Vietnamese learners.
+
+Primary learning domains:
+
+* Vocabulary
+* Grammar
+* Idioms
+* Phrasal verbs
+* Collocations
+* Common expressions
+* Mistake correction
+* Adaptive review
+* Personalized learning paths
+
+Supported learning progression:
+
+`A1 → A2 → B1 → B2 → C1 → C2`
+
+The product must eventually support real user accounts, persistent cloud data, multiple devices, production content datasets, reliable adaptive scheduling, and safe data management.
+
+The learner should feel that the application continuously answers:
+
+1. What should I learn?
+2. What should I review?
+3. What am I weak at?
+4. What am I ready to learn next?
+5. When should I review something again?
+6. How much new material should I study today?
+
+---
+
+# 1. DO A COMPLETE REPOSITORY AUDIT FIRST
+
+Before implementing anything, inspect the repository.
+
+Run:
+
+```bash
+cd /mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app
+
+git status
+git log --oneline -10
+git branch --show-current
+git remote -v
+
+find src -maxdepth 5 -type f | sort
+cat package.json
+```
+
+Inspect:
+
+* application routes
+* React/Next.js architecture
+* server/client component boundaries
+* current data models
+* learning engine
+* daily planning
+* FSRS integration
+* mastery calculations
+* mistake bank
+* placement test
+* personalized path
+* exercise generator
+* persistence
+* seed content
+* tests
+* validation scripts
+* settings
+* backup/restore
+* existing documentation
+
+Create an internal architecture assessment before changing code.
+
+Identify:
+
+* systems that are production-worthy already
+* systems that need refactoring
+* systems that are demo-only
+* security risks
+* persistence risks
+* scalability risks
+* data-quality risks
+* missing product capabilities
+
+Do NOT stop after reporting the audit.
+
+Continue implementation.
+
+Do NOT discard existing work.
+
+Never use destructive commands such as:
+
+```bash
+git reset --hard
+git clean -fd
+git restore .
+```
+
+---
+
+# 2. PRODUCTION ARCHITECTURE GOAL
+
+Move the application toward a production architecture conceptually similar to:
+
+```text
+Browser / Mobile Web
+        │
+        ▼
+Next.js Application
+        │
+        ├── Authentication
+        ├── Server Actions / API Layer
+        ├── Authorization
+        ├── Validation
+        │
+        ▼
+Application Services
+        │
+        ├── Learning Engine
+        ├── FSRS Scheduler
+        ├── Placement Engine
+        ├── Learning Path Engine
+        ├── Exercise Engine
+        ├── Content Service
+        └── Analytics/Progress Service
+        │
+        ▼
+Repository/Data Layer
+        │
+        ▼
+PostgreSQL
+```
+
+Static educational content and mutable user data should be properly separated.
+
+Do not allow UI components to directly implement database or learning business logic.
+
+---
+
+# 3. DATABASE
+
+Introduce a production-capable relational database architecture.
+
+Preferred database:
+
+**PostgreSQL**
+
+Choose an appropriate mature TypeScript ORM/query solution compatible with the existing application.
+
+Possible choices include:
+
+* Prisma
+* Drizzle
+
+Choose based on the existing stack and explain the decision.
+
+Do not create unnecessary infrastructure.
+
+The application must support local development without requiring paid services.
+
+---
+
+# 4. DATABASE DOMAINS
+
+Design normalized production models for at least these domains.
+
+## Identity
+
+* User
+* Account if authentication provider requires it
+* Session if required
+* Email verification
+* Password reset token if credentials auth is supported
+
+## User profile
+
+* UserProfile
+* LearningPreferences
+* InterfacePreferences
+
+## Educational content
+
+* Vocabulary
+* VocabularyMeaning
+* VocabularyExample
+* VocabularyRelation
+* WordFamily
+* Collocation
+* Idiom
+* PhrasalVerb
+* CommonExpression
+* GrammarTopic
+* GrammarLesson
+* GrammarPrerequisite
+* GrammarSubtopic
+* ExerciseTemplate
+
+## Learner state
+
+* VocabularyProgress
+* GrammarProgress
+* ExpressionProgress
+* ReviewState
+* Mistake
+* StudySession
+* StudySessionItem
+* PlacementAttempt
+* PlacementAnswer
+* LearningPath
+* LearningPathItem
+
+## Product operations
+
+If useful:
+
+* ContentVersion
+* MigrationRecord
+* AuditLog
+
+Avoid tables that provide no practical value.
+
+---
+
+# 5. DATA INTEGRITY
+
+Use production database constraints.
+
+Examples:
+
+* unique content IDs
+* unique email where applicable
+* foreign keys
+* indexes
+* enum/check constraints where appropriate
+* cascade behavior chosen deliberately
+* timestamps
+* database transactions for multi-step mutations
+
+Prevent orphaned learning progress.
+
+Content IDs referenced by user progress must remain stable.
+
+---
+
+# 6. AUTHENTICATION
+
+Implement production-quality authentication.
+
+Support at minimum:
+
+* Register
+* Login
+* Logout
+* Persistent session
+* Protected application routes
+
+Strongly consider:
+
+* email/password credentials
+* Google login if architecture supports it cleanly
+
+Do not require paid infrastructure for local development.
+
+Passwords must NEVER be stored in plaintext.
+
+Use established secure password hashing.
+
+Do not implement custom cryptography.
+
+---
+
+# 7. ACCOUNT FLOWS
+
+Provide usable flows for:
+
+## Registration
+
+Input:
+
+```text
+name
+email
+password
+password confirmation
+```
+
+Validation:
+
+* valid email
+* password policy
+* duplicate account prevention
+* normalized email
+* matching passwords
+
+Output:
+
+* account created
+* session established or verification required
+* clear user-safe response
+
+## Login
+
+Input:
+
+```text
+email
+password
+```
+
+Output:
+
+* authenticated session
+* redirect into app
+* generic error for invalid credentials
+
+Do not leak whether a specific email exists where that would be inappropriate.
+
+## Logout
+
+Invalidate/end session correctly.
+
+## Password reset
+
+Design and implement if appropriate for the selected authentication stack.
+
+At minimum make architecture ready for it.
+
+---
+
+# 8. AUTHORIZATION
+
+Authentication and authorization are separate concerns.
+
+Protect user-owned resources.
+
+User A must never be able to access:
+
+* User B progress
+* User B mistakes
+* User B sessions
+* User B placement results
+* User B preferences
+
+Never trust user IDs supplied by the browser when identity can be derived from the authenticated session.
+
+Add authorization tests.
+
+---
+
+# 9. ROUTE PROTECTION
+
+Public routes may include:
+
+```text
+/
+login
+register
+about
+privacy
+terms
+```
+
+Authenticated routes should include learning features such as:
+
+```text
+dashboard
+learn
+vocabulary
+grammar
+expressions
+review
+mistakes
+progress
+settings
+placement
+learning-path
+```
+
+Implement appropriate middleware/server authorization.
+
+Do not rely only on hiding navigation links.
+
+---
+
+# 10. FIRST-TIME USER FLOW
+
+A production onboarding flow should approximately be:
+
+```text
+Register
+   ↓
+Welcome / onboarding
+   ↓
+Choose language preferences
+   ↓
+Choose goal
+   ↓
+Placement Test
+   OR
+Choose starting level
+   ↓
+Initial Learning Path
+   ↓
+Dashboard
+```
+
+Allow placement test to be skipped.
+
+---
+
+# 11. USER SETTINGS
+
+Persist settings in the database.
+
+Support useful options such as:
+
+```text
+dailyStudyTarget
+maxNewWordsPerDay
+maxNewGrammarPerDay
+desiredRetention
+showVietnameseTranslation
+interfaceLanguage
+selectedLevel
+studyIntensity
+```
+
+Changing these settings must influence future daily plans.
+
+---
+
+# 12. ADAPTIVE LEARNING ENGINE
+
+Preserve and strengthen the existing learning engine.
+
+Priority should approximately remain:
+
+```text
+1. Overdue reviews
+2. Due reviews
+3. Relearning after mistakes
+4. Recurring weak knowledge
+5. Learning-path priorities
+6. New vocabulary
+7. New grammar
+8. Mixed practice
+```
+
+The daily planner must account for:
+
+* daily target
+* review backlog
+* overdue count
+* mastery
+* mistakes
+* FSRS scheduling
+* learning path
+* CEFR
+* frequency
+* prerequisites
+
+Do not force a fixed number of new words every day.
+
+---
+
+# 13. DAILY PLAN INPUT/OUTPUT CONTRACT
+
+Create a clear domain contract.
+
+Example input concept:
+
+```ts
+interface DailyPlanInput {
+  userId: string
+  date: Date
+
+  dailyTarget: number
+  maxNewVocabulary: number
+  maxNewGrammar: number
+
+  dueReviews: ReviewCandidate[]
+  weaknesses: WeaknessCandidate[]
+  mistakes: MistakeCandidate[]
+  pathCandidates: LearningPathCandidate[]
+}
+```
+
+Example output:
+
+```ts
+interface DailyPlan {
+  date: Date
+  estimatedMinutes: number
+
+  reviewItems: StudyItem[]
+  weaknessItems: StudyItem[]
+  mistakeItems: StudyItem[]
+  newVocabulary: StudyItem[]
+  newGrammar: StudyItem[]
+
+  totalItems: number
+}
+```
+
+Adapt to the existing model rather than duplicating concepts.
+
+---
+
+# 14. DAILY PLAN TEST CASES
+
+Implement automated tests including scenarios similar to:
+
+## Case A
+
+Input:
+
+```text
+daily target = 25
+due reviews = 5
+max new vocabulary = 10
+```
+
+Expected:
+
+* due items prioritized
+* new vocabulary may be near maximum
+* total workload reasonable
+
+## Case B
+
+```text
+daily target = 25
+due reviews = 20
+```
+
+Expected:
+
+* substantially fewer new items
+
+## Case C
+
+```text
+daily target = 25
+due reviews = 32
+```
+
+Expected:
+
+* review dominates
+* potentially zero new material
+
+## Case D
+
+Repeated mistakes exist.
+
+Expected:
+
+* relearning receives high priority
+
+## Case E
+
+A grammar prerequisite is incomplete.
+
+Expected:
+
+* dependent grammar topic is not introduced
+
+---
+
+# 15. FSRS
+
+Use a proper FSRS implementation/adapter.
+
+Maintain separation:
+
+```text
+Learning Path
+= WHAT new knowledge is appropriate
+
+FSRS
+= WHEN learned knowledge returns
+
+Daily Planner
+= WHAT appears TODAY
+```
+
+Never hardcode review intervals when FSRS provides scheduling.
+
+Persist FSRS state transactionally.
+
+---
+
+# 16. REVIEW TEST CASES
+
+Test:
+
+* Again schedules appropriately
+* Hard differs from Good
+* Good differs from Easy
+* repeated lapse changes state
+* due dates persist correctly
+* reviews survive logout/login
+* reviews survive different browser/device sessions
+* invalid duplicate review submission is handled safely
+
+---
+
+# 17. VOCABULARY PRODUCTION DATASET
+
+The long-term vocabulary target should be approximately:
+
+```text
+5,000–8,000 high-quality headwords
+```
+
+Suggested distribution:
+
+```text
+A1      ~700
+A2      ~900
+B1    ~1,200
+B2    ~1,400
+C1    ~1,200
+C2      ~800
+```
+
+These are target ranges, not rigid quotas.
+
+---
+
+# 18. VOCABULARY DATA QUALITY
+
+A production vocabulary record should support useful metadata including:
+
+```text
+word
+lemma
+part of speech
+CEFR
+frequency/commonness
+English definition
+Vietnamese meaning
+IPA
+examples
+topics
+synonyms
+antonyms
+word family
+collocations
+usage notes
+register
+```
+
+Not every optional field must exist for every word.
+
+Do not populate nonsense metadata simply to fill fields.
+
+---
+
+# 19. VOCABULARY SOURCES AND LICENSING
+
+A production application must not rely on randomly AI-generated dictionaries alone.
+
+Research and design a legitimate content sourcing strategy.
+
+For every external vocabulary/lexical source considered:
+
+* identify its license
+* determine whether redistribution is allowed
+* record attribution requirements
+* document the source
+* avoid incompatible proprietary datasets
+
+Do NOT copy commercial vocabulary lists or dictionary definitions without appropriate rights.
+
+Prefer:
+
+* permissively licensed lexical datasets
+* public/open educational resources
+* internally authored enrichment
+* clearly documented data provenance
+
+If external data cannot safely be redistributed, do not copy it into the repository.
+
+Create:
+
+```text
+docs/content-sources.md
+```
+
+documenting content provenance and licensing.
+
+---
+
+# 20. CONTENT INGESTION PIPELINE
+
+Do not manually maintain thousands of records in giant source files.
+
+Create a production content pipeline:
+
+```text
+Source
+  ↓
+Import
+  ↓
+Normalize
+  ↓
+Validate
+  ↓
+Deduplicate
+  ↓
+Enrich
+  ↓
+Database/content package
+```
+
+Provide scripts for importing valid content.
+
+Never require hand-editing 6,000 TypeScript objects.
+
+---
+
+# 21. CONTENT VALIDATOR
+
+Expand:
+
+```bash
+npm run validate:content
+```
+
+to catch:
+
+* duplicate IDs
+* malformed CEFR
+* duplicate headwords/senses
+* missing definitions
+* malformed examples
+* broken relations
+* synonym self-reference
+* antonym self-reference
+* synonym/antonym contradictions
+* invalid grammar prerequisites
+* invalid exercise references
+* bad content relationships
+* unstable IDs
+
+Validation must fail with useful diagnostics.
+
+---
+
+# 22. VOCABULARY SEARCH
+
+Production vocabulary search should support:
+
+* headword
+* English meaning
+* Vietnamese meaning
+* topic
+* synonym
+* antonym
+* collocation
+
+Support pagination.
+
+Do not render thousands of records simultaneously.
+
+Add appropriate database indexes.
+
+---
+
+# 23. GRAMMAR PRODUCTION CONTENT
+
+The existing curriculum contains approximately 138 topics.
+
+Do not increase topic count merely to look impressive.
+
+The important goal is:
+
+```text
+100–130 high-quality detailed lessons
+```
+
+covering:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+---
+
+# 24. DETAILED GRAMMAR LESSON STANDARD
+
+A production lesson should contain relevant sections such as:
+
+```text
+overview
+English explanation
+Vietnamese explanation
+usage
+formula
+positive
+negative
+question
+examples
+common mistakes
+related structures
+contrast
+subtopics
+practice
+review questions
+```
+
+Examples must be natural English.
+
+Avoid superficial content.
+
+---
+
+# 25. GRAMMAR CONTENT QUALITY TESTS
+
+Create validation ensuring:
+
+* prerequisite references exist
+* topic IDs are stable
+* no circular dependency exists unless explicitly supported
+* lesson level matches curriculum topic
+* required explanation exists
+* exercise answers reference valid content
+
+Add cycle detection for grammar prerequisites.
+
+---
+
+# 26. EXPRESSIONS
+
+Production targets may eventually include:
+
+```text
+Idioms             300–500
+Phrasal verbs      300–500
+Collocations       1,000+
+Common expressions hundreds where useful
+```
+
+Again, prioritize quality.
+
+Use common modern English before obscure expressions.
+
+---
+
+# 27. EXERCISE ENGINE
+
+Treat the Exercise Engine as a major product subsystem.
+
+Support vocabulary:
+
+* recognition
+* recall
+* definition
+* Vietnamese ↔ English
+* context
+* fill blank
+* synonym
+* antonym
+* word family
+* collocation
+
+Support grammar:
+
+* multiple choice
+* fill blank
+* tense contrast
+* error correction
+* sentence building
+* sentence transformation
+* rewrite
+* translation
+* grammar contrast
+
+---
+
+# 28. EXERCISE INPUT/OUTPUT CONTRACT
+
+Define clear types.
+
+Conceptually:
+
+```ts
+interface ExerciseGenerationInput {
+  userId: string
+  knowledgeId: string
+  knowledgeType: string
+
+  targetDimension?: string
+  difficulty: number
+
+  recentExercises?: string[]
+}
+```
+
+Output:
+
+```ts
+interface GeneratedExercise {
+  id: string
+  type: ExerciseType
+  prompt: string
+
+  choices?: string[]
+
+  correctAnswer: string | string[]
+
+  explanation: string
+
+  knowledgeId: string
+  masteryDimension: string
+
+  difficulty: number
+}
+```
+
+Adapt to current architecture.
+
+---
+
+# 29. EXERCISE QUALITY RULES
+
+Generated exercises must:
+
+* have one defensible best answer
+* avoid duplicate choices
+* avoid multiple correct answers
+* avoid absurd distractors
+* use grammatically compatible distractors
+* use semantically plausible distractors
+* not reveal answer through formatting
+* have explanations where appropriate
+
+If a safe question cannot be generated, skip it.
+
+---
+
+# 30. EXERCISE TEST CASES
+
+Test:
+
+* four unique options
+* exactly one correct answer
+* answer is included
+* synonym does not accidentally create multiple answers
+* correct answer is never duplicated
+* same question is not repeated excessively
+* weak mastery dimension produces corresponding exercise type
+* difficult vocabulary gets harder context questions
+
+Use deterministic random seeding in tests where randomness exists.
+
+---
+
+# 31. PLACEMENT TEST
+
+Productionize the existing Placement Test.
+
+It should evaluate:
+
+* vocabulary
+* grammar
+* context
+
+Keep adaptive A1–C2 behavior.
+
+Do not claim formal CEFR certification.
+
+Use wording:
+
+```text
+Estimated learning level
+```
+
+---
+
+# 32. PLACEMENT TEST QUALITY
+
+Expand the question pool substantially enough that retakes are meaningful.
+
+Design toward at least:
+
+```text
+100+ validated placement questions
+```
+
+with balanced coverage.
+
+Do not require all 100 questions in one test.
+
+Actual test length should remain bounded/adaptive.
+
+---
+
+# 33. PLACEMENT TEST CASES
+
+Test simulated profiles:
+
+### Beginner profile
+
+Mostly A1 correct, A2 weak.
+
+Expected estimate:
+
+```text
+A1/A2 region
+```
+
+### Intermediate profile
+
+Strong A2/B1, weaker B2.
+
+Expected:
+
+```text
+B1 region
+```
+
+### Advanced profile
+
+Strong B2/C1.
+
+Expected:
+
+```text
+B2/C1 region
+```
+
+Also test random guessing to prevent unrealistically high estimates.
+
+---
+
+# 34. PERSONALIZED LEARNING PATH
+
+Productionize the path engine.
+
+Inputs should include:
+
+* placement diagnostics
+* vocabulary mastery
+* grammar mastery
+* prerequisites
+* FSRS state
+* mistake frequency
+* CEFR
+* frequency
+* exposure history
+* study settings
+
+Path output should be explainable.
+
+Example:
+
+```text
+Recommended:
+Present Perfect vs Past Simple
+
+Reason:
+- placement weakness
+- prerequisite mastered
+- repeated mistakes
+```
+
+Avoid black-box recommendations.
+
+---
+
+# 35. LEARNING PATH TESTS
+
+Test:
+
+* weak prerequisite blocks advanced topic
+* mastered topic drops priority
+* recurring mistakes increase priority
+* due reviews do not incorrectly become "new learning"
+* B1 learner is not flooded with C2 vocabulary
+* frequency influences vocabulary recommendation
+
+---
+
+# 36. MISTAKE BANK
+
+Maintain a production-quality mistake model.
+
+Track:
+
+```text
+knowledge
+subtopic
+exercise type
+user answer
+correct answer
+timestamp
+repeat count
+resolved status
+```
+
+Repeated mistakes should meaningfully affect future sessions.
+
+Do not store unnecessary sensitive data.
+
+---
+
+# 37. STUDY SESSION TRANSACTIONS
+
+Study-session completion may update:
+
+* mastery
+* FSRS
+* mistakes
+* session history
+* streak
+* learning path
+
+Ensure multi-step updates cannot leave inconsistent state.
+
+Use database transactions where appropriate.
+
+---
+
+# 38. STREAK LOGIC
+
+Define streak behavior clearly.
+
+Test:
+
+* one study day
+* consecutive days
+* missed day
+* same-day multiple sessions
+* timezone boundaries
+
+Use explicit user/application timezone behavior.
+
+Do not accidentally increment streak for every session.
+
+---
+
+# 39. API VALIDATION
+
+Validate all user-controlled input.
+
+Use an established schema validation solution already present or appropriate for TypeScript.
+
+Validate:
+
+* API payloads
+* form input
+* URL params
+* query params
+* import files
+* backup restore data
+
+Never trust client-side validation alone.
+
+---
+
+# 40. SECURITY
+
+Perform a production security review.
+
+Address:
+
+* authentication
+* authorization
+* session security
+* password storage
+* CSRF where applicable
+* XSS
+* SQL injection
+* open redirects
+* mass assignment
+* user-owned resource access
+* rate limiting
+* secret management
+* environment variables
+* sensitive logging
+* backup upload validation
+
+Do not implement homemade crypto.
+
+---
+
+# 41. RATE LIMITING
+
+Add reasonable protection to sensitive endpoints such as:
+
+* login
+* register
+* password reset
+* placement submission if abuse matters
+* expensive APIs
+
+Design for local development and production deployment.
+
+Do not overcomplicate.
+
+---
+
+# 42. ENVIRONMENT VARIABLES
+
+Create/update:
+
+```text
+.env.example
+```
+
+It may contain names such as:
+
+```text
+DATABASE_URL=
+AUTH_SECRET=
+APP_URL=
+```
+
+plus provider-specific settings if required.
+
+Never commit real secrets.
+
+Validate required production configuration at startup.
+
+---
+
+# 43. PRIVACY
+
+Create production-ready placeholders/pages for:
+
+* Privacy Policy
+* Terms of Service
+
+Do not fabricate legal guarantees.
+
+Clearly document what personal learning data the application stores.
+
+Support account deletion architecture.
+
+---
+
+# 44. ACCOUNT DATA DELETION
+
+Implement or architect:
+
+```text
+Delete account
+```
+
+with safe handling of user-owned data.
+
+Require appropriate confirmation.
+
+Prevent accidental one-click deletion.
+
+Add test coverage.
+
+---
+
+# 45. BACKUP / RESTORE
+
+The existing JSON backup/restore feature should be reviewed.
+
+For authenticated production users, determine whether it remains useful.
+
+If retained:
+
+* validate schema
+* validate ownership
+* limit file size
+* reject malformed payloads
+* protect against prototype pollution/untrusted input
+* version backup format
+
+Never blindly deserialize arbitrary objects into application state.
+
+---
+
+# 46. DATABASE MIGRATIONS
+
+Set up proper database migrations.
+
+Production schema changes must be reproducible.
+
+Document:
+
+```bash
+development migration
+production migration
+database setup
+database reset for local development
+```
+
+Never rely on manually editing production tables.
+
+---
+
+# 47. SEEDING
+
+Create deterministic development seed data.
+
+Seed:
+
+* representative vocabulary
+* grammar
+* expressions
+* test account only where safe and documented
+
+Do not seed real credentials into production.
+
+Production educational content loading should be separate from random development fixtures where appropriate.
+
+---
+
+# 48. ADMIN / CONTENT MANAGEMENT
+
+Design a minimal content-management strategy.
+
+A production system eventually needs controlled ability to:
+
+* import content
+* validate content
+* publish content
+* update content
+* version content
+
+Do NOT build a massive admin CMS unless necessary.
+
+A CLI/import pipeline is acceptable initially.
+
+---
+
+# 49. CONTENT VERSIONING
+
+Educational content will evolve while user progress references it.
+
+Design content versioning so that:
+
+* IDs remain stable
+* progress does not disappear
+* deleted content is handled gracefully
+* corrections can be deployed safely
+
+---
+
+# 50. OBSERVABILITY
+
+Production software needs visibility.
+
+Introduce reasonable structured logging.
+
+Log useful operational events such as:
+
+* application errors
+* database failures
+* authentication failures without passwords
+* content validation failures
+* unexpected learning-engine exceptions
+
+Never log:
+
+* passwords
+* authentication secrets
+* session tokens
+* sensitive user data unnecessarily
+
+---
+
+# 51. ERROR HANDLING
+
+Implement production error boundaries/pages.
+
+Handle:
+
+* 404
+* unauthorized
+* forbidden
+* database unavailable
+* unexpected application error
+
+Do not expose stack traces or internal secrets to end users in production.
+
+---
+
+# 52. HEALTH CHECK
+
+Add a health endpoint suitable for deployment.
+
+For example conceptually:
+
+```text
+/api/health
+```
+
+Return minimal status.
+
+Optionally validate database connectivity.
+
+Do not expose sensitive system details.
+
+---
+
+# 53. PERFORMANCE
+
+Set production performance expectations.
+
+Investigate:
+
+* bundle size
+* large vocabulary data hydration
+* server/client boundaries
+* database query count
+* pagination
+* indexes
+* N+1 queries
+* unnecessary rerenders
+* cache opportunities
+
+Avoid loading thousands of vocabulary records into the browser unnecessarily.
+
+---
+
+# 54. DATABASE INDEXES
+
+At minimum consider indexes for common operations such as:
+
+```text
+vocabulary word
+CEFR
+frequency
+topic relationships
+user progress by user/content
+review due date
+mistakes by user/knowledge
+study sessions by user/date
+```
+
+Use query patterns to decide indexes rather than adding arbitrary indexes.
+
+---
+
+# 55. ACCESSIBILITY
+
+Production UX must support:
+
+* semantic HTML
+* keyboard navigation
+* visible focus
+* accessible forms
+* button names
+* labels
+* contrast
+* meaningful errors
+* appropriate ARIA where necessary
+
+Do not use ARIA to replace correct semantic HTML.
+
+---
+
+# 56. RESPONSIVE DESIGN
+
+Validate major flows at:
+
+* desktop
+* tablet
+* mobile
+
+At minimum:
+
+```text
+login
+register
+dashboard
+placement
+daily session
+vocabulary
+grammar
+mistakes
+progress
+settings
+```
+
+---
+
+# 57. TEST PYRAMID
+
+Use multiple layers of testing.
+
+## Unit tests
+
+For:
+
+* planning algorithms
+* FSRS adapters
+* mastery
+* prerequisite graph
+* placement scoring
+* learning path
+* exercise generation
+* validators
+
+## Integration tests
+
+For:
+
+* authentication
+* database persistence
+* session submission
+* progress update
+* account ownership
+* placement persistence
+
+## End-to-end / browser smoke tests
+
+Where practical, cover key production flows.
+
+Avoid writing thousands of meaningless tests.
+
+---
+
+# 58. CRITICAL E2E USER FLOW
+
+Create an automated or clearly reproducible test for:
+
+```text
+Register
+   ↓
+Login
+   ↓
+Complete onboarding
+   ↓
+Take placement test
+   ↓
+Receive learning path
+   ↓
+Start daily session
+   ↓
+Answer correct + incorrect
+   ↓
+Mistake created
+   ↓
+Mastery updated
+   ↓
+Review scheduled
+   ↓
+Progress updated
+   ↓
+Logout
+   ↓
+Login again
+   ↓
+Progress still exists
+```
+
+This is a critical production acceptance flow.
+
+---
+
+# 59. AUTH TEST CASES
+
+At minimum test:
+
+```text
+valid registration
+duplicate registration
+invalid email
+weak/invalid password
+valid login
+wrong password
+protected route unauthenticated
+protected route authenticated
+logout
+cross-user access denial
+```
+
+---
+
+# 60. DATABASE TEST CASES
+
+Test:
+
+* constraints
+* ownership
+* cascading behavior
+* transaction rollback
+* unique records
+* migration from clean database
+* idempotent seed behavior where appropriate
+
+---
+
+# 61. FAILURE TESTS
+
+Production validation must test unhappy paths.
+
+Examples:
+
+```text
+database unavailable
+malformed backup
+invalid placement submission
+missing vocabulary ID
+deleted content referenced by old progress
+duplicate review request
+invalid session input
+expired authentication
+```
+
+The application should fail safely.
+
+---
+
+# 62. CONCURRENCY / IDEMPOTENCY
+
+Review operations where accidental duplicate submission matters.
+
+Examples:
+
+* study session completion
+* FSRS review submission
+* placement completion
+* account creation
+
+Prevent double-click/network retry from corrupting progress.
+
+Use idempotent semantics where appropriate.
+
+---
+
+# 63. CI PIPELINE
+
+Create a production CI workflow suitable for the Git host if appropriate.
+
+At minimum CI should run:
+
+```bash
+npm ci
+npm run validate:content
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Add database/integration test setup if feasible.
+
+Do not require production secrets during ordinary validation.
+
+---
+
+# 64. PACKAGE SCRIPTS
+
+Provide useful scripts where appropriate, for example:
+
+```text
+dev
+build
+start
+lint
+typecheck
+test
+test:integration
+test:e2e
+validate:content
+db:migrate
+db:seed
+```
+
+Names may differ based on selected tooling.
+
+Document them.
+
+---
+
+# 65. DEPENDENCY SECURITY
+
+Review dependencies.
+
+Run non-destructive security inspection where appropriate.
+
+Do NOT blindly run:
+
+```bash
+npm audit fix --force
+```
+
+Do not introduce breaking dependency upgrades merely to silence low-risk warnings.
+
+Report unresolved material dependency risks.
+
+---
+
+# 66. PRODUCTION BUILD
+
+The final application must pass:
+
+```bash
+npm run validate:content
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Plus any integration/e2e suites introduced.
+
+Do not mark PASS if a command actually failed.
+
+---
+
+# 67. RUNTIME VALIDATION
+
+Run the application and verify major routes.
+
+At minimum validate:
+
+```text
+/
+login
+register
+dashboard
+placement
+learning path
+daily session
+vocabulary
+grammar
+expressions
+review
+mistakes
+progress
+settings
+privacy
+terms
+health
+```
+
+Authenticated routes must behave correctly both authenticated and unauthenticated.
+
+---
+
+# 68. INPUT / OUTPUT ACCEPTANCE MATRIX
+
+Create:
+
+```text
+docs/acceptance-tests.md
+```
+
+Document important functional contracts.
+
+Example:
+
+| Feature        | Input                   | Expected output       |
+| -------------- | ----------------------- | --------------------- |
+| Register       | valid email/password    | account created       |
+| Register       | duplicate email         | safe validation error |
+| Login          | correct credentials     | authenticated session |
+| Login          | incorrect credentials   | generic failure       |
+| Daily planner  | heavy backlog           | few/no new items      |
+| Grammar path   | prerequisite incomplete | topic locked          |
+| Review         | Again                   | earlier review        |
+| Placement      | intermediate answers    | B1-like estimate      |
+| Session answer | incorrect               | mistake + relearning  |
+| Delete account | confirmed user          | user data removed     |
+
+Expand this meaningfully.
+
+---
+
+# 69. QUALITY SCORECARD
+
+At the end assess the system in these categories on a 0–5 scale:
+
+```text
+Architecture
+Authentication
+Authorization
+Security
+Database integrity
+Learning engine
+FSRS/review correctness
+Content architecture
+Content quality
+Placement test
+Personalization
+Exercise engine
+Testing
+Accessibility
+Performance
+Observability
+Deployment readiness
+Documentation
+```
+
+For any score below 4:
+
+* explain why
+* identify what remains
+
+Do not inflate scores.
+
+---
+
+# 70. PRODUCTION READINESS GATES
+
+Do not call the application production-ready unless ALL critical gates pass.
+
+Critical gates:
+
+```text
+Authentication works
+Authorization works
+Database migrations work
+No plaintext passwords
+No committed secrets
+Cross-user isolation tested
+Learning progress persists
+Review scheduling persists
+Critical user flow passes
+Content validation passes
+Typecheck passes
+Tests pass
+Production build passes
+Health check works
+Environment configuration documented
+```
+
+If one gate fails, call the application:
+
+```text
+Production-oriented but NOT production-ready
+```
+
+Be explicit.
+
+---
+
+# 71. DEPLOYMENT READINESS
+
+Prepare the app so it can later be deployed using a normal production environment.
+
+Document:
+
+* required environment variables
+* PostgreSQL requirement
+* migration command
+* build command
+* start command
+* health endpoint
+* initial content import/seed process
+
+Do not lock architecture to one hosting provider unless already required.
+
+---
+
+# 72. DO NOT DEPLOY OR PURCHASE SERVICES
+
+Do not:
+
+* purchase services
+* create paid infrastructure
+* publish production secrets
+* register domains
+* deploy publicly without explicit instruction
+
+Prepare for deployment only.
+
+Local development must remain functional.
+
+---
+
+# 73. LOCAL DEVELOPMENT EXPERIENCE
+
+A new developer should eventually be able to follow README instructions approximately like:
+
+```bash
+git clone ...
+npm install
+configure .env
+start PostgreSQL
+run migrations
+load content/seed
+npm run dev
+```
+
+Adapt to actual architecture.
+
+---
+
+# 74. README
+
+Rewrite/update README into production-quality developer documentation.
+
+Include:
+
+* product overview
+* architecture
+* prerequisites
+* installation
+* environment variables
+* database setup
+* migrations
+* content loading
+* development commands
+* tests
+* content validation
+* authentication
+* learning engine
+* placement
+* learning path
+* deployment preparation
+* troubleshooting
+
+---
+
+# 75. ARCHITECTURE DOCUMENTATION
+
+Create:
+
+```text
+docs/architecture.md
+```
+
+Document:
+
+```text
+Frontend
+Backend
+Database
+Authentication
+Learning Engine
+FSRS
+Content Pipeline
+Exercise Engine
+Persistence
+Security boundaries
+```
+
+Use diagrams in Markdown where useful.
+
+---
+
+# 76. DATABASE DOCUMENTATION
+
+Create:
+
+```text
+docs/database.md
+```
+
+Document important entities and relationships.
+
+Explain which data is:
+
+```text
+global educational content
+```
+
+versus:
+
+```text
+user-owned learning state
+```
+
+---
+
+# 77. SECURITY DOCUMENTATION
+
+Create:
+
+```text
+docs/security.md
+```
+
+Document:
+
+* authentication
+* authorization
+* password handling
+* secret handling
+* user data access
+* rate limits
+* known security limitations
+
+Do not make exaggerated security claims.
+
+---
+
+# 78. TEST REPORT
+
+Create or update:
+
+```text
+docs/test-report.md
+```
+
+Include:
+
+* test suites
+* scenarios
+* inputs
+* outputs
+* pass/fail
+* known gaps
+
+Include the critical production user-flow result.
+
+---
+
+# 79. CONTENT ROADMAP
+
+If the full 5,000–8,000 vocabulary dataset and 100+ detailed grammar lessons cannot be completed with verified quality during this development run, do NOT fake completion.
+
+Create:
+
+```text
+docs/content-roadmap.md
+```
+
+showing:
+
+```text
+current count
+production target
+available licensed sources
+remaining work
+validation approach
+```
+
+Infrastructure and data quality are more important than fabricated content counts.
+
+---
+
+# 80. IMPLEMENTATION PRIORITY
+
+This is a large production program.
+
+Prioritize in this order:
+
+```text
+1. Architecture audit
+2. Database architecture
+3. Authentication
+4. Authorization
+5. User data persistence
+6. Migrate existing local learning state architecture
+7. Core learning flow with database
+8. Security
+9. Integration tests
+10. Placement persistence
+11. Personalized learning path persistence
+12. Content pipeline
+13. Production vocabulary/grammar strategy
+14. Exercise quality
+15. Performance
+16. Accessibility
+17. Observability
+18. CI
+19. Documentation
+20. Additional content volume
+```
+
+Do not spend the whole run generating vocabulary before the production foundation exists.
+
+---
+
+# 81. MIGRATION FROM CURRENT LOCAL STORAGE
+
+The current app has local state.
+
+Do not simply remove it and destroy existing user progress.
+
+Design a migration/import path.
+
+Possible flow:
+
+```text
+Existing local state
+       ↓
+Authenticated user
+       ↓
+Import legacy progress
+       ↓
+Validate schema
+       ↓
+Persist to database
+       ↓
+Mark migration complete
+```
+
+Do not automatically import data into the wrong account.
+
+Provide explicit user confirmation where appropriate.
+
+---
+
+# 82. DEVELOPMENT DATABASE
+
+Set up a practical local development database strategy.
+
+If local PostgreSQL is unavailable, document or configure a developer-friendly option such as Docker if appropriate.
+
+Do not assume Docker exists without checking.
+
+If infrastructure setup requires manual sudo/password interaction, explain the exact action required.
+
+Routine coding and validation commands should be executed autonomously whenever possible.
+
+---
+
+# 83. NO SILENT BREAKING CHANGES
+
+If major architecture migration is necessary:
+
+* introduce it incrementally
+* preserve working routes where possible
+* write migration tests
+* validate after each major stage
+
+Do not perform a massive rewrite and only test at the end.
+
+---
+
+# 84. CHECKPOINT VALIDATION
+
+After each major production subsystem, run targeted validation.
+
+Examples:
+
+```text
+Database migration
+→ database tests
+
+Authentication
+→ auth integration tests
+
+Learning persistence
+→ learning tests
+
+Content migration
+→ content validator
+
+Final system
+→ complete suite
+```
+
+Fix issues before continuing.
+
+---
+
+# 85. GIT DISCIPLINE
+
+Before work:
+
+```bash
+git status
+```
+
+During major implementation stages, inspect diffs.
+
+Do not commit:
+
+```text
+node_modules
+.next
+coverage output
+logs
+real .env
+secrets
+database dumps containing credentials
+temporary files
+```
+
+Maintain `.gitignore`.
+
+---
+
+# 86. FINAL GIT REVIEW
+
+After all feasible implementation and validation:
+
+```bash
+git status
+git diff --stat
+git diff
+```
+
+Review all changes.
+
+Then:
+
+```bash
+git add -A
+git diff --cached --stat
+git diff --cached
+```
+
+Ensure only legitimate production changes are staged.
+
+---
+
+# 87. COMMIT
+
+If the implementation is coherent and validation is successful, create one production-development commit.
+
+Suggested commit message:
+
+```bash
+git commit -m "Build production foundation for English Mastery"
+```
+
+If another message better reflects actual implemented scope, use it.
+
+Do NOT push.
+
+I will push manually.
+
+---
+
+# 88. FINAL REPORT
+
+Produce a rigorous final report.
+
+Use these sections:
+
+## Production Architecture
+
+Describe the final architecture.
+
+## Authentication
+
+Report:
+
+```text
+registration
+login
+logout
+password handling
+route protection
+authorization
+```
+
+## Database
+
+Report:
+
+```text
+database technology
+ORM
+migration count
+core tables/models
+important indexes
+transactions
+```
+
+## Learning System
+
+Report:
+
+```text
+daily planner
+FSRS
+mastery
+mistake bank
+placement
+learning path
+exercise engine
+```
+
+## Content
+
+Report actual counts:
+
+```text
+Vocabulary:
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+
+Grammar topics:
+Detailed grammar lessons:
+
+Idioms:
+Phrasal verbs:
+Collocations:
+Common expressions:
+```
+
+Report data sources/licensing.
+
+## Security
+
+Report:
+
+```text
+authentication
+authorization
+password storage
+rate limiting
+input validation
+secret handling
+cross-user isolation
+known limitations
+```
+
+## Tests
+
+Report:
+
+```text
+unit tests
+integration tests
+E2E tests
+content validation
+total test count
+```
+
+## Validation
+
+Report exactly:
+
+```text
+npm run validate:content:
+npm run lint:
+npm run typecheck:
+npm test:
+integration tests:
+E2E/smoke tests:
+npm run build:
+runtime:
+```
+
+Use only:
+
+```text
+PASS
+FAIL
+NOT AVAILABLE
+```
+
+## Performance
+
+Report:
+
+* pagination
+* database query strategy
+* indexes
+* bundle/data loading improvements
+
+## Accessibility
+
+Report validation completed and remaining gaps.
+
+## Production Readiness Gates
+
+Show every critical gate as:
+
+```text
+PASS
+FAIL
+```
+
+## Quality Scorecard
+
+Score 0–5:
+
+```text
+Architecture:
+Authentication:
+Authorization:
+Security:
+Database integrity:
+Learning engine:
+FSRS:
+Content architecture:
+Content quality:
+Placement:
+Personalization:
+Exercise engine:
+Testing:
+Accessibility:
+Performance:
+Observability:
+Deployment readiness:
+Documentation:
+```
+
+Do not inflate ratings.
+
+## Known Limitations
+
+Be explicit.
+
+## Git
+
+Report:
+
+```text
+branch
+latest commit
+working tree
+remote
+upstream
+```
+
+Do NOT push.
+
+If upstream exists, finish by telling me to run:
+
+```bash
+git push
+```
+
+---
+
+# 89. DEFINITION OF DONE
+
+This development phase is successful only if there is a verified production foundation.
+
+It is NOT enough to:
+
+* create login UI without real authentication
+* create database models without migrations
+* create APIs without authorization
+* generate thousands of vocabulary rows without validation
+* add tests that do not exercise real behavior
+* claim production readiness because build passes
+
+A production foundation requires real integration between:
+
+```text
+User
+   ↓
+Authentication
+   ↓
+Database
+   ↓
+Learning State
+   ↓
+Learning Engine
+   ↓
+Study Session
+   ↓
+Progress
+```
+
+with automated verification.
+
+---
+
+# 90. EXECUTION INSTRUCTION
+
+Do not only provide a plan.
+
+Work autonomously through the repository.
+
+Execute normal development commands yourself.
+
+Do not ask me to manually run routine commands such as:
+
+```bash
+npm install
+npm run lint
+npm test
+npm run build
+git status
+git diff
+```
+
+Only request my intervention when genuinely required, for example:
+
+* sudo password
+* Windows UAC
+* browser authentication to an external provider
+* credentials/secrets that you cannot safely invent
+* destructive or externally visible action requiring explicit authorization
+
+If a third-party service would be needed, keep the implementation configurable and use local development alternatives where possible.
+
+Do not purchase, deploy, push, or expose anything publicly.
+
+Start with a complete audit of the current repository, then proceed with production architecture implementation.

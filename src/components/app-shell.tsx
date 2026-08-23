@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BarChart3, BookMarked, BookOpen, Brain, ClipboardCheck, Gauge, GraduationCap, LibraryBig, Map, Menu, Settings, Sparkles, TestTube2, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { BarChart3, BookMarked, BookOpen, Brain, ClipboardCheck, Gauge, GraduationCap, LibraryBig, LogOut, Map, Menu, Settings, Sparkles, TestTube2, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAppState } from "@/components/app-provider";
 import { calculateStreak } from "@/lib/learning/streak";
@@ -16,12 +16,13 @@ const navigation = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname(); const [open, setOpen] = useState(false); const { state } = useAppState();
+  const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const { state, syncStatus } = useAppState();
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, []);
+  if (["/login", "/register", "/privacy", "/terms"].includes(pathname)) return <main id="main-content">{children}</main>;
   const levelVocabularyIds = new Set(vocabulary.filter((item) => item.cefrLevel === state.settings.currentLevel).map((item) => item.id));
   const levelGrammarIds = new Set(grammarTopics.filter((item) => item.level === state.settings.currentLevel).map((item) => item.id));
   const levelScores = [...state.vocabularyProgress.filter((item) => levelVocabularyIds.has(item.itemId)).map((item) => item.mastery.overall), ...state.grammarProgress.filter((item) => levelGrammarIds.has(item.topicId)).map((item) => item.mastery)];
   const levelProgress = levelScores.length ? Math.round(levelScores.reduce((sum, value) => sum + value, 0) / levelScores.length) : 0;
-  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, []);
   return <div className="min-h-screen lg:grid lg:grid-cols-[238px_1fr]">
     <a href="#main-content" className="skip-link">Skip to main content</a>
     <aside aria-label="Application navigation" className={`${open ? "fixed inset-0 z-50 flex" : "hidden"} bg-black/25 lg:sticky lg:top-0 lg:flex lg:h-screen lg:bg-transparent`} onClick={() => setOpen(false)}>
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button className="icon-button lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)}><X/></button>
         </div>
         <nav className="space-y-1">{navigation.map(([label, href, Icon]) => { const active = href === "/" ? pathname === "/" : pathname.startsWith(href); return <Link key={href} href={href} aria-current={active ? "page" : undefined} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold ${active ? "bg-[#e8f6f0] text-[#11664b]" : "text-[#586760] hover:bg-[#f3f6f4]"}`}><Icon size={18}/>{label}</Link>; })}</nav>
-        <div className="mt-auto rounded-2xl bg-[#f1f7f4] p-3.5"><div className="eyebrow">Current path</div><div className="mt-2 flex items-center justify-between"><b>{state.settings.currentLevel} · CEFR</b><span className="badge">{levelProgress}%</span></div><div className="progress-track mt-3"><div className="progress-fill" style={{ width: `${levelProgress}%` }}/></div><div className="muted mt-2 text-xs">{calculateStreak(state.activities)} day study streak</div></div>
+        <div className="mt-auto space-y-2"><div className="rounded-2xl bg-[#f1f7f4] p-3.5"><div className="eyebrow">Current path</div><div className="mt-2 flex items-center justify-between"><b>{state.settings.currentLevel} · CEFR</b><span className="badge">{levelProgress}%</span></div><div className="progress-track mt-3"><div className="progress-fill" style={{ width: `${levelProgress}%` }}/></div><div className="muted mt-2 text-xs">{calculateStreak(state.activities)} day study streak · {syncStatus}</div></div><button className="btn-secondary w-full gap-2" onClick={() => void fetch("/api/auth/logout", { method: "POST" }).finally(() => { router.replace("/login"); router.refresh(); })}><LogOut size={15}/>Sign out</button></div>
       </div>
     </aside>
     <div className="min-w-0">

@@ -4,28 +4,39 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "validate:content": "vitest run src/lib/content/content.test.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "validate:content": "vitest run src/lib/content/content.test.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx scripts/seed-content.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.468.0",
-    "next": "^15.5.2",
+    "next": "^16.3.2",
+    "pg": "^8.23.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^22.10.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.0.3",
     "@types/react-dom": "^19.0.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.17.0",
-    "eslint-config-next": "^15.5.2",
+    "eslint-config-next": "^16.3.2",
     "tailwindcss": "^4.1.12",
+    "tsx": "^4.23.12",
     "typescript": "^5.7.2",
     "vitest": "^3.2.4"
   }
