@@ -3,6 +3,8 @@ import { exercises } from "@/data/exercises";
 import { expressions } from "@/data/expressions";
 import { grammarTopics } from "@/data/grammar";
 import { placementQuestions } from "@/data/placement";
+import { readingPassages } from "@/data/placement-reading";
+import { contentProvenanceBatches } from "@/data/content-provenance";
 import { vocabulary } from "@/data/vocabulary";
 import { normalizeVocabularyItem } from "./vocabulary";
 import { validateLearningContent } from "./validate";
@@ -14,7 +16,7 @@ describe("learning content pipeline", () => {
   });
 
   it("validates the complete application dataset", () => {
-    expect(validateLearningContent({ vocabulary, grammar: grammarTopics, expressions, exercises, placement: placementQuestions })).toEqual([]);
+    expect(validateLearningContent({ vocabulary, grammar: grammarTopics, expressions, exercises, placement: placementQuestions, readingPassages, provenance: contentProvenanceBatches })).toEqual([]);
   });
 
   it("reports duplicate IDs, self-relations, broken prerequisites, and ambiguous choices", () => {

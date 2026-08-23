@@ -160,11 +160,17 @@ export async function completePlacement(userId: string, input: PlacementWrite) {
   return getDb().transaction(async (tx) => {
     const [attempt] = await tx.insert(placementAttempts).values({
       userId, idempotencyKey: input.idempotencyKey, estimatedLevel: result.estimatedLevel,
-      dimensionScores: result.dimensionScores, topicScores: result.topicScores, strongAreas: result.strongAreas,
+      overallAbility: result.overallAbility, standardError: result.confidence.standardError,
+      confidenceScore: result.confidence.score, confidenceLabel: result.confidence.label,
+      dimensionScores: result.dimensionScores, domainEstimates: result.domainEstimates, topicScores: result.topicScores, strongAreas: result.strongAreas,
       weakAreas: result.weakAreas, startedAt: new Date(input.startedAt), completedAt: new Date(result.completedAt),
     }).onConflictDoNothing({ target: [placementAttempts.userId, placementAttempts.idempotencyKey] }).returning({ id: placementAttempts.id });
     if (!attempt) return { duplicate: true } as const;
-    if (result.answers.length) await tx.insert(placementAnswers).values(result.answers.map((answer, position) => ({ placementAttemptId: attempt.id, ...answer, position })));
+    if (result.answers.length) await tx.insert(placementAnswers).values(result.answers.map((answer, position) => ({
+      placementAttemptId: attempt.id, questionId: answer.questionId, answer: answer.answer, correct: answer.correct,
+      level: answer.level, dimension: answer.dimension, topic: answer.topic, subtopic: answer.subtopic,
+      difficulty: answer.difficulty, discrimination: answer.discrimination, responseTimeMs: answer.responseTimeMs, position,
+    })));
     await persistState(tx, userId, input.state);
     const pathId = await persistLearningPath(tx, userId, input.state);
     await tx.insert(auditLogs).values({ userId, action: "placement.completed", entityType: "placement_attempt", entityId: attempt.id, metadata: { pathId } });

@@ -1,21 +1,25 @@
-import type { Exercise, ExpressionItem, GrammarTopic, PlacementQuestion, VocabularyItem } from "@/types/domain";
+import type { ContentProvenanceBatch } from "@/data/content-provenance";
+import type { Exercise, ExpressionItem, GrammarTopic, PlacementQuestion, ReadingPassage, VocabularyItem } from "@/types/domain";
 
 const levels = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const normalized = (value: string) => value.trim().toLocaleLowerCase();
 const duplicates = (values: string[]) => values.filter((value, index) => values.indexOf(value) !== index);
 
-export interface LearningContent { vocabulary: VocabularyItem[]; grammar: GrammarTopic[]; expressions: ExpressionItem[]; exercises: Exercise[]; placement?: PlacementQuestion[] }
+export interface LearningContent { vocabulary: VocabularyItem[]; grammar: GrammarTopic[]; expressions: ExpressionItem[]; exercises: Exercise[]; placement?: PlacementQuestion[]; readingPassages?: ReadingPassage[]; provenance?: ContentProvenanceBatch[] }
 
 export function validateLearningContent(content: LearningContent): string[] {
   const errors: string[] = [];
   const checkUnique = (label: string, values: string[]) => { for (const value of new Set(duplicates(values))) errors.push(`${label}: duplicate ${value}`); };
   checkUnique("vocabulary id", content.vocabulary.map((item) => item.id));
-  checkUnique("vocabulary sense", content.vocabulary.map((item) => `${normalized(item.word)}:${normalized(item.partOfSpeech)}`));
+  checkUnique("vocabulary sense", content.vocabulary.map((item) => `${normalized(item.word)}:${normalized(item.partOfSpeech)}:${normalized(item.meanings[0]?.definition ?? "")}`));
   checkUnique("grammar id", content.grammar.map((item) => item.id));
   checkUnique("expression id", content.expressions.map((item) => item.id));
   checkUnique("expression", content.expressions.map((item) => normalized(item.expression)));
   checkUnique("exercise id", content.exercises.map((item) => item.id));
   if (content.placement) checkUnique("placement id", content.placement.map((item) => item.id));
+  if (content.placement) checkUnique("placement item", content.placement.map((item) => `${normalized(item.prompt)}:${item.options?.map(normalized).sort().join("|") ?? ""}`));
+  if (content.readingPassages) checkUnique("reading passage id", content.readingPassages.map((item) => item.id));
+  if (content.provenance) checkUnique("provenance id", content.provenance.map((item) => item.id));
 
   for (const item of content.vocabulary) {
     const key = `vocabulary ${item.id}`;
@@ -23,6 +27,7 @@ export function validateLearningContent(content: LearningContent): string[] {
     if (!levels.has(item.cefrLevel)) errors.push(`${key}: invalid CEFR ${item.cefrLevel}`);
     if (!item.meanings.length || item.meanings.some((meaning) => !meaning.definition.trim())) errors.push(`${key}: missing definition`);
     if (!item.examples.length || item.examples.some((example) => example.trim().length < 4)) errors.push(`${key}: malformed example`);
+    if (item.frequencyRank !== undefined && (!Number.isInteger(item.frequencyRank) || item.frequencyRank < 1)) errors.push(`${key}: invalid frequency rank`);
     const synonyms = item.synonyms.map((relation) => normalized(relation.word)); const antonyms = item.antonyms.map((relation) => normalized(relation.word)); const word = normalized(item.word);
     if (synonyms.includes(word)) errors.push(`${key}: self-referencing synonym`);
     if (antonyms.includes(word)) errors.push(`${key}: self-referencing antonym`);
@@ -32,6 +37,7 @@ export function validateLearningContent(content: LearningContent): string[] {
     if (item.wordFamily.some((relation) => !relation.word.trim() || !relation.partOfSpeech.trim() || normalized(relation.word) === word)) errors.push(`${key}: malformed word-family relation`);
     if (item.collocations.some((relation) => relation.trim().split(/\s+/).length < 2)) errors.push(`${key}: malformed collocation`);
     for (const relation of new Set(duplicates(item.collocations.map(normalized)))) errors.push(`${key}: duplicate collocation ${relation}`);
+    if ([...item.synonyms, ...item.antonyms].some((relation) => !Number.isFinite(relation.strength) || relation.strength < 0 || relation.strength > 100)) errors.push(`${key}: relation strength must be between 0 and 100`);
   }
 
   const grammarIds = new Set(content.grammar.map((item) => item.id));
@@ -40,6 +46,16 @@ export function validateLearningContent(content: LearningContent): string[] {
     for (const prerequisite of topic.prerequisites) if (!grammarIds.has(prerequisite)) errors.push(`grammar ${topic.id}: broken prerequisite ${prerequisite}`);
     if (!topic.explanation.trim() || !topic.examples.length || !topic.commonMistakes.length) errors.push(`grammar ${topic.id}: incomplete lesson content`);
   }
+  const visiting = new Set<string>(); const visited = new Set<string>();
+  const findCycle = (topicId: string, trail: string[]): void => {
+    if (visiting.has(topicId)) { errors.push(`grammar prerequisite cycle: ${[...trail, topicId].join(" -> ")}`); return; }
+    if (visited.has(topicId)) return;
+    visiting.add(topicId);
+    const topic = content.grammar.find((candidate) => candidate.id === topicId);
+    for (const prerequisite of topic?.prerequisites ?? []) if (grammarIds.has(prerequisite)) findCycle(prerequisite, [...trail, topicId]);
+    visiting.delete(topicId); visited.add(topicId);
+  };
+  for (const topic of content.grammar) findCycle(topic.id, []);
 
   const contentIds = new Set([...content.vocabulary.map((item) => item.id), ...content.grammar.map((item) => item.id), ...content.expressions.map((item) => item.id)]);
   const validateExercise = (exercise: Exercise, standalone = false) => {
@@ -53,7 +69,27 @@ export function validateLearningContent(content: LearningContent): string[] {
     }
   };
   content.exercises.forEach((exercise) => validateExercise(exercise));
-  content.placement?.forEach((exercise) => validateExercise(exercise, true));
+  const provenanceIds = new Set(content.provenance?.map((batch) => batch.id) ?? []);
+  const passageIds = new Set(content.readingPassages?.map((passage) => passage.id) ?? []);
+  for (const passage of content.readingPassages ?? []) {
+    if (passage.text.trim().length < 40) errors.push(`reading passage ${passage.id}: passage is too short`);
+    if (!levels.has(passage.level)) errors.push(`reading passage ${passage.id}: invalid CEFR ${passage.level}`);
+    if (!provenanceIds.has(passage.provenanceId)) errors.push(`reading passage ${passage.id}: unknown provenance ${passage.provenanceId}`);
+    if (passage.status === "published" && content.provenance?.find((batch) => batch.id === passage.provenanceId)?.status !== "published") errors.push(`reading passage ${passage.id}: published content requires published provenance`);
+  }
+  content.placement?.forEach((exercise) => {
+    validateExercise(exercise, true);
+    const key = `placement ${exercise.id}`;
+    if (!exercise.options || exercise.options.length !== 4) errors.push(`${key}: exactly four choices are required`);
+    if (!exercise.explanation?.trim() || exercise.explanation.trim().length < 12) errors.push(`${key}: substantive explanation is required`);
+    if (!exercise.subtopic.trim()) errors.push(`${key}: subtopic is required`);
+    if (!Number.isFinite(exercise.difficulty) || exercise.difficulty < 0 || exercise.difficulty > 1) errors.push(`${key}: difficulty must be between 0 and 1`);
+    if (!Number.isFinite(exercise.discrimination) || exercise.discrimination < 0.45 || exercise.discrimination > 2.2) errors.push(`${key}: discrimination must be between 0.45 and 2.2`);
+    if (!provenanceIds.has(exercise.provenanceId)) errors.push(`${key}: unknown provenance ${exercise.provenanceId}`);
+    if (exercise.dimension === "reading" && (!exercise.passageId || !passageIds.has(exercise.passageId))) errors.push(`${key}: reading item requires a valid passage`);
+    if (exercise.dimension !== "reading" && exercise.passageId) errors.push(`${key}: non-reading item cannot reference a passage`);
+    if (exercise.status === "published" && content.provenance?.find((batch) => batch.id === exercise.provenanceId)?.status !== "published") errors.push(`${key}: published content requires published provenance`);
+  });
   return errors;
 }
 

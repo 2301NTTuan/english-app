@@ -12,6 +12,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
     "validate:content": "vitest run src/lib/content/content.test.ts",
+    "content:stats": "node --import tsx scripts/content-stats.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed-content.ts",

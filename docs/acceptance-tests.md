@@ -2,9 +2,9 @@
 
 | Feature | Input | Expected output | Automated evidence |
 | --- | --- | --- | --- |
-| Register | valid name/email/strong password | account, defaults, snapshot, session | database/E2E pending |
-| Register | duplicate email | safe 409; no duplicate account | database/E2E pending |
-| Login | correct credentials | revocable HttpOnly session | E2E pending |
+| Register | valid name/email/strong password | account, defaults, snapshot, session | database integration and Playwright |
+| Register | duplicate email | safe 409; no duplicate account | database integration |
+| Login | correct credentials | revocable HttpOnly session | Playwright |
 | Login | wrong or unknown credentials | same generic 401 | unit primitives; E2E pending |
 | Protected route | no cookie | redirect to `/login` with internal return path | runtime smoke |
 | State API | no/forged/expired session | 401; no data | database/E2E pending |
@@ -12,10 +12,11 @@
 | Daily planner | backlog exceeds target | reviews dominate; zero new material | unit tests |
 | Grammar path | unmet prerequisite | dependent topic locked | unit tests |
 | Review | Again/Hard/Good/Easy | ordered, distinct scheduling behavior | unit tests |
-| Placement | beginner/intermediate/advanced evidence | bounded CEFR learning estimate | unit tests |
-| Session answer | incorrect | mistake/relearning and mastery update | unit tests; normalized integration pending |
-| Import | malformed or over 1 MB | rejected without state change | schema unit; E2E pending |
-| Delete account | password plus `DELETE` | account and owned rows removed | cascade integration; E2E pending |
+| Placement | strong/foundation/uneven/random evidence | bounded multidomain estimate and calibrated confidence | simulations and Playwright |
+| Placement delivery | active attempt | one server-selected item; no corpus or answer key | Playwright production flow |
+| Session answer | incorrect | mistake/relearning and mastery update | unit, integration, and Playwright |
+| Import | malformed or over 1 MB | rejected without state change | schema unit and Playwright |
+| Delete account | password plus `DELETE` | account and owned rows removed | cascade integration and Playwright |
 | Health | database unavailable | HTTP 503 `{status:"degraded"}` only | runtime smoke |
 
 Automate these with Playwright against an isolated migrated database before release:
@@ -31,4 +32,4 @@ Automate these with Playwright against an isolated migrated database before rele
 9. Health returns 200/`ok` with PostgreSQL and 503/`degraded` without it, with no diagnostics.
 10. Keyboard navigation reaches the skip link, labeled forms, errors, menu, core learning controls, and legal links; layouts remain usable under zoom.
 
-This catalogue is not evidence that browser E2E tests have run. Results are in `docs/test-report.md`.
+The most recent execution evidence and environment details are in `docs/test-report.md`.

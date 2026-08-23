@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
 import { grammarTopics } from "@/data/grammar";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { scorePlacement } from "@/lib/learning/placement";
 import { createEmptyAccountState } from "@/lib/storage/app-repository";
 import type { AppState, ReviewState } from "@/types/domain";
 
@@ -128,11 +129,7 @@ suite("PostgreSQL migration and ownership", () => {
   it("persists placement answers and replaces the active path atomically", async () => {
     const userId = await createUser();
     const state = learningState();
-    state.placement = {
-      completedAt: new Date().toISOString(), estimatedLevel: "B1", dimensionScores: { vocabulary: 70, grammar: 60, context: 65 },
-      topicScores: { vocabulary: 70 }, strongAreas: ["vocabulary"], weakAreas: ["grammar"],
-      answers: [{ questionId: "integration-question", answer: "answer", correct: true, level: "B1", dimension: "vocabulary", topic: "vocabulary" }],
-    };
+    state.placement = scorePlacement([{ questionId: "integration-question", answer: "answer", correct: true, level: "B1", dimension: "vocabulary", topic: "vocabulary" }]);
     const input = { idempotencyKey: randomUUID(), startedAt: new Date(Date.now() - 120_000).toISOString(), state };
     expect(await completePlacement(userId, input)).toMatchObject({ duplicate: false });
     expect(await completePlacement(userId, input)).toEqual({ duplicate: true });

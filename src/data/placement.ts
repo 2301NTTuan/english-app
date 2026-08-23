@@ -1,4 +1,6 @@
 import type { CEFRLevel, PlacementDimension, PlacementQuestion } from "@/types/domain";
+import { readingPlacementQuestions } from "@/data/placement-reading";
+import { expandedPlacementQuestions } from "@/data/placement-expanded";
 
 type Seed = [CEFRLevel, PlacementDimension, string, string, string[], string, string?];
 const seeds: Seed[] = [
@@ -45,11 +47,20 @@ const seeds: Seed[] = [
   ["C2", "context", "information-structure", "Choose the version with natural emphatic focus.", ["What the study reveals is a change in priorities.", "What reveals the study is priorities change.", "The study what reveals a priorities change.", "What is the study revealing are priority."], "What the study reveals is a change in priorities."],
 ];
 
-export const placementQuestions: PlacementQuestion[] = seeds.map(([level, dimension, topic, prompt, options, answer, explanation], index) => ({
+const corePlacementQuestions: PlacementQuestion[] = seeds.map(([level, dimension, topic, prompt, options, answer, explanation], index) => ({
   id: `placement-${level.toLowerCase()}-${dimension}-${index + 1}`,
   itemId: `placement-${topic}`,
   knowledgeType: dimension === "grammar" ? "grammar" : "vocabulary",
   type: dimension === "context" ? "context" : "multiple-choice",
-  prompt, options, answer, explanation, level, dimension, topic,
-  difficulty: Math.min(5, ["A1", "A2", "B1", "B2", "C1", "C2"].indexOf(level) + 1) as 1 | 2 | 3 | 4 | 5,
+  prompt, options, answer,
+  explanation: explanation ?? `“${answer}” is the only option that correctly completes the task.`,
+  level, dimension, topic, subtopic: topic,
+  difficulty: Math.min(0.96, (["A1", "A2", "B1", "B2", "C1", "C2"].indexOf(level) + 0.5 + index % 2 * 0.08) / 6),
+  discrimination: 1,
+  status: "validated",
+  provenanceId: "placement-core-2026-08",
 }));
+
+/** Validated pre-launch bank. Published-only filtering is the production release gate. */
+export const placementQuestions: PlacementQuestion[] = [...corePlacementQuestions, ...expandedPlacementQuestions, ...readingPlacementQuestions];
+export const publishedPlacementQuestions = placementQuestions.filter((question) => question.status === "published");

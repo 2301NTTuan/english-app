@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { scorePlacement } from "@/lib/learning/placement";
 
 const level = z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const finiteScore = z.number().finite().min(0).max(100);
@@ -11,7 +12,29 @@ const review = z.object({
   incorrectCount: z.number().int().nonnegative(), lapses: z.number().int().nonnegative(),
 });
 const mastery = z.object({ recognition: finiteScore, recall: finiteScore, context: finiteScore, spelling: finiteScore, overall: finiteScore });
-const placementAnswer = z.object({ questionId: z.string().min(1).max(120), answer: z.string().max(1000), correct: z.boolean(), level, dimension: z.enum(["vocabulary", "grammar", "context"]), topic: z.string().max(160) });
+const placementDimension = z.enum(["vocabulary", "grammar", "context", "reading"]);
+const placementAnswer = z.object({
+  questionId: z.string().min(1).max(120), answer: z.string().max(1000), correct: z.boolean(), level,
+  dimension: placementDimension, topic: z.string().max(160), subtopic: z.string().max(160).optional(),
+  difficulty: z.number().finite().min(0).max(1).optional(), discrimination: z.number().finite().min(0.45).max(2.2).optional(),
+  responseTimeMs: z.number().int().nonnegative().max(3_600_000).optional(),
+});
+const placementDomainEstimate = z.object({ ability: z.number().finite().min(-3.2).max(3.2), standardError: z.number().finite().min(0).max(2), estimatedLevel: level, score: finiteScore, questions: z.number().int().nonnegative().max(500) });
+const placementResult = z.object({
+  completedAt: isoDate, estimatedLevel: level,
+  overallAbility: z.number().finite().min(-3.2).max(3.2),
+  confidence: z.object({ score: finiteScore, label: z.enum(["low", "developing", "moderate", "high"]), standardError: z.number().finite().min(0).max(2), abilityRange: z.tuple([z.number().finite().min(-3.2).max(3.2), z.number().finite().min(-3.2).max(3.2)]) }),
+  dimensionScores: z.object({ vocabulary: finiteScore, grammar: finiteScore, context: finiteScore, reading: finiteScore }),
+  domainEstimates: z.object({ vocabulary: placementDomainEstimate, grammar: placementDomainEstimate, context: placementDomainEstimate, reading: placementDomainEstimate }),
+  topicScores: z.record(z.string(), finiteScore), strongAreas: z.array(z.string().max(160)).max(100), weakAreas: z.array(z.string().max(160)).max(100),
+  answers: z.array(placementAnswer).max(500),
+});
+const legacyPlacementResult = z.object({
+  completedAt: isoDate, estimatedLevel: level,
+  dimensionScores: z.object({ vocabulary: finiteScore, grammar: finiteScore, context: finiteScore }),
+  topicScores: z.record(z.string(), finiteScore), strongAreas: z.array(z.string().max(160)).max(100), weakAreas: z.array(z.string().max(160)).max(100),
+  answers: z.array(placementAnswer).max(500),
+}).transform((placement) => scorePlacement(placement.answers, new Date(placement.completedAt)));
 
 export const appStateSchema = z.object({
   settings: z.object({
@@ -32,12 +55,7 @@ export const appStateSchema = z.object({
     minutes: z.number().int().nonnegative().optional(), masteryDelta: z.number().finite().optional(), vocabularyReviewed: z.number().int().nonnegative(),
     newVocabulary: z.number().int().nonnegative(), grammarExercises: z.number().int().nonnegative(), mistakesCorrected: z.number().int().nonnegative(),
   })).max(366),
-  placement: z.object({
-    completedAt: isoDate, estimatedLevel: level,
-    dimensionScores: z.object({ vocabulary: finiteScore, grammar: finiteScore, context: finiteScore }),
-    topicScores: z.record(z.string(), finiteScore), strongAreas: z.array(z.string().max(160)).max(100), weakAreas: z.array(z.string().max(160)).max(100),
-    answers: z.array(placementAnswer).max(500),
-  }).optional(),
+  placement: z.union([placementResult, legacyPlacementResult]).optional(),
 });
 
 export const stateEnvelopeSchema = z.object({ state: appStateSchema, confirmLegacyImport: z.literal(true).optional() });

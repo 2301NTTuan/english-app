@@ -30,16 +30,26 @@ async function assertNoSeriousAccessibilityViolations(page: Page) {
 
 test.describe.serial("production acceptance", () => {
   test("persists the full placement, learning, mistake, review, and relogin flow", async ({ page }) => {
+    const consoleErrors: string[] = []; const failedRequests: string[] = [];
     await register(page, userA);
+    page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
+    page.on("requestfailed", (request) => failedRequests.push(`${request.failure()?.errorText ?? "failed"} ${request.url()}`));
     await assertNoSeriousAccessibilityViolations(page);
 
+    const firstQuestionResponse = page.waitForResponse((response) => response.url().includes("/api/placement/question") && response.request().method() === "POST");
     await page.getByRole("button", { name: /Begin test/ }).click();
-    for (let index = 0; index < 30; index += 1) {
+    const firstQuestionBody = await (await firstQuestionResponse).json();
+    expect(firstQuestionBody.question.answer).toBeUndefined();
+    expect(firstQuestionBody.question.explanation).toBeUndefined();
+    expect(firstQuestionBody.question.options).toHaveLength(4);
+    const placementResult = page.getByRole("heading", { name: /Estimated learning level:/ });
+    for (let index = 0; index < 50; index += 1) {
+      if (await placementResult.isVisible()) break;
       const answers = page.locator(".answer-option");
       await expect(answers.first()).toBeVisible();
       await answers.nth(index % 4).click();
     }
-    await expect(page.getByRole("heading", { name: /Estimated learning level:/ })).toBeVisible();
+    await expect(placementResult).toBeVisible();
     await page.getByRole("link", { name: /View learning path/ }).click();
     await expect(page.getByRole("heading", { name: /learning path/ })).toBeVisible();
 
@@ -78,6 +88,7 @@ test.describe.serial("production acceptance", () => {
     const stateBeforeLogout = await page.evaluate(async () => (await fetch("/api/state")).json());
     expect(stateBeforeLogout.state.activities.length).toBeGreaterThan(0);
     expect(stateBeforeLogout.state.vocabularyProgress.length + stateBeforeLogout.state.grammarProgress.length).toBeGreaterThan(0);
+    expect({ consoleErrors, failedRequests }).toEqual({ consoleErrors: [], failedRequests: [] });
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.getByLabel("Email").fill(userA.email);

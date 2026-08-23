@@ -2,17 +2,23 @@ import { createHash } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
 import { eq } from "drizzle-orm";
 import { vocabulary } from "../src/data/vocabulary";
+import { contentProvenanceBatches } from "../src/data/content-provenance";
+import { exercises } from "../src/data/exercises";
 import { detailedGrammarTopics, grammarTopics } from "../src/data/grammar";
 import { expressions as expressionData } from "../src/data/expressions";
+import { placementQuestions } from "../src/data/placement";
+import { readingPassages } from "../src/data/placement-reading";
+import { assertValidLearningContent } from "../src/lib/content/validate";
 import { getDb, getPool } from "../src/db/client";
-import { collocations, contentVersions, expressions, grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, vocabularyContent, vocabularyExamples, vocabularyMeanings, vocabularyRelations, wordFamilies } from "../src/db/schema";
+import { collocations, contentVersions, expressions, grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, placementItems, placementPassages, vocabularyContent, vocabularyExamples, vocabularyMeanings, vocabularyRelations, wordFamilies } from "../src/db/schema";
 
 loadEnvConfig(process.cwd());
 
 const version = process.env.CONTENT_VERSION ?? "bundled-v1";
-const checksum = createHash("sha256").update(JSON.stringify({ vocabulary, grammarTopics, expressionData })).digest("hex");
+const checksum = createHash("sha256").update(JSON.stringify({ vocabulary, grammarTopics, expressionData, placementQuestions, readingPassages })).digest("hex");
 
 async function main() {
+  assertValidLearningContent({ vocabulary, grammar: grammarTopics, expressions: expressionData, exercises, placement: placementQuestions, readingPassages, provenance: contentProvenanceBatches });
   const db = getDb();
   try {
   await db.transaction(async (tx) => {
@@ -54,8 +60,12 @@ async function main() {
       .onConflictDoUpdate({ target: expressions.contentId, set: { kind: item.kind, expression: item.expression, baseVerb: item.relatedVerb, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, level: item.cefrLevel, examples: item.examples, usageNotes: item.usageNotes, separability: item.separability, topics: item.tags, updatedAt: new Date() } });
     for (const item of expressionData.filter((item) => item.kind === "collocation")) await tx.insert(collocations).values({ contentId: item.id, phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags })
       .onConflictDoUpdate({ target: collocations.contentId, set: { phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags, updatedAt: new Date() } });
+    for (const passage of readingPassages) await tx.insert(placementPassages).values({ contentId: passage.id, title: passage.title, passage: passage.text, level: passage.level, status: passage.status, provenanceId: passage.provenanceId, contentVersionId: contentVersion.id })
+      .onConflictDoUpdate({ target: placementPassages.contentId, set: { title: passage.title, passage: passage.text, level: passage.level, status: passage.status, provenanceId: passage.provenanceId, contentVersionId: contentVersion.id, updatedAt: new Date() } });
+    for (const item of placementQuestions) await tx.insert(placementItems).values({ contentId: item.id, domain: item.dimension, level: item.level, topic: item.topic, subtopic: item.subtopic, prompt: item.prompt, options: item.options ?? [], answer: item.answer, explanation: item.explanation ?? "", difficulty: item.difficulty, discrimination: item.discrimination, status: item.status, provenanceId: item.provenanceId, passageContentId: item.passageId, contentVersionId: contentVersion.id })
+      .onConflictDoUpdate({ target: placementItems.contentId, set: { domain: item.dimension, level: item.level, topic: item.topic, subtopic: item.subtopic, prompt: item.prompt, options: item.options ?? [], answer: item.answer, explanation: item.explanation ?? "", difficulty: item.difficulty, discrimination: item.discrimination, status: item.status, provenanceId: item.provenanceId, passageContentId: item.passageId, contentVersionId: contentVersion.id, updatedAt: new Date() } });
   });
-    console.log(`Seeded ${vocabulary.length} vocabulary items, ${grammarTopics.length} grammar topics, and ${expressionData.length} expressions (${checksum.slice(0, 12)}).`);
+    console.log(`Seeded ${vocabulary.length} vocabulary items, ${grammarTopics.length} grammar topics, ${expressionData.length} expressions, and ${placementQuestions.length} placement items (${checksum.slice(0, 12)}).`);
   } finally { await getPool().end(); }
 }
 

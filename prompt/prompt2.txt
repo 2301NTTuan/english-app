@@ -1,0 +1,2656 @@
+You are continuing development of the existing **English Mastery** application.
+
+Repository:
+
+`/mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app`
+
+Current state:
+
+* Next.js + TypeScript
+* PostgreSQL + Drizzle
+* Production authentication/authorization foundation
+* Database integration tests passing
+* E2E tests passing
+* Adaptive learning engine
+* FSRS/review system
+* Mistake Bank
+* Personalized Learning Path
+* Placement Test
+* Vocabulary/Grammar/Expressions architecture
+* Content validation
+* CI/build validation
+* Production-hardening work already completed
+
+The engineering foundation is now substantially stronger.
+
+This phase is NOT about infrastructure.
+
+This phase is about turning the application into a **production-quality English learning product**.
+
+The two biggest current weaknesses are:
+
+1. The educational content corpus is far too small.
+2. The Placement Test is too small/fixed to accurately estimate a learner's English level.
+
+Current approximate content:
+
+```text
+Vocabulary: 192
+
+A1: 46
+A2: 48
+B1: 59
+B2: 27
+C1: 9
+C2: 3
+
+Grammar curriculum topics: 138
+Detailed grammar lessons: 35
+
+Idioms: 30
+Phrasal verbs: 30
+Collocations: 40
+Common expressions: 7
+
+Placement question pool: ~36
+Placement test length: ~30
+```
+
+Your responsibility in this phase is to build the **content and assessment foundation required for a serious production English-learning application**.
+
+Do NOT redesign unrelated infrastructure.
+
+Do NOT rewrite authentication/database architecture unless required by this phase.
+
+Do NOT blindly generate thousands of low-quality rows just to hit a number.
+
+Quality, validation, provenance, stable IDs, maintainability, and assessment reliability are more important than arbitrary counts.
+
+---
+
+# 1. AUDIT CURRENT CONTENT AND ASSESSMENT IMPLEMENTATION
+
+Start by inspecting:
+
+```bash
+cd /mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app
+
+git status
+git log --oneline -10
+cat package.json
+```
+
+Inspect the actual implementations of:
+
+```text
+Vocabulary content
+Grammar curriculum
+Detailed grammar lessons
+Idioms
+Phrasal verbs
+Collocations
+Content validation
+Content seeding/import
+Placement question bank
+Placement scoring
+Adaptive placement logic
+Personalized path
+Exercise generator
+Mastery system
+Database content schema
+```
+
+Identify:
+
+* current content format
+* content IDs
+* content loading path
+* database representation
+* current placement algorithm
+* how CEFR is assigned
+* how placement selects the next question
+* how placement determines stopping
+* how results feed Personalized Learning Path
+
+Preserve all existing legitimate functionality.
+
+Never run:
+
+```bash
+git reset --hard
+git clean -fd
+git restore .
+```
+
+---
+
+# 2. PRIMARY PRODUCT TARGET
+
+The application should eventually support approximately:
+
+```text
+Vocabulary:
+A1      700–800
+A2      900–1,000
+B1    1,100–1,300
+B2    1,300–1,500
+C1    1,000–1,300
+C2      500–800
+
+Total target:
+~5,500–6,500 high-value headwords
+```
+
+Grammar:
+
+```text
+Curriculum topics:
+~138 existing topics are sufficient unless genuine gaps exist.
+
+Detailed lessons target:
+~110–130
+```
+
+Expressions:
+
+```text
+Idioms:
+300+
+
+Phrasal verbs:
+300+
+
+Collocations:
+1,000+
+
+Common expressions:
+expand based on usefulness rather than arbitrary quota
+```
+
+Placement Assessment:
+
+```text
+Validated question bank target:
+750+ eventually
+
+Approximate long-term balance:
+
+Vocabulary          250+
+Grammar             250+
+Usage/Context       150+
+Reading             100+
+```
+
+The learner should NOT answer all questions.
+
+An individual placement attempt should remain adaptive and bounded.
+
+---
+
+# 3. DO NOT TRY TO COMPLETE EVERYTHING BADLY
+
+This phase is allowed to progress incrementally.
+
+Priority:
+
+```text
+1. Production content architecture
+2. Content provenance/licensing framework
+3. Content validation/QA
+4. Assessment engine redesign
+5. Placement item-bank architecture
+6. Placement scoring/confidence
+7. A1 vocabulary expansion
+8. A2 vocabulary expansion
+9. B1 vocabulary expansion
+10. Grammar detailed lessons
+11. B2/C1/C2 vocabulary
+12. Expressions
+```
+
+If fully enriching 6,000 words in one run would reduce quality, do NOT fabricate completion.
+
+Report actual counts honestly.
+
+---
+
+# 4. SEPARATE CONTENT FROM APPLICATION CODE
+
+Educational content must not be embedded in giant React components.
+
+Do not create a massive:
+
+```text
+vocabulary.ts
+```
+
+containing tens of thousands of lines.
+
+Use a production maintainable structure.
+
+Possible architecture:
+
+```text
+content/
+  vocabulary/
+    a1/
+    a2/
+    b1/
+    b2/
+    c1/
+    c2/
+
+  grammar/
+    a1/
+    a2/
+    b1/
+    b2/
+    c1/
+    c2/
+
+  placement/
+    vocabulary/
+    grammar/
+    context/
+    reading/
+
+  expressions/
+    idioms/
+    phrasal-verbs/
+    collocations/
+```
+
+Adapt this to existing project conventions.
+
+The application/database importer should consume normalized content.
+
+---
+
+# 5. CONTENT SOURCE / LICENSING POLICY
+
+This is a production product.
+
+Do NOT copy:
+
+* Oxford definitions
+* Cambridge definitions/examples
+* Longman content
+* commercial CEFR word lists
+* proprietary course material
+
+unless a compatible license explicitly permits redistribution.
+
+Research/document the source strategy.
+
+Maintain:
+
+```text
+docs/content-sources.md
+```
+
+For every external source used or considered, record:
+
+```text
+Source
+URL/name
+Content type
+License
+Redistribution allowed?
+Commercial use allowed?
+Attribution required?
+Imported fields
+Notes
+```
+
+If licensing is unclear:
+
+```text
+DO NOT IMPORT IT.
+```
+
+Repository-authored content is acceptable.
+
+Do not fabricate licenses.
+
+---
+
+# 6. CONTENT PROVENANCE
+
+Add provenance metadata where practical.
+
+Conceptually:
+
+```ts
+interface ContentProvenance {
+  sourceType:
+    | "repository-authored"
+    | "open-dataset"
+    | "editorial"
+
+  sourceId?: string
+  license?: string
+  attribution?: string
+  reviewedAt?: string
+}
+```
+
+Do not burden every runtime query unnecessarily.
+
+This metadata may exist in content/import metadata rather than learner-facing tables.
+
+---
+
+# 7. VOCABULARY MODEL
+
+Review and improve the existing vocabulary model only where required.
+
+A production vocabulary item should conceptually support:
+
+```ts
+interface VocabularyItem {
+  id: string
+
+  lemma: string
+  displayWord: string
+
+  partOfSpeech: string
+
+  cefr:
+    | "A1"
+    | "A2"
+    | "B1"
+    | "B2"
+    | "C1"
+    | "C2"
+
+  frequencyRank?: number
+
+  frequencyBand?:
+    | "very-common"
+    | "common"
+    | "less-common"
+    | "advanced"
+
+  ipa?: string
+
+  meanings: {
+    englishDefinition: string
+    vietnameseMeaning?: string
+    usageNote?: string
+  }[]
+
+  examples: {
+    sentence: string
+    vietnameseTranslation?: string
+  }[]
+
+  synonyms?: VocabularyRelation[]
+  antonyms?: VocabularyRelation[]
+
+  wordFamily?: WordFamilyRelation[]
+
+  collocations?: CollocationRelation[]
+
+  topics: string[]
+
+  register?:
+    | "informal"
+    | "neutral"
+    | "formal"
+
+  status:
+    | "draft"
+    | "validated"
+    | "reviewed"
+    | "published"
+    | "retired"
+}
+```
+
+Adapt to current schema rather than duplicating existing concepts.
+
+---
+
+# 8. VOCABULARY CORE VS ENRICHED DATA
+
+Do NOT force every word to have fake metadata.
+
+Minimum production entry:
+
+```text
+stable ID
+lemma
+part of speech
+CEFR
+frequency/commonness
+English definition
+Vietnamese meaning
+at least one natural example
+topic
+```
+
+Optional enrichment:
+
+```text
+IPA
+synonyms
+antonyms
+word family
+collocations
+register
+usage nuance
+```
+
+Only include optional enrichment when accurate.
+
+---
+
+# 9. FREQUENCY IS CRITICAL
+
+Content ordering must not be alphabetical.
+
+New vocabulary selection should consider:
+
+```text
+CEFR suitability
++
+frequency/commonness
++
+learning path
++
+user mastery
++
+previous exposure
++
+topic
+```
+
+Example:
+
+An A2 learner should learn common A1/A2 words before obscure B2/C1 words.
+
+Add tests for frequency-aware selection.
+
+---
+
+# 10. VOCABULARY TOPICS
+
+Use a practical taxonomy such as:
+
+```text
+daily-life
+family
+home
+food
+shopping
+work
+education
+travel
+health
+technology
+money
+relationships
+emotions
+communication
+nature
+environment
+society
+business
+science
+media
+culture
+academic
+```
+
+Avoid hundreds of tiny categories.
+
+---
+
+# 11. VOCABULARY STABLE IDs
+
+Existing user progress references content IDs.
+
+IDs must therefore remain stable.
+
+Do NOT regenerate random IDs on import.
+
+Use deterministic ID generation if necessary.
+
+For example conceptually:
+
+```text
+vocab:acquire:verb:1
+```
+
+or another stable scheme.
+
+Add automated validation preventing accidental ID churn.
+
+---
+
+# 12. VOCABULARY DUPLICATE HANDLING
+
+Words may legitimately have:
+
+```text
+noun vs verb
+multiple senses
+homographs
+```
+
+Do not simply ban duplicate spellings.
+
+Instead distinguish:
+
+```text
+lemma
+part of speech
+sense
+```
+
+Detect accidental duplicates intelligently.
+
+---
+
+# 13. SYNONYMS
+
+Synonyms must teach nuance.
+
+Do not model:
+
+```text
+big = huge = large
+```
+
+as universally interchangeable.
+
+Support:
+
+```text
+word
+strength/intensity
+register
+usage note
+context limitation
+```
+
+Example:
+
+```text
+big mistake
+huge mistake
+large amount
+```
+
+Teach why natural usage differs.
+
+---
+
+# 14. ANTONYMS
+
+Expand meaningful antonym relationships.
+
+Examples:
+
+```text
+accept ↔ reject
+increase ↔ decrease
+temporary ↔ permanent
+flexible ↔ rigid
+optimistic ↔ pessimistic
+expand ↔ contract
+```
+
+Do not generate weak/arguable antonyms merely to fill fields.
+
+---
+
+# 15. WORD FAMILIES
+
+Support families such as:
+
+```text
+decide
+decision
+decisive
+decisively
+indecisive
+```
+
+and:
+
+```text
+success
+succeed
+successful
+successfully
+unsuccessful
+```
+
+and:
+
+```text
+analyse
+analysis
+analytical
+analytically
+```
+
+Use this data for grammar-sensitive exercises.
+
+---
+
+# 16. COLLOCATIONS
+
+Treat collocations as a major production feature.
+
+Long-term target:
+
+```text
+1,000+
+```
+
+Prioritize natural, common combinations:
+
+```text
+make a decision
+take responsibility
+gain experience
+acquire knowledge
+raise awareness
+reach an agreement
+meet a requirement
+highly recommended
+deeply concerned
+strongly disagree
+heavy rain
+strong coffee
+```
+
+Where useful include learner-error contrasts:
+
+```text
+make homework ❌
+do homework ✅
+```
+
+Do not create unnatural collocations.
+
+---
+
+# 17. VOCABULARY EXPANSION STRATEGY
+
+Expand progressively.
+
+Suggested batch sequence:
+
+```text
+Current A1 46
+→ 200
+→ 400
+→ ~750
+
+Current A2 48
+→ 250
+→ 500
+→ ~950
+
+Current B1 59
+→ 300
+→ 700
+→ ~1,200
+```
+
+Validate after every meaningful batch.
+
+Then expand:
+
+```text
+B2
+C1
+C2
+```
+
+Do not wait until thousands of items exist before validating.
+
+---
+
+# 18. GRAMMAR CURRICULUM
+
+The current ~138 curriculum topics are probably enough.
+
+Audit them for actual gaps or duplicates.
+
+Do not add topics merely to increase the count.
+
+Focus on converting curriculum metadata into complete lessons.
+
+---
+
+# 19. DETAILED GRAMMAR TARGET
+
+Expand:
+
+```text
+35 detailed lessons
+```
+
+toward:
+
+```text
+110–130
+```
+
+Recommended priority:
+
+```text
+A1: ~20
+A2: ~22
+B1: ~25
+B2: ~25
+C1: ~18–20
+C2: ~10–15
+```
+
+Do not treat these as rigid quotas.
+
+---
+
+# 20. DETAILED GRAMMAR LESSON STANDARD
+
+Each relevant lesson should include:
+
+```text
+Title
+CEFR
+Overview
+Prerequisites
+
+English explanation
+Vietnamese explanation
+
+Usage
+Structure/formula
+
+Positive form
+Negative form
+Question form
+
+Natural examples
+
+Common mistakes
+
+Related structures
+
+Contrast with similar grammar
+
+Subtopics
+
+Practice exercises
+
+Review questions
+```
+
+Do not include meaningless empty sections.
+
+---
+
+# 21. GRAMMAR LESSON QUALITY EXAMPLE
+
+A lesson such as Present Perfect must not be only:
+
+```text
+have/has + V3
+```
+
+It should cover:
+
+```text
+Present Perfect
+├── form
+├── life experience
+├── unfinished time
+├── recent events
+├── ever / never
+├── already / yet / just
+├── for / since
+├── common errors
+└── Present Perfect vs Past Simple
+```
+
+---
+
+# 22. GRAMMAR PREREQUISITES
+
+Maintain prerequisite graph.
+
+Examples:
+
+```text
+Present Simple
+      ↓
+Past Simple
+      ↓
+Present Perfect
+      ↓
+Present Perfect vs Past Simple
+```
+
+```text
+First Conditional
+      ↓
+Second Conditional
+      ↓
+Third Conditional
+      ↓
+Mixed Conditionals
+```
+
+Add or preserve automated:
+
+```text
+missing-reference validation
+cycle detection
+```
+
+---
+
+# 23. ASSESSMENT ENGINE — MAJOR REDESIGN
+
+Treat Placement Test as a standalone **assessment engine**, not simply a quiz page.
+
+The goal is:
+
+```text
+estimate learner ability
++
+identify skill weaknesses
++
+measure uncertainty
++
+generate personalized learning starting point
+```
+
+The current ~36-question pool is insufficient.
+
+---
+
+# 24. ASSESSMENT DOMAINS
+
+Production assessment should evaluate separately:
+
+```text
+Vocabulary
+Grammar
+Usage / Context
+Reading
+```
+
+Do NOT infer total English proficiency from vocabulary alone.
+
+Do not add listening/speaking yet unless a robust audio system already exists.
+
+---
+
+# 25. ASSESSMENT SUBSKILLS
+
+Support subskill tagging.
+
+Examples:
+
+Grammar:
+
+```text
+present-simple
+past-simple
+present-perfect
+tense-contrast
+articles
+prepositions
+conditionals
+modals
+relative-clauses
+gerund-infinitive
+passive
+reported-speech
+inversion
+```
+
+Vocabulary:
+
+```text
+meaning
+context
+collocation
+synonym
+word-family
+frequency/core-vocabulary
+```
+
+Reading:
+
+```text
+main-idea
+detail
+reference
+inference
+vocabulary-in-context
+```
+
+---
+
+# 26. PLACEMENT ITEM MODEL
+
+Each assessment item should have metadata conceptually similar to:
+
+```ts
+interface PlacementItem {
+  id: string
+
+  domain:
+    | "vocabulary"
+    | "grammar"
+    | "context"
+    | "reading"
+
+  cefr:
+    | "A1"
+    | "A2"
+    | "B1"
+    | "B2"
+    | "C1"
+    | "C2"
+
+  topic: string
+  subtopic?: string
+
+  difficulty: number
+
+  discrimination?: number
+
+  prompt: string
+
+  choices: string[]
+
+  correctAnswer: string
+
+  explanation: string
+
+  status:
+    | "draft"
+    | "validated"
+    | "reviewed"
+    | "published"
+    | "retired"
+}
+```
+
+Adapt to current architecture.
+
+---
+
+# 27. CONTINUOUS DIFFICULTY
+
+Do not treat CEFR alone as the difficulty value.
+
+Within B1, for example:
+
+```text
+B1 easy
+B1 medium
+B1 hard
+```
+
+should be distinguishable.
+
+Use a normalized or psychometric-style value such as:
+
+```text
+difficulty: 0.00 → 1.00
+```
+
+or another documented internal scale.
+
+CEFR remains useful for presentation and content selection.
+
+---
+
+# 28. ITEM DISCRIMINATION
+
+Support or prepare for item discrimination.
+
+Conceptually:
+
+```text
+How well does this question distinguish between users above and below its target ability?
+```
+
+Initial values may be editorial estimates.
+
+Later they should be calibratable from real user data.
+
+Do not pretend manually assigned discrimination is statistically validated.
+
+---
+
+# 29. DO NOT CLAIM FORMAL IRT CALIBRATION WITHOUT DATA
+
+If using IRT/Rasch-like concepts:
+
+* separate mathematically implemented estimation from statistically calibrated parameters
+* do not claim psychometric validation without sufficient real response data
+
+It is acceptable to implement an **IRT-ready** architecture.
+
+Be explicit about what is estimated vs empirically calibrated.
+
+---
+
+# 30. ADAPTIVE TEST ALGORITHM
+
+Replace simplistic level jumping with an ability estimate.
+
+Conceptually:
+
+```text
+Initial ability estimate
+        ↓
+Select informative item
+        ↓
+User answer
+        ↓
+Update ability estimate
+        ↓
+Update uncertainty/confidence
+        ↓
+Select next item
+```
+
+The next question should consider:
+
+```text
+estimated ability
+domain coverage
+subskill coverage
+item exposure
+difficulty
+information/discrimination
+previous answers
+```
+
+---
+
+# 31. INITIAL ABILITY
+
+The test may start around:
+
+```text
+A2/B1
+```
+
+for users with no prior information.
+
+If a user manually indicates approximate level, this can inform the prior without determining the final result.
+
+Do not lock the test to their self-selected level.
+
+---
+
+# 32. ADAPTIVE EXAMPLE
+
+Expected behavior:
+
+```text
+B1-medium
+    ↓ correct
+
+B1-hard
+    ↓ correct
+
+B2-easy
+    ↓ wrong
+
+B1-hard
+    ↓ correct
+
+B2-easy alternate
+```
+
+The engine should converge rather than simply:
+
+```text
+correct → +1 CEFR
+wrong → -1 CEFR
+```
+
+---
+
+# 33. STOPPING RULE
+
+Do not always require exactly 30 questions.
+
+Support:
+
+```text
+minimum questions: ~25
+maximum questions: ~50
+```
+
+After minimum coverage:
+
+```text
+ability confidence sufficient?
+domain coverage sufficient?
+```
+
+If yes:
+
+```text
+STOP
+```
+
+Otherwise:
+
+```text
+continue
+```
+
+Document the exact stopping rule.
+
+---
+
+# 34. ASSESSMENT CONFIDENCE
+
+Return an uncertainty/confidence measure.
+
+Example:
+
+```text
+Estimated learning level: B1
+
+Confidence: High
+```
+
+or internally:
+
+```text
+ability estimate
+standard error
+confidence band
+```
+
+Do not fake precision such as:
+
+```text
+B1 = 87.432%
+```
+
+unless the metric truly means that.
+
+---
+
+# 35. MULTIDIMENSIONAL RESULTS
+
+Output must not be only:
+
+```text
+B1
+```
+
+Use:
+
+```text
+Estimated learning level: B1
+
+Vocabulary      B1+   76%
+Grammar         A2+   64%
+Usage/Context   B1    71%
+Reading         B1    68%
+```
+
+Then show subskill diagnostics:
+
+```text
+Strong
+
+Present Simple
+Past Simple
+Everyday vocabulary
+
+Needs work
+
+Present Perfect vs Past Simple
+Prepositions
+Collocations
+Word families
+```
+
+---
+
+# 36. DO NOT CLAIM OFFICIAL CEFR CERTIFICATION
+
+UI must clearly use wording such as:
+
+```text
+Estimated learning level
+```
+
+or:
+
+```text
+App-based CEFR estimate
+```
+
+Never:
+
+```text
+Certified B1
+```
+
+This is not an official examination.
+
+---
+
+# 37. RESPONSE TIME
+
+Track response time as assessment metadata.
+
+Do NOT over-penalize slow users.
+
+Response time may be used as a weak supporting signal for:
+
+```text
+guess detection
+automaticity
+future calibration
+```
+
+but correctness and item difficulty should dominate.
+
+Add a clear documented policy.
+
+---
+
+# 38. GUESS ROBUSTNESS
+
+Add tests/logic so random guessing does not easily produce a high CEFR estimate.
+
+For example simulate:
+
+```text
+25% random multiple-choice correctness
+```
+
+Expected:
+
+```text
+low confidence
+low/intermediate estimate
+not B2/C1
+```
+
+---
+
+# 39. DOMAIN COVERAGE REQUIREMENT
+
+Do not let the adaptive engine ask only vocabulary because the vocabulary estimate converged quickly.
+
+A valid placement result should include minimum coverage for:
+
+```text
+Vocabulary
+Grammar
+Context
+Reading
+```
+
+before stopping.
+
+---
+
+# 40. ITEM EXPOSURE CONTROL
+
+Track previously seen placement questions.
+
+For retakes:
+
+```text
+prefer unseen items
+```
+
+Do not guarantee zero repeats if the pool is limited.
+
+But avoid showing nearly identical tests repeatedly.
+
+---
+
+# 41. RETAKE POLICY
+
+Persist:
+
+```text
+attempt date
+questions shown
+answers
+response time
+ability estimates
+domain estimates
+confidence
+```
+
+A retake should use unseen items when possible.
+
+Do not overwrite history.
+
+---
+
+# 42. PLACEMENT ITEM BANK TARGET
+
+Build architecture for:
+
+```text
+750+
+```
+
+validated items eventually.
+
+During this run, substantially increase the current pool.
+
+Priority:
+
+```text
+1. infrastructure
+2. quality validator
+3. 100+
+4. 200+
+5. 400+
+6. 750+
+```
+
+Do not generate 750 poor questions just to claim success.
+
+Report actual published item count.
+
+---
+
+# 43. ITEM STATUS WORKFLOW
+
+Assessment items should support:
+
+```text
+draft
+validated
+reviewed
+published
+retired
+```
+
+Only:
+
+```text
+published
+```
+
+items should be used in production placement.
+
+If human/editorial review has not happened, do not lie.
+
+You may use:
+
+```text
+validated
+```
+
+for machine-validated content and document remaining editorial review.
+
+---
+
+# 44. PLACEMENT QUESTION VALIDATOR
+
+Add rigorous validation.
+
+Every multiple-choice item must have:
+
+```text
+exactly one defensible best answer
+unique choices
+correct answer present exactly once
+valid CEFR
+valid domain
+valid topic
+valid difficulty
+explanation
+stable ID
+```
+
+Reject:
+
+```text
+duplicate choices
+answer duplicated
+ambiguous synonyms
+invalid references
+missing explanation
+empty prompt
+```
+
+---
+
+# 45. SEMANTIC DISTRACTOR VALIDATION
+
+Do not use silly distractors such as:
+
+```text
+acquire means:
+
+A. obtain
+B. banana
+C. blue
+D. television
+```
+
+Distractors should preferably match:
+
+```text
+part of speech
+CEFR proximity
+semantic neighborhood
+common learner confusions
+```
+
+But ensure only one correct answer.
+
+---
+
+# 46. READING ASSESSMENT
+
+Add a small but meaningful reading assessment subsystem.
+
+Reading items should use short passages and test:
+
+```text
+main idea
+detail
+reference
+inference
+vocabulary in context
+```
+
+Avoid copyrighted passages.
+
+Use repository-authored passages.
+
+Support CEFR progression.
+
+Do not use enormous reading texts for placement.
+
+---
+
+# 47. PLACEMENT TEST INPUT CONTRACT
+
+Define a clear input contract.
+
+Conceptually:
+
+```ts
+interface PlacementAttemptInput {
+  userId: string
+  previousAttempts?: PlacementAttemptSummary[]
+
+  priorLevel?: CEFRLevel
+
+  seenItemIds: string[]
+}
+```
+
+Actual question submission:
+
+```ts
+interface PlacementAnswerInput {
+  attemptId: string
+  itemId: string
+  selectedAnswer: string
+  responseTimeMs: number
+}
+```
+
+Validate server-side.
+
+---
+
+# 48. PLACEMENT ENGINE OUTPUT CONTRACT
+
+Conceptually:
+
+```ts
+interface PlacementResult {
+  estimatedLevel: CEFRLevel
+
+  overallAbility: number
+  confidence: number
+
+  domains: {
+    vocabulary: DomainEstimate
+    grammar: DomainEstimate
+    context: DomainEstimate
+    reading: DomainEstimate
+  }
+
+  strengths: SkillDiagnostic[]
+  weaknesses: SkillDiagnostic[]
+
+  recommendedStartingTopics: string[]
+}
+```
+
+Do not duplicate existing models unnecessarily.
+
+---
+
+# 49. PLACEMENT SIMULATION TESTS
+
+Create deterministic simulation tests.
+
+## Profile A — Beginner
+
+Simulate:
+
+```text
+A1 mostly correct
+A2 mixed
+B1 mostly incorrect
+B2+ incorrect
+```
+
+Expected:
+
+```text
+A1/A2 estimate
+```
+
+---
+
+# 50. PROFILE B — INTERMEDIATE
+
+Simulate:
+
+```text
+A1/A2 strong
+B1 strong
+B2 mixed
+C1 weak
+```
+
+Expected:
+
+```text
+B1/B2 boundary
+```
+
+---
+
+# 51. PROFILE C — ADVANCED
+
+Simulate:
+
+```text
+A1–B2 very strong
+C1 strong
+C2 mixed
+```
+
+Expected:
+
+```text
+C1 region
+```
+
+Do not automatically classify C2 merely because a few C2 items are correct.
+
+---
+
+# 52. PROFILE D — VOCABULARY STRONG / GRAMMAR WEAK
+
+Simulate:
+
+```text
+Vocabulary: B2
+Grammar: A2/B1
+Context: B1
+Reading: B1
+```
+
+Expected:
+
+```text
+overall estimate around B1-ish
+with clear vocabulary strength
+and grammar weakness
+```
+
+The overall result must not hide the skill imbalance.
+
+---
+
+# 53. PROFILE E — RANDOM GUESSER
+
+Simulate random choices.
+
+Expected:
+
+```text
+low confidence
+no inflated advanced result
+```
+
+---
+
+# 54. PROFILE F — INCONSISTENT USER
+
+Simulate:
+
+```text
+easy questions wrong
+hard questions occasionally correct
+```
+
+Expected:
+
+```text
+low confidence
+more questions requested before stopping
+```
+
+---
+
+# 55. STOPPING-RULE TESTS
+
+Test:
+
+```text
+stable learner
+→ stops relatively early
+```
+
+and:
+
+```text
+inconsistent learner
+→ continues closer to max question count
+```
+
+Also verify maximum is always respected.
+
+---
+
+# 56. LEARNING PATH INTEGRATION
+
+Placement must feed the existing Personalized Learning Path.
+
+Conceptual flow:
+
+```text
+Placement
+   ↓
+Ability estimate
+   ↓
+Domain weaknesses
+   ↓
+Subskill weaknesses
+   ↓
+Knowledge gaps
+   ↓
+Personalized Learning Path
+```
+
+Do not leave placement results isolated.
+
+---
+
+# 57. EXAMPLE LEARNING PATH RESULT
+
+Placement:
+
+```text
+Overall: B1
+
+Vocabulary: B1+
+Grammar: A2+
+Reading: B1
+Context: B1
+
+Weak:
+Present Perfect
+Prepositions
+Collocations
+```
+
+Learning path might prioritize:
+
+```text
+A2 grammar repair
+↓
+Present Perfect
+↓
+Prepositions
+↓
+B1 grammar
+↓
+B1 collocations
+```
+
+while still allowing B1 vocabulary.
+
+---
+
+# 58. DAILY PLANNER INTEGRATION
+
+The existing daily planner should consume:
+
+```text
+placement diagnostics
++
+learning path
++
+mastery
++
+mistakes
++
+FSRS due reviews
+```
+
+Placement determines a starting point.
+
+It must NOT override ongoing user performance forever.
+
+As the learner studies:
+
+```text
+real mastery/history
+```
+
+should gradually matter more than the original placement result.
+
+---
+
+# 59. ASSESSMENT CALIBRATION ARCHITECTURE
+
+Prepare for future statistical calibration.
+
+Persist per-item anonymous/aggregate-safe metrics where appropriate:
+
+```text
+attempt count
+correct count
+ability distribution
+response time summary
+```
+
+Do not expose private user data.
+
+Do not build a huge analytics platform.
+
+The purpose is future estimation of:
+
+```text
+empirical item difficulty
+item discrimination
+```
+
+---
+
+# 60. DO NOT AUTO-RECALIBRATE PROD ITEMS DANGEROUSLY
+
+Do not let a few early users automatically rewrite item difficulty.
+
+Design a safe calibration workflow:
+
+```text
+collect statistics
+↓
+analyze
+↓
+recommend calibration changes
+↓
+review
+↓
+publish
+```
+
+Production calibration must be controlled/versioned.
+
+---
+
+# 61. CONTENT VERSIONING
+
+Content changes must not break progress.
+
+Preserve:
+
+```text
+stable content IDs
+content version
+publication state
+```
+
+Retired content should not destroy historical progress.
+
+---
+
+# 62. CONTENT DATABASE IMPORT
+
+Improve content import/seeding.
+
+The process should be conceptually:
+
+```text
+source files
+↓
+normalize
+↓
+validate
+↓
+check provenance
+↓
+deduplicate
+↓
+publish/seed
+↓
+database
+```
+
+Do not hand-edit production DB rows.
+
+---
+
+# 63. CONTENT VALIDATION COMMAND
+
+Expand or preserve:
+
+```bash
+npm run validate:content
+```
+
+It should validate:
+
+```text
+Vocabulary
+Grammar
+Expressions
+Placement items
+Reading passages
+Relations
+Prerequisites
+Stable IDs
+Publication status
+```
+
+Provide useful diagnostics.
+
+---
+
+# 64. ADD CONTENT STATISTICS COMMAND
+
+If appropriate, add something like:
+
+```bash
+npm run content:stats
+```
+
+Output useful counts:
+
+```text
+Vocabulary by CEFR
+Detailed grammar lessons by CEFR
+Idioms
+Phrasal verbs
+Collocations
+Placement items by domain/CEFR
+Published vs draft
+```
+
+Do not add it if equivalent tooling already exists.
+
+---
+
+# 65. PRODUCTION CONTENT QUALITY REPORT
+
+Create/update:
+
+```text
+docs/content-quality.md
+```
+
+Include:
+
+```text
+Current counts
+Targets
+Validation rules
+Provenance status
+Editorial status
+Known weak areas
+```
+
+---
+
+# 66. ASSESSMENT DESIGN DOCUMENT
+
+Create:
+
+```text
+docs/placement-assessment.md
+```
+
+Document:
+
+```text
+domains
+item model
+difficulty scale
+ability estimate
+question selection
+domain coverage
+stopping rule
+confidence calculation
+retake behavior
+guess robustness
+future calibration
+limitations
+```
+
+Be mathematically clear.
+
+Do not claim psychometric validation where none exists.
+
+---
+
+# 67. TEST COVERAGE
+
+Add meaningful unit tests for:
+
+```text
+ability update
+question selection
+domain balancing
+seen-question avoidance
+stopping rule
+confidence
+random guessing
+placement profiles
+stable IDs
+content validation
+grammar prerequisites
+frequency-aware vocabulary selection
+```
+
+---
+
+# 68. INTEGRATION TESTS
+
+Use the existing PostgreSQL integration test infrastructure.
+
+Test:
+
+```text
+placement attempt persisted
+answers persisted
+seen items persisted
+results persisted
+retake avoids prior items when possible
+personalized path generated
+content import deterministic
+```
+
+---
+
+# 69. E2E TEST
+
+Extend the existing Playwright E2E flow.
+
+Test:
+
+```text
+Register
+↓
+Start Placement
+↓
+Receive adaptive questions
+↓
+Complete test
+↓
+Receive multidimensional result
+↓
+Open Learning Path
+↓
+Path reflects actual weaknesses
+↓
+Start first learning session
+```
+
+Do not hard-code the E2E to one exact question sequence if the engine is adaptive.
+
+Test behavior, not implementation trivia.
+
+---
+
+# 70. PERFORMANCE
+
+Prepare for:
+
+```text
+6,000+ vocabulary
+750+ placement items
+100+ detailed grammar lessons
+```
+
+Do not send the entire corpus to the browser.
+
+Use:
+
+```text
+server-side query
+pagination
+filtering
+search
+```
+
+where appropriate.
+
+Placement should fetch/select only the current required item(s).
+
+---
+
+# 71. VOCABULARY SEARCH
+
+Production search should support:
+
+```text
+lemma
+English meaning
+Vietnamese meaning
+topic
+synonym
+collocation
+```
+
+Use PostgreSQL efficiently where appropriate.
+
+Keep page size bounded.
+
+---
+
+# 72. CONTENT PAGINATION
+
+Preserve or improve the existing 24-item vocabulary pagination.
+
+Test:
+
+```text
+page size
+total count
+CEFR filters
+topic filters
+search
+```
+
+against the database.
+
+---
+
+# 73. EDITORIAL REVIEW ARCHITECTURE
+
+Do not build a giant CMS.
+
+But prepare a workflow:
+
+```text
+draft
+↓
+validation
+↓
+editorial review
+↓
+published
+```
+
+A CLI/report-based workflow is acceptable initially.
+
+---
+
+# 74. CONTENT QUALITY SAMPLES
+
+Before claiming a batch complete, inspect representative random samples from each CEFR.
+
+For example:
+
+```text
+20 random A1
+20 random A2
+20 random B1
+...
+```
+
+Review for:
+
+```text
+natural English
+correct Vietnamese
+correct POS
+reasonable CEFR
+natural examples
+no obvious hallucinated collocations
+```
+
+Automated validation cannot prove semantic quality.
+
+Record sampling results.
+
+---
+
+# 75. DO NOT LET AI GENERATION DEFINE CEFR BY GUESS ALONE
+
+If CEFR is repository-authored/editorially estimated, label it accordingly.
+
+If a licensed source provides CEFR, record provenance.
+
+Do not claim official CEFR mapping without support.
+
+---
+
+# 76. GRAMMAR QA
+
+For newly completed grammar lessons, validate:
+
+```text
+correct formula
+natural examples
+no contradictory explanations
+correct prerequisites
+correct answer keys
+Vietnamese explanation consistency
+```
+
+Add representative tests where practical.
+
+---
+
+# 77. EXPRESSIONS
+
+Expand expressions only after vocabulary/assessment architecture is stable.
+
+Priority:
+
+```text
+common phrasal verbs
+common collocations
+common modern idioms
+```
+
+Do not prioritize obscure expressions.
+
+---
+
+# 78. NO FEATURE CREEP
+
+Do NOT add:
+
+```text
+AI chatbot
+speech recognition
+payments
+social network
+leaderboards
+gambling-style rewards
+new authentication providers
+microservices
+Kubernetes
+```
+
+during this phase.
+
+---
+
+# 79. VALIDATION
+
+After implementation run:
+
+```bash
+npm run validate:content
+npm run lint
+npm run typecheck
+npm test
+npm run test:integration
+npm run build
+npm run test:e2e
+```
+
+Use actual script names if different.
+
+Fix failures.
+
+Do not report skipped tests as PASS.
+
+---
+
+# 80. RUNTIME QA
+
+Run the application and manually/runtime-check:
+
+```text
+Vocabulary
+Grammar
+Placement
+Placement Result
+Learning Path
+Daily Session
+Progress
+```
+
+Verify browser console for obvious runtime errors.
+
+---
+
+# 81. PLACEMENT ACCEPTANCE MATRIX
+
+Add/update acceptance documentation with scenarios such as:
+
+| Scenario               | Input                 | Expected                |
+| ---------------------- | --------------------- | ----------------------- |
+| Beginner               | strong A1, weak A2+   | A1/A2 estimate          |
+| Intermediate           | strong B1, mixed B2   | B1/B2 boundary          |
+| Advanced               | strong B2/C1          | C1-like estimate        |
+| Grammar weak           | B2 vocab, A2 grammar  | visible skill imbalance |
+| Random guess           | random answers        | low confidence          |
+| Retake                 | prior item history    | mostly unseen questions |
+| Consistent responses   | stable ability        | earlier stop            |
+| Inconsistent responses | contradictory answers | longer test             |
+
+Record actual automated results.
+
+---
+
+# 82. VOCABULARY ACCEPTANCE TESTS
+
+Test:
+
+```text
+A1 learner receives common A1 vocabulary before rare items
+mastered words excluded from new candidates
+frequency changes priority
+CEFR mismatch penalizes selection
+search works
+pagination works
+stable IDs preserved
+```
+
+---
+
+# 83. GRAMMAR ACCEPTANCE TESTS
+
+Test:
+
+```text
+locked prerequisite
+ready topic
+mastered topic
+weak subtopic
+lesson content exists
+exercise answer valid
+```
+
+---
+
+# 84. FINAL CONTENT COUNTS
+
+Report exact final counts.
+
+Vocabulary:
+
+```text
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+Total:
+```
+
+Relations:
+
+```text
+Synonyms:
+Antonyms:
+Word-family relations:
+Vocabulary collocations:
+```
+
+Grammar:
+
+```text
+Curriculum topics:
+Detailed lessons:
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+```
+
+Expressions:
+
+```text
+Idioms:
+Phrasal verbs:
+Collocations:
+Common expressions:
+```
+
+Placement:
+
+```text
+Total item bank:
+Published items:
+
+Vocabulary:
+Grammar:
+Context:
+Reading:
+
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+```
+
+---
+
+# 85. ASSESSMENT QUALITY REPORT
+
+Report:
+
+```text
+Adaptive algorithm:
+Ability model:
+Confidence model:
+Stopping rule:
+Minimum questions:
+Maximum questions:
+Domain coverage:
+Retake behavior:
+Seen-item avoidance:
+Guess robustness:
+Calibration state:
+```
+
+Be explicit whether parameters are:
+
+```text
+editorially estimated
+```
+
+or:
+
+```text
+empirically calibrated
+```
+
+---
+
+# 86. PRODUCTION LEARNING PRODUCT GATES
+
+At the end evaluate:
+
+```text
+Vocabulary architecture ready for 6k+: PASS/FAIL
+Content provenance documented: PASS/FAIL
+Content validator production-ready: PASS/FAIL
+Grammar curriculum complete: PASS/FAIL
+Detailed grammar coverage production-adequate: PASS/FAIL
+Placement architecture production-ready: PASS/FAIL
+Placement item bank adequate: PASS/FAIL
+Adaptive ability estimate tested: PASS/FAIL
+Confidence/stopping rule tested: PASS/FAIL
+Multidimensional diagnostics tested: PASS/FAIL
+Retake exposure control tested: PASS/FAIL
+Personalized path integration tested: PASS/FAIL
+Content performance tested: PASS/FAIL
+```
+
+Do not mark corpus-volume gates PASS merely because architecture exists.
+
+---
+
+# 87. QUALITY SCORECARD
+
+Score 0–5:
+
+```text
+Vocabulary architecture
+Vocabulary quantity
+Vocabulary quality
+Grammar curriculum
+Grammar detailed lessons
+Idioms
+Phrasal verbs
+Collocations
+Content provenance
+Content validation
+Placement item bank
+Placement algorithm
+Placement reliability
+Placement diagnostics
+Personalized-path integration
+Exercise quality
+Content performance
+Editorial readiness
+```
+
+Do not inflate scores.
+
+---
+
+# 88. GIT REVIEW
+
+Before committing:
+
+```bash
+git status
+git diff --stat
+git diff
+```
+
+Do not commit:
+
+```text
+.env
+secrets
+node_modules
+.next
+coverage
+Playwright output
+logs
+temporary content-generation artifacts
+unlicensed source dumps
+```
+
+---
+
+# 89. STAGE AND REVIEW
+
+Run:
+
+```bash
+git add -A
+git diff --cached --stat
+git diff --cached
+git status
+```
+
+Review everything before commit.
+
+---
+
+# 90. COMMIT
+
+If validation is successful, create one commit.
+
+Suggested:
+
+```bash
+git commit -m "Build production content and adaptive assessment foundation"
+```
+
+Use a better concise message if the implemented scope differs.
+
+Do NOT push.
+
+---
+
+# 91. FINAL REPORT
+
+Return:
+
+## Vocabulary
+
+Exact counts by CEFR.
+
+## Grammar
+
+Exact curriculum and detailed lesson counts.
+
+## Expressions
+
+Exact counts.
+
+## Placement
+
+Exact question-bank counts.
+
+Explain:
+
+```text
+algorithm
+difficulty model
+confidence
+stopping
+domain coverage
+retakes
+calibration
+```
+
+## Content provenance
+
+List:
+
+```text
+repository-authored sources
+external permitted sources
+licenses
+remaining provenance blockers
+```
+
+## Tests
+
+Report:
+
+```text
+content validation
+unit
+integration
+E2E
+build
+runtime
+```
+
+with exact test counts.
+
+## Learning Product Gates
+
+PASS/FAIL every gate.
+
+## Quality Scorecard
+
+0–5.
+
+## Remaining blockers
+
+Separate:
+
+```text
+content quantity
+content quality
+assessment calibration
+editorial review
+licensing
+```
+
+## Git
+
+Report:
+
+```text
+branch
+latest commit
+working tree
+remote
+upstream
+```
+
+Do not push.
+
+If upstream exists, end with:
+
+```bash
+git push
+```
+
+as the manual command for me.
+
+---
+
+# 92. EXECUTION RULE
+
+Do not only produce a plan.
+
+Execute the work autonomously.
+
+Run routine commands yourself.
+
+Only ask for manual interaction if genuinely required.
+
+Do not stop merely because the final 6,000-word corpus cannot be completed in one run.
+
+Finish as much high-quality validated work as practical and leave the repository in a coherent state.
+
+---
+
+# FINAL PRIORITY
+
+If the task becomes too large, prioritize exactly:
+
+```text
+1. Assessment architecture
+2. Assessment tests/simulations
+3. Placement item validation
+4. Content provenance
+5. Vocabulary production pipeline
+6. A1 vocabulary
+7. A2 vocabulary
+8. B1 vocabulary
+9. Grammar detailed lessons
+10. B2 vocabulary
+11. C1 vocabulary
+12. C2 vocabulary
+13. Expressions expansion
+```
+
+The goal is not to manufacture impressive counts.
+
+The goal is to create a trustworthy English-learning content and assessment system that can continue scaling toward production.
+
+Begin now by auditing the current vocabulary corpus, grammar lesson coverage, placement question bank, and existing adaptive scoring implementation.

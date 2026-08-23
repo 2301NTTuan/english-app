@@ -21,4 +21,11 @@ describe("buildLearningPath", () => {
     const result = buildLearningPath(state, new Date("2026-08-23T00:00:00.000Z"));
     expect(result[0].itemId).toBe("perfect-vs-past");
   });
+
+  it("never recommends an encountered word as new vocabulary", () => {
+    const state = createInitialState();
+    const learnedIds = new Set(state.vocabularyProgress.map((progress) => progress.itemId));
+    const recommended = buildLearningPath(state).filter((item) => item.knowledgeType === "vocabulary");
+    expect(recommended.every((item) => !learnedIds.has(item.itemId))).toBe(true);
+  });
 });

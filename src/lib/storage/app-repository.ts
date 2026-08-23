@@ -1,12 +1,21 @@
-import type { AppState, MistakeRecord } from "@/types/domain";
+import type { AppState, MistakeRecord, PlacementAnswer, PlacementResult } from "@/types/domain";
 import { vocabulary } from "@/data/vocabulary";
 import { grammarTopics } from "@/data/grammar";
+import { scorePlacement } from "@/lib/learning/placement";
 
 const KEY = "english-mastery:state";
 const LEGACY_KEY = "english-mastery:v1";
 const STORAGE_VERSION = 4;
 const isoOffset = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
 const defaultReview = (nextReview = new Date().toISOString()): AppState["vocabularyProgress"][number]["review"] => ({ difficulty: 5, stability: 1, state: "new", nextReview, scheduledDays: 0, elapsedDays: 0, reviewCount: 0, correctCount: 0, incorrectCount: 0, lapses: 0 });
+
+function normalizePlacement(value: unknown): PlacementResult | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const candidate = value as Partial<PlacementResult> & { answers?: PlacementAnswer[]; completedAt?: string };
+  if (!Array.isArray(candidate.answers) || !candidate.completedAt) return undefined;
+  if (candidate.confidence && candidate.domainEstimates && typeof candidate.overallAbility === "number") return candidate as PlacementResult;
+  return scorePlacement(candidate.answers, new Date(candidate.completedAt));
+}
 
 export function createEmptyAccountState(): AppState {
   return { settings: { currentLevel: "B1", dailyTarget: 25, maxNewWordsPerDay: 10, maxNewGrammarTopicsPerDay: 1, desiredRetention: 0.9, interfaceLanguage: "en", showVietnamese: true }, vocabularyProgress: [], grammarProgress: [], mistakes: [], streak: 0, activities: [] };
@@ -45,7 +54,7 @@ export function normalizeState(candidate: unknown): AppState {
     grammarProgress: Array.isArray(candidate.grammarProgress) ? candidate.grammarProgress.map((item) => { const legacy = item as typeof item & { nextReview?: string }; return { ...item, review: { ...defaultReview(legacy.nextReview), ...item.review } }; }) : defaults.grammarProgress,
     mistakes: Array.isArray(candidate.mistakes) ? candidate.mistakes.map((item) => ({ ...item, resolved: item.resolved ?? false })) : defaults.mistakes,
     activities: Array.isArray(candidate.activities) ? candidate.activities.slice(0, 30).map((item) => ({ ...item, vocabularyReviewed: item.vocabularyReviewed ?? 0, newVocabulary: item.newVocabulary ?? 0, grammarExercises: item.grammarExercises ?? 0, mistakesCorrected: item.mistakesCorrected ?? 0 })) : defaults.activities,
-    placement: candidate.placement && Array.isArray(candidate.placement.answers) ? candidate.placement : undefined,
+    placement: normalizePlacement(candidate.placement),
   };
 }
 

@@ -24,6 +24,7 @@ Open `http://localhost:3000`, register an account, and sign in. WSL users must e
 
 ```bash
 npm run validate:content
+npm run content:stats
 npm run lint
 npm run typecheck
 npm test
@@ -58,9 +59,9 @@ Key documentation:
 
 ## Content and learning system
 
-The existing pure TypeScript systems remain intact: backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 30-question placement test, prerequisite-aware personalized paths, and metadata-driven exercises. Content validation checks stable identifiers, duplicate senses, references, relations, prerequisites, examples, and answer ambiguity.
+The existing pure TypeScript systems include backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 25–50-question four-domain placement assessment, prerequisite-aware personalized paths, and metadata-driven exercises. Placement selection and scoring remain server-scoped so the browser receives only the active item. Content validation checks stable identifiers, duplicate senses, references, relations, cyclic prerequisites, examples, provenance, item parameters, passage links, and answer ambiguity.
 
-Current bundled content: 192 vocabulary entries, 138 grammar topics (35 fully detailed lessons), and 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions).
+Current bundled content: 192 vocabulary entries, 138 grammar topics (35 fully detailed lessons), 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions), and a 108-item validated placement pilot with six authored passages. Run `npm run content:stats` for exact coverage and release gates. Validated pilot content is not educator-reviewed or production-published.
 
 ## Operational notes
 

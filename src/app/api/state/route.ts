@@ -6,6 +6,7 @@ import { currentUser } from "@/lib/auth/server";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { saveLearningState } from "@/lib/learning/persistence";
 import { appStateSchema, stateEnvelopeSchema } from "@/lib/validation/app-state";
+import { normalizeState } from "@/lib/storage/app-repository";
 
 export async function GET() {
   try {
@@ -13,7 +14,7 @@ export async function GET() {
     if (!user) return jsonError("Authentication required.", 401);
     const [snapshot] = await getDb().select({ state: userStateSnapshots.state, updatedAt: userStateSnapshots.updatedAt }).from(userStateSnapshots).where(eq(userStateSnapshots.userId, user.id)).limit(1);
     if (!snapshot) return jsonError("Learning state not found.", 404);
-    const parsed = appStateSchema.safeParse(snapshot.state);
+    const parsed = appStateSchema.safeParse(normalizeState(snapshot.state));
     if (!parsed.success) return jsonError("Stored learning state is invalid.", 500);
     return NextResponse.json({ state: parsed.data, updatedAt: snapshot.updatedAt });
   } catch { return jsonError("Learning data is temporarily unavailable.", 503); }

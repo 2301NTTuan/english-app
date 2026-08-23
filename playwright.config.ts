@@ -8,6 +8,7 @@ const databaseName = new URL(testDatabaseUrl).pathname.slice(1);
 if (!databaseName.includes("test")) throw new Error(`Refusing to run Playwright against non-test database: ${databaseName}`);
 process.env.DATABASE_URL = testDatabaseUrl;
 process.env.PASSWORD_RESET_DELIVERY = "development";
+process.env.PLACEMENT_CONTENT_CHANNEL = "validated-preview";
 
 export default defineConfig({
   testDir: "./tests/e2e",
