@@ -4,6 +4,7 @@ import { vocabulary } from "@/data/vocabulary";
 import { selectDailyPlan } from "@/lib/learning/selectors";
 import { weakestDimension } from "@/lib/learning/mastery";
 import { recommendableTopics } from "@/lib/learning/prerequisites";
+import { prioritizeMistakes } from "@/lib/learning/mistakes";
 import type { AppState, Exercise, PlanCategory, SessionExercise, VocabularyItem } from "@/types/domain";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
@@ -24,6 +25,8 @@ function vocabularyExercise(item: VocabularyItem, source: PlanCategory, preferre
   ));
   if (seeded) return { ...seeded, id: `${source}-${seeded.id}`, source, targetDimension: preferred ?? "recognition" };
   if (preferred === "recall") return { id: `${source}-${item.id}-recall`, itemId: item.id, knowledgeType: "vocabulary", type: "recall", source, targetDimension: "recall", prompt: `Which English word means “${item.meanings[0].vietnamese ?? item.meanings[0].definition}”?`, options: optionsForWord(item, "word"), answer: item.word, explanation: `${item.word}: ${item.meanings[0].definition}` };
+  if (preferred === "spelling" && item.wordFamily.length) { const answer = item.wordFamily[0].word; return { id: `${source}-${item.id}-family`, itemId: item.id, knowledgeType: "vocabulary", type: "fill-blank", source, targetDimension: "spelling", prompt: `Choose the ${item.wordFamily[0].partOfSpeech} in the word family of “${item.word}”.`, options: rotate(unique([answer, item.word, ...item.wordFamily.slice(1).map((entry) => entry.word), "none of these"]).slice(0, 4), 1), answer, explanation: `${answer} is the ${item.wordFamily[0].partOfSpeech} form.` }; }
+  if (preferred === "context" && item.collocations.length) { const [first, ...rest] = item.collocations[0].split(" "); return { id: `${source}-${item.id}-collocation`, itemId: item.id, knowledgeType: "vocabulary", type: "collocation", source, targetDimension: "context", prompt: `Complete the natural collocation: ___ ${rest.join(" ")}`, options: rotate(unique([first, "do", "make", "perform"]).slice(0, 4), 1), answer: first, explanation: `“${item.collocations[0]}” is the natural combination.` }; }
   if (preferred === "context" && item.synonyms.length) return { id: `${source}-${item.id}-synonym`, itemId: item.id, knowledgeType: "vocabulary", type: "synonym", source, targetDimension: "context", prompt: `Which word is closest in meaning to “${item.word}”?`, options: rotate(unique([item.synonyms[0].word, ...vocabulary.filter((candidate) => candidate.id !== item.id).slice(0, 3).map((candidate) => candidate.word)]), 1), answer: item.synonyms[0].word, explanation: `${item.synonyms[0].word} is similar here, though synonyms are not always interchangeable.` };
   return { id: `${source}-${item.id}-recognition`, itemId: item.id, knowledgeType: "vocabulary", type: "recognition", source, targetDimension: "recognition", prompt: `What does “${item.word}” mean?`, options: optionsForWord(item, "meaning"), answer: item.meanings[0].definition, explanation: item.examples[0] };
 }
@@ -39,7 +42,8 @@ function grammarExercise(topicId: string, source: PlanCategory): SessionExercise
 }
 
 function mistakeExercise(state: AppState, index: number): SessionExercise | undefined {
-  const mistake = [...state.mistakes].sort((a, b) => b.repeatedCount - a.repeatedCount)[index % state.mistakes.length];
+  const active = prioritizeMistakes(state.mistakes);
+  const mistake = active[index % active.length];
   if (!mistake) return undefined;
   const seeded = seedExercises.find((exercise) => exercise.itemId === mistake.itemId);
   if (seeded) return { ...seeded, id: `mistake-${seeded.id}-${index}`, source: "mistakes" };
@@ -60,8 +64,8 @@ export function buildStudySession(state: AppState, now = new Date()): SessionExe
     newVocabulary: vocabulary.filter((item) => !learnedIds.has(item.id) && atOrBelow(item.cefrLevel, state.settings.currentLevel)),
   };
   const grammarBySource: Partial<Record<PlanCategory, string[]>> = {
-    overdueGrammar: state.grammarProgress.filter((item) => overdue(item.nextReview)).map((item) => item.topicId),
-    dueGrammar: state.grammarProgress.filter((item) => dueToday(item.nextReview)).map((item) => item.topicId),
+    overdueGrammar: state.grammarProgress.filter((item) => overdue(item.review.nextReview)).map((item) => item.topicId),
+    dueGrammar: state.grammarProgress.filter((item) => dueToday(item.review.nextReview)).map((item) => item.topicId),
     weakGrammar: state.grammarProgress.filter((item) => item.mastery < 60).sort((a, b) => a.mastery - b.mastery).map((item) => item.topicId),
     newGrammar: recommendableTopics(grammarTopics, state.grammarProgress).filter((item) => !learnedGrammarIds.has(item.id) && atOrBelow(item.level, state.settings.currentLevel)).map((item) => item.id),
   };

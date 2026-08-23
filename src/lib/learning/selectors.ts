@@ -14,11 +14,11 @@ export function selectInventory(state: AppState, now = new Date()): LearningInve
   return {
     overdueVocabulary: state.vocabularyProgress.filter((item) => overdue(item.review.nextReview)).length,
     dueVocabulary: state.vocabularyProgress.filter((item) => due(item.review.nextReview) && !overdue(item.review.nextReview)).length,
-    overdueGrammar: state.grammarProgress.filter((item) => overdue(item.nextReview)).length,
-    dueGrammar: state.grammarProgress.filter((item) => due(item.nextReview) && !overdue(item.nextReview)).length,
+    overdueGrammar: state.grammarProgress.filter((item) => overdue(item.review.nextReview)).length,
+    dueGrammar: state.grammarProgress.filter((item) => due(item.review.nextReview) && !overdue(item.review.nextReview)).length,
     weakVocabulary: state.vocabularyProgress.filter((item) => item.mastery.overall < 60).length,
     weakGrammar: state.grammarProgress.filter((item) => item.mastery < 60).length,
-    mistakes: state.mistakes.length,
+    mistakes: state.mistakes.filter((item) => !item.resolved).length,
     newVocabulary: vocabulary.filter((item) => atOrBelow(item.cefrLevel, state.settings.currentLevel) && !state.vocabularyProgress.some((progress) => progress.itemId === item.id)).length,
     newGrammar: recommendableTopics(grammarTopics, state.grammarProgress).filter((item) => atOrBelow(item.level, state.settings.currentLevel) && !state.grammarProgress.some((progress) => progress.topicId === item.id)).length,
   };

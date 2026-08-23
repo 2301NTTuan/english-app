@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ui";
 import { scheduleReview } from "@/lib/fsrs/scheduler";
 import { buildStudySession } from "@/lib/learning/session";
 import { updateMastery } from "@/lib/learning/mastery";
+import { evaluateAnswer, ratingForAnswer } from "@/lib/learning/evaluation";
 import { upsertMistake } from "@/lib/storage/app-repository";
 import { grammarTopics } from "@/data/grammar";
 import type { GrammarProgress, MasteryDimensions, Rating, ReviewState, SessionExercise } from "@/types/domain";
@@ -21,21 +22,21 @@ const ratingStyle: Record<Rating, string> = {
 const sourceLabel: Record<SessionExercise["source"], string> = {
   overdueVocabulary: "Overdue vocabulary", overdueGrammar: "Overdue grammar", dueVocabulary: "Due vocabulary", dueGrammar: "Due grammar",
   weakVocabulary: "Weak vocabulary", weakGrammar: "Weak grammar", mistakes: "Mistake review", newVocabulary: "New vocabulary", newGrammar: "New grammar",
+  mixedPractice: "Mixed practice",
 };
 
 function initialReview(): ReviewState {
-  return { difficulty: 5, stability: 1, state: "new", nextReview: new Date().toISOString(), reviewCount: 0, correctCount: 0, incorrectCount: 0, lapses: 0 };
+  return { difficulty: 5, stability: 1, state: "new", nextReview: new Date().toISOString(), scheduledDays: 0, elapsedDays: 0, reviewCount: 0, correctCount: 0, incorrectCount: 0, lapses: 0 };
 }
 
-function updateGrammarProgress(progress: GrammarProgress[], exercise: SessionExercise, correct: boolean, rating: Rating): GrammarProgress[] {
-  const interval = { again: 0, hard: 1, good: 3, easy: 7 }[rating];
-  const nextReview = new Date(Date.now() + interval * 86_400_000).toISOString();
+function updateGrammarProgress(progress: GrammarProgress[], exercise: SessionExercise, correct: boolean, rating: Rating, desiredRetention: number): GrammarProgress[] {
   const existing = progress.find((item) => item.topicId === exercise.itemId);
   const topic = grammarTopics.find((item) => item.id === exercise.itemId);
-  if (!existing) return [...progress, { topicId: exercise.itemId, mastery: correct ? 12 : 3, subtopicMastery: Object.fromEntries((topic?.subtopics ?? []).map((subtopic, index) => [subtopic.id, index === 0 ? (correct ? 12 : 3) : 0])), nextReview }];
+  const review = scheduleReview(existing?.review ?? initialReview(), rating, new Date(), desiredRetention);
+  if (!existing) return [...progress, { topicId: exercise.itemId, mastery: correct ? 12 : 3, subtopicMastery: Object.fromEntries((topic?.subtopics ?? []).map((subtopic, index) => [subtopic.id, index === 0 ? (correct ? 12 : 3) : 0])), review }];
   const weakest = Object.entries(existing.subtopicMastery).sort((a, b) => a[1] - b[1])[0]?.[0] ?? topic?.subtopics[0]?.id;
   const subtopicMastery = weakest ? { ...existing.subtopicMastery, [weakest]: Math.max(0, Math.min(100, (existing.subtopicMastery[weakest] ?? 0) + (correct ? 4 : -9))) } : existing.subtopicMastery;
-  return progress.map((item) => item.topicId === exercise.itemId ? { ...item, mastery: Math.max(0, Math.min(100, item.mastery + (correct ? 3 : -8))), subtopicMastery, nextReview } : item);
+  return progress.map((item) => item.topicId === exercise.itemId ? { ...item, mastery: Math.max(0, Math.min(100, item.mastery + (correct ? 3 : -8))), subtopicMastery, review } : item);
 }
 
 export function SessionPlayer() {
@@ -49,6 +50,8 @@ export function SessionPlayer() {
   const [checked, setChecked] = useState(false);
   const [correct, setCorrect] = useState(0);
   const [mistakes, setMistakes] = useState(0);
+  const [mistakesCorrected, setMistakesCorrected] = useState(0);
+  const [missedPrompts, setMissedPrompts] = useState<string[]>([]);
   const item = session[index];
 
   if (!hydrated) return <div className="card mx-auto max-w-3xl p-8"><div className="h-2 animate-pulse rounded-full bg-[#dce6e1]"/><div className="mt-8 h-8 w-3/4 animate-pulse rounded-lg bg-[#e8eeeb]"/><div className="mt-8 grid gap-3">{[1, 2, 3, 4].map((value) => <div key={value} className="h-14 animate-pulse rounded-xl bg-[#eef2f0]"/>)}</div><span className="sr-only">Loading your study session</span></div>;
@@ -63,37 +66,43 @@ export function SessionPlayer() {
       <div className="my-7 grid grid-cols-3 gap-2">
         <SummaryMetric value={`${accuracy}%`} label="Accuracy"/><SummaryMetric value={correct} label="Correct"/><SummaryMetric value={mistakes} label="To revisit"/>
       </div>
+      <div className="mb-7 grid gap-2 text-left sm:grid-cols-2"><SummaryLine label="Vocabulary reviewed" value={session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length}/><SummaryLine label="New vocabulary" value={session.filter((entry) => entry.source === "newVocabulary").length}/><SummaryLine label="Grammar exercises" value={session.filter((entry) => entry.knowledgeType === "grammar").length}/><SummaryLine label="Mistakes corrected" value={mistakesCorrected}/></div>
+      {missedPrompts.length > 0 ? <div className="mb-7 rounded-xl bg-amber-50 p-4 text-left"><b className="text-sm text-amber-900">Needs more practice</b><p className="mt-1 text-sm text-amber-800">{missedPrompts.slice(0, 2).join(" · ")}</p></div> : <div className="mb-7 rounded-xl bg-emerald-50 p-4 text-left"><b className="text-sm text-emerald-900">Strong improvement</b><p className="mt-1 text-sm text-emerald-800">You completed the session without an incorrect answer.</p></div>}
       <div className="flex flex-col justify-center gap-2 sm:flex-row"><Link href="/" className="btn-primary">Back to dashboard</Link><Link href="/progress" className="btn-secondary">View progress</Link></div>
     </section>;
   }
 
-  const isCorrect = selected === item.answer;
+  const isCorrect = evaluateAnswer(selected, item.answer);
   const submit = () => {
     if (!selected || checked) return;
     setChecked(true);
     setCorrect((value) => value + (isCorrect ? 1 : 0));
     setMistakes((value) => value + (isCorrect ? 0 : 1));
+    if (isCorrect && item.source === "mistakes") setMistakesCorrected((value) => value + 1);
+    if (!isCorrect) setMissedPrompts((value) => [...value, item.prompt]);
     if (!isCorrect) setState((current) => ({ ...current, mistakes: upsertMistake(current.mistakes, { itemId: item.itemId, label: item.prompt, knowledgeType: item.knowledgeType, exerciseType: item.type, wrongAnswer: selected, correctAnswer: item.answer }) }));
   };
 
   const rate = (rating: Rating) => {
     setState((current) => {
-      const masteryCorrect = isCorrect && rating !== "again";
+      const effectiveRating = ratingForAnswer(isCorrect, rating);
+      const masteryCorrect = effectiveRating !== "again";
       let vocabularyProgress = current.vocabularyProgress;
       let grammarProgress = current.grammarProgress;
       if (item.knowledgeType === "vocabulary") {
         const existing = vocabularyProgress.find((entry) => entry.itemId === item.itemId);
         const mastery: MasteryDimensions = existing?.mastery ?? { recognition: 0, recall: 0, context: 0, spelling: 0, overall: 0 };
         const dimension = item.targetDimension ?? (item.type === "recall" ? "recall" : item.type === "recognition" ? "recognition" : "context");
-        const updated = { itemId: item.itemId, mastery: updateMastery(mastery, dimension, masteryCorrect), review: scheduleReview(existing?.review ?? initialReview(), rating, new Date(), current.settings.desiredRetention) };
+        const updated = { itemId: item.itemId, mastery: updateMastery(mastery, dimension, masteryCorrect), review: scheduleReview(existing?.review ?? initialReview(), effectiveRating, new Date(), current.settings.desiredRetention) };
         vocabularyProgress = existing ? vocabularyProgress.map((entry) => entry.itemId === item.itemId ? updated : entry) : [...vocabularyProgress, updated];
       } else if (item.knowledgeType === "grammar") {
-        grammarProgress = updateGrammarProgress(grammarProgress, item, masteryCorrect, rating);
+        grammarProgress = updateGrammarProgress(grammarProgress, item, masteryCorrect, effectiveRating, current.settings.desiredRetention);
       }
       const finished = index === session.length - 1;
       const minutes = Math.max(1, Math.round((Date.now() - startedAt.current) / 60_000));
-      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct, total: session.length, minutes, masteryDelta: correct > mistakes ? 3 : 1 }, ...current.activities].slice(0, 30) : current.activities;
-      const mistakeRecords = item.source === "mistakes" && masteryCorrect ? current.mistakes.flatMap((mistake) => mistake.itemId !== item.itemId ? [mistake] : mistake.repeatedCount > 1 ? [{ ...mistake, repeatedCount: mistake.repeatedCount - 1 }] : []) : current.mistakes;
+      const finalCorrect = correct;
+      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct: finalCorrect, total: session.length, minutes, masteryDelta: finalCorrect > mistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
+      const mistakeRecords = item.source === "mistakes" && masteryCorrect ? current.mistakes.map((mistake) => mistake.itemId === item.itemId ? { ...mistake, resolved: true } : mistake) : current.mistakes;
       return { ...current, vocabularyProgress, grammarProgress, mistakes: mistakeRecords, activities };
     });
     setIndex((value) => value + 1);
@@ -135,3 +144,5 @@ export function SessionPlayer() {
 function SummaryMetric({ value, label }: { value: string | number; label: string }) {
   return <div className="rounded-xl bg-[#f5f8f6] p-3"><b className="text-xl">{value}</b><div className="muted text-xs">{label}</div></div>;
 }
+
+function SummaryLine({ value, label }: { value: number; label: string }) { return <div className="flex items-center justify-between rounded-xl bg-[#f5f8f6] px-4 py-3 text-sm"><span className="muted">{label}</span><b>{value}</b></div>; }

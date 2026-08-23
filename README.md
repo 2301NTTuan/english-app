@@ -55,8 +55,8 @@ npm run build
 
 1. Overdue vocabulary and grammar
 2. Due vocabulary and grammar
-3. Weak vocabulary and grammar dimensions
-4. Previous mistakes
+3. Previous mistakes
+4. Weak vocabulary and grammar dimensions
 5. New vocabulary
 6. New grammar
 
@@ -67,7 +67,7 @@ The session builder translates each allocation into a suitable exercise and targ
 ## Current limitations
 
 - The scheduler is a compact FSRS-inspired adapter, not a full FSRS implementation.
-- Seed content is intentionally small: 30 words, 15 representative grammar topics, and 8 expressions.
+- Seed content currently includes 120 words, the full 137-topic A1–C2 grammar catalogue with 15 richer representative lessons, and 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, and 7 common expressions).
 - State is browser-local and intended for one learner and one device.
 - Generated sessions still rely on a deliberately small curated content set and exercise template library.
 - No authentication, backend, audio, speech recognition, AI tutor, or complete A1–C2 corpus.

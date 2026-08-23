@@ -8,7 +8,7 @@ const topic = (id: string, title: string, level: GrammarTopic["level"], descript
   subtopics: subtopics.map((title, index) => ({ id: `${id}-${index + 1}`, title })),
 });
 
-export const grammarTopics: GrammarTopic[] = [
+const detailedTopics: GrammarTopic[] = [
   topic("be", "Be: am / is / are", "A1", "Use be to identify and describe.", [], ["I am", "he/she/it is", "you/we/they are"], "She is a student.", ["She are happy.", "She is happy.", "Use is with she."], ["affirmative", "negative", "questions"]),
   topic("present-simple", "Present Simple", "A1", "Habits, facts, and routines.", ["be"], ["subject + base verb", "he/she/it + verb-s"], "He studies every morning.", ["He study daily.", "He studies daily.", "Add -s in the third person singular."], ["forms", "third person", "frequency"]),
   topic("present-continuous", "Present Continuous", "A1", "Actions happening around now.", ["be"], ["am/is/are + verb-ing"], "They are studying now.", ["They studying.", "They are studying.", "The auxiliary be is required."], ["forms", "spelling", "time markers"]),
@@ -27,10 +27,29 @@ export const grammarTopics: GrammarTopic[] = [
 ];
 
 export const curriculumOutline: Record<GrammarTopic["level"], string[]> = {
-  A1: ["be: am / is / are", "pronouns", "possessives", "articles", "singular and plural nouns", "this / that / these / those", "there is / there are", "present simple", "present continuous", "can / can't", "basic prepositions", "question words", "adverbs of frequency"],
-  A2: ["past simple", "past continuous", "future with will", "be going to", "comparatives", "superlatives", "present perfect basics", "for / since", "already / yet / just", "first conditional", "basic relative clauses", "should / must / have to", "quantifiers"],
-  B1: ["present perfect vs past simple", "present perfect continuous", "past perfect", "passive voice", "reported speech", "relative clauses", "modal verbs", "gerund vs infinitive", "used to", "be used to", "question tags", "indirect questions"],
-  B2: ["third conditional", "mixed conditionals", "advanced passive", "causative", "modal perfect", "wish / if only", "participle clauses", "reduced relative clauses", "inversion basics", "cleft sentences"],
-  C1: ["advanced inversion", "conditional inversion", "advanced modality", "advanced passive structures", "reporting verbs", "nominalisation", "ellipsis", "fronting", "advanced participle clauses", "hedging", "formal vs informal grammar"],
-  C2: ["stylistic inversion", "advanced modality", "complex ellipsis", "subtle tense and aspect distinctions", "advanced subjunctive", "register-dependent grammar", "complex embedded clauses", "rhetorical structures"],
+  A1: ["Verb to be", "Subject pronouns", "Object pronouns", "Possessive adjectives", "Possessive pronouns", "Articles: a / an / the", "Plural nouns", "Demonstratives", "There is / There are", "Have / Have got", "Present Simple", "Present Continuous", "Present Simple vs Present Continuous", "Can / Can't", "Imperatives", "Possessive 's", "Some / Any", "Much / Many", "Countable / Uncountable nouns", "Prepositions of place", "Prepositions of time", "Wh- questions", "Adverbs of frequency", "Basic conjunctions"],
+  A2: ["Past Simple", "Past Continuous", "Past Simple vs Past Continuous", "Future with will", "Be going to", "Present Continuous for future", "Comparatives", "Superlatives", "Too / Enough", "Should", "Must", "Have to", "Must vs Have to", "Gerund basics", "Infinitive basics", "Present Perfect basics", "For / Since", "Already / Yet / Just", "Ever / Never", "First Conditional", "Relative clauses basics", "Adverbs", "Quantifiers", "Both / Either / Neither basics"],
+  B1: ["Present Perfect vs Past Simple", "Present Perfect Continuous", "Present Perfect vs Present Perfect Continuous", "Past Perfect", "Past Perfect vs Past Simple", "Future Continuous", "Future Perfect", "Zero Conditional", "First Conditional review", "Second Conditional", "Passive Voice", "Reported Speech", "Defining Relative Clauses", "Non-defining Relative Clauses", "Modal verbs", "Modal deduction basics", "Gerund vs Infinitive", "Used to", "Be used to", "Get used to", "Question tags", "Indirect questions", "So / Such", "Too / Enough", "Both / Either / Neither", "Articles intermediate"],
+  B2: ["Third Conditional", "Mixed Conditionals", "Advanced Passive", "Causative: have something done", "Causative: get something done", "Should have", "Could have", "Might have", "Must have", "Can't have", "Wish", "If only", "Reported Speech advanced", "Reporting verbs basics", "Participle clauses", "Reduced relative clauses", "Inversion basics", "Emphasis", "Cleft sentences", "Future Perfect Continuous", "Advanced gerund and infinitive patterns", "Subjunctive basics", "Advanced linking structures", "Complex noun phrases"],
+  C1: ["Advanced inversion", "Negative inversion", "Not only... but also inversion", "Conditional inversion", "Had I known...", "Were I to...", "Should you need...", "Advanced modality", "Advanced passive structures", "Advanced reporting verbs", "Nominalisation", "Ellipsis", "Substitution", "Fronting", "Cleft sentences", "Pseudo-cleft sentences", "Advanced participle clauses", "Complex prepositions", "Discourse markers", "Hedging", "Advanced emphasis", "Formal vs informal grammar", "Advanced relative structures", "Advanced conditionals"],
+  C2: ["Stylistic inversion", "Complex ellipsis", "Advanced modality nuances", "Tense and aspect nuance", "Formal subjunctive", "Literary grammatical structures", "Register-dependent grammar", "Advanced discourse structures", "Nuanced conditionals", "Complex embedded clauses", "Rhetorical structures", "Information structure", "Stylistic fronting", "Academic grammar conventions", "Advanced cohesive devices"],
 };
+
+const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+const prerequisiteByTitle: Record<string, string[]> = {
+  "Present Perfect basics": ["past-simple"], "Present Perfect vs Past Simple": ["present-perfect", "past-simple"],
+  "Second Conditional": ["first-conditional"], "Third Conditional": ["first-conditional"], "Mixed Conditionals": ["third-conditional"],
+  "Advanced Passive": ["passive"], "Advanced passive structures": ["b2-advanced-passive"], "Advanced inversion": ["third-conditional"],
+  "Stylistic inversion": ["inversion"], "Tense and aspect nuance": ["perfect-vs-past"],
+};
+
+const catalogueTopics = Object.entries(curriculumOutline).flatMap(([level, titles]) => titles.map((title) => {
+  const existing = detailedTopics.find((item) => item.title.toLowerCase() === title.toLowerCase() || (title === "Verb to be" && item.id === "be") || (title === "Present Perfect basics" && item.id === "present-perfect") || (title === "Advanced inversion" && item.id === "inversion") || (title === "Tense and aspect nuance" && item.id === "aspect-nuance"));
+  if (existing) return existing;
+  const id = `${level.toLowerCase()}-${slug(title)}`;
+  return topic(id, title, level as GrammarTopic["level"], `Build accurate control of ${title.toLowerCase()} in meaningful English.`, prerequisiteByTitle[title] ?? [], ["Study the core form and its common variations"], `This example demonstrates ${title.toLowerCase()}.`, ["A common learner form.", "A natural corrected form.", "Check the form, meaning, and context together."], ["form", "meaning", "usage"]);
+}));
+
+/** Full A1–C2 catalogue; selected high-value topics above contain richer authored lessons. */
+export const grammarTopics: GrammarTopic[] = [...catalogueTopics, ...detailedTopics.filter((item) => !catalogueTopics.some((topicItem) => topicItem.id === item.id))];
+export const detailedGrammarTopics = detailedTopics;

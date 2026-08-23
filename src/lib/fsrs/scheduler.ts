@@ -4,6 +4,8 @@ const DAY = 86_400_000;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 /** FSRS-inspired scheduling kept behind a stable adapter so a full FSRS implementation can replace it later. */
+export interface ReviewScheduler { schedule(current: ReviewState, rating: Rating, reviewedAt?: Date, desiredRetention?: number): ReviewState }
+
 export function scheduleReview(current: ReviewState, rating: Rating, reviewedAt = new Date(), desiredRetention = 0.9): ReviewState {
   const failed = rating === "again";
   const elapsedDays = current.lastReview ? Math.max(0, (reviewedAt.getTime() - new Date(current.lastReview).getTime()) / DAY) : 0;
@@ -19,7 +21,10 @@ export function scheduleReview(current: ReviewState, rating: Rating, reviewedAt 
   const intervalDays = failed ? ratingFloor.again : Math.max(ratingFloor[rating], Math.round(targetInterval));
   return {
     ...current, difficulty, stability, state: failed ? "relearning" : "review", lastReview: reviewedAt.toISOString(),
-    nextReview: new Date(reviewedAt.getTime() + intervalDays * DAY).toISOString(), reviewCount: current.reviewCount + 1,
+    nextReview: new Date(reviewedAt.getTime() + intervalDays * DAY).toISOString(), scheduledDays: intervalDays, elapsedDays,
+    reviewCount: current.reviewCount + 1,
     correctCount: current.correctCount + (failed ? 0 : 1), incorrectCount: current.incorrectCount + (failed ? 1 : 0), lapses: current.lapses + (failed ? 1 : 0),
   };
 }
+
+export const fsrsScheduler: ReviewScheduler = { schedule: scheduleReview };

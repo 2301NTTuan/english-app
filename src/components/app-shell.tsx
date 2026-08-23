@@ -6,6 +6,8 @@ import { BarChart3, BookMarked, BookOpen, Brain, ClipboardCheck, Gauge, Graduati
 import { useEffect, useState, type ReactNode } from "react";
 import { useAppState } from "@/components/app-provider";
 import { calculateStreak } from "@/lib/learning/streak";
+import { grammarTopics } from "@/data/grammar";
+import { vocabulary } from "@/data/vocabulary";
 
 const navigation = [
   ["Dashboard", "/", Gauge], ["Learn", "/learn", GraduationCap], ["Vocabulary", "/vocabulary", BookOpen],
@@ -15,7 +17,10 @@ const navigation = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const [open, setOpen] = useState(false); const { state } = useAppState();
-  const levelProgress = ({ A1: 82, A2: 67, B1: 42, B2: 18, C1: 8, C2: 2 } as const)[state.settings.currentLevel];
+  const levelVocabularyIds = new Set(vocabulary.filter((item) => item.cefrLevel === state.settings.currentLevel).map((item) => item.id));
+  const levelGrammarIds = new Set(grammarTopics.filter((item) => item.level === state.settings.currentLevel).map((item) => item.id));
+  const levelScores = [...state.vocabularyProgress.filter((item) => levelVocabularyIds.has(item.itemId)).map((item) => item.mastery.overall), ...state.grammarProgress.filter((item) => levelGrammarIds.has(item.topicId)).map((item) => item.mastery)];
+  const levelProgress = levelScores.length ? Math.round(levelScores.reduce((sum, value) => sum + value, 0) / levelScores.length) : 0;
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, []);
   return <div className="min-h-screen lg:grid lg:grid-cols-[238px_1fr]">
     <a href="#main-content" className="skip-link">Skip to main content</a>

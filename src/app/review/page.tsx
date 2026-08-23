@@ -12,7 +12,7 @@ export default function ReviewPage() {
   const { state } = useAppState(); const inventory = selectInventory(state); const plan = selectDailyPlan(state); const now = new Date();
   const queue = [
     ...state.vocabularyProgress.filter((item) => new Date(item.review.nextReview) <= now).map((item) => ({ id: `v-${item.itemId}`, label: vocabulary.find((word) => word.id === item.itemId)?.word ?? item.itemId, kind: "Vocabulary", mastery: item.mastery.overall, due: item.review.nextReview })),
-    ...state.grammarProgress.filter((item) => item.nextReview && new Date(item.nextReview) <= now).map((item) => ({ id: `g-${item.topicId}`, label: grammarTopics.find((topic) => topic.id === item.topicId)?.title ?? item.topicId, kind: "Grammar", mastery: item.mastery, due: item.nextReview! })),
+    ...state.grammarProgress.filter((item) => new Date(item.review.nextReview) <= now).map((item) => ({ id: `g-${item.topicId}`, label: grammarTopics.find((topic) => topic.id === item.topicId)?.title ?? item.topicId, kind: "Grammar", mastery: item.mastery, due: item.review.nextReview })),
   ].sort((a, b) => a.due.localeCompare(b.due));
 
   return <>

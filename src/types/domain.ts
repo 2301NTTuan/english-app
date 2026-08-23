@@ -14,7 +14,8 @@ export interface VocabularyItem {
 export interface MasteryDimensions { recognition: number; recall: number; context: number; spelling: number; overall: number }
 export interface ReviewState {
   difficulty: number; stability: number; state: "new" | "learning" | "review" | "relearning";
-  lastReview?: string; nextReview: string; reviewCount: number; correctCount: number; incorrectCount: number; lapses: number;
+  lastReview?: string; nextReview: string; scheduledDays: number; elapsedDays: number;
+  reviewCount: number; correctCount: number; incorrectCount: number; lapses: number;
 }
 export interface VocabularyProgress { itemId: string; mastery: MasteryDimensions; review: ReviewState }
 
@@ -25,7 +26,7 @@ export interface GrammarTopic {
   commonMistakes: { incorrect: string; correct: string; explanation: string }[];
   subtopics: { id: string; title: string }[];
 }
-export interface GrammarProgress { topicId: string; mastery: number; subtopicMastery: Record<string, number>; nextReview?: string }
+export interface GrammarProgress { topicId: string; mastery: number; subtopicMastery: Record<string, number>; review: ReviewState }
 export interface ExpressionItem {
   id: string; expression: string; kind: "idiom" | "phrasal-verb" | "collocation" | "common-expression";
   meaning: string; vietnameseMeaning: string; cefrLevel: CEFRLevel; examples: string[]; usageNotes: string; tags: string[];
@@ -33,11 +34,12 @@ export interface ExpressionItem {
 }
 export interface Exercise { id: string; knowledgeType: KnowledgeType; itemId: string; type: ExerciseType | GrammarExerciseType; prompt: string; options?: string[]; answer: string; explanation?: string }
 export interface SessionExercise extends Exercise { source: PlanCategory; targetDimension?: keyof Omit<MasteryDimensions, "overall"> }
-export interface MistakeRecord { id: string; itemId: string; label: string; knowledgeType: KnowledgeType; exerciseType: string; wrongAnswer: string; correctAnswer: string; timestamp: string; repeatedCount: number }
-export interface UserSettings { currentLevel: CEFRLevel; dailyTarget: number; maxNewWordsPerDay: number; desiredRetention: number }
+export interface MistakeRecord { id: string; itemId: string; subtopicId?: string; label: string; knowledgeType: KnowledgeType; exerciseType: string; wrongAnswer: string; correctAnswer: string; timestamp: string; repeatedCount: number; resolved: boolean }
+export interface UserSettings { currentLevel: CEFRLevel; dailyTarget: number; maxNewWordsPerDay: number; maxNewGrammarTopicsPerDay: number; desiredRetention: number; interfaceLanguage: "en" | "vi"; showVietnamese: boolean }
 export interface LearningInventory { overdueVocabulary: number; dueVocabulary: number; overdueGrammar: number; dueGrammar: number; weakVocabulary: number; weakGrammar: number; mistakes: number; newVocabulary: number; newGrammar: number }
-export type PlanCategory = "overdueVocabulary" | "overdueGrammar" | "dueVocabulary" | "dueGrammar" | "weakVocabulary" | "weakGrammar" | "mistakes" | "newVocabulary" | "newGrammar";
+export type PlanCategory = "overdueVocabulary" | "overdueGrammar" | "dueVocabulary" | "dueGrammar" | "mistakes" | "weakVocabulary" | "weakGrammar" | "newVocabulary" | "newGrammar" | "mixedPractice";
 export interface PlanAllocation { category: PlanCategory; count: number; minutesPerItem: number }
 export interface DailyPlan { allocations: PlanAllocation[]; totalItems: number; estimatedMinutes: number; reviewBacklog: number; newWords: number }
 export interface Activity { id: string; date: string; label: string; correct: number; total: number; minutes?: number; masteryDelta?: number }
-export interface AppState { settings: UserSettings; vocabularyProgress: VocabularyProgress[]; grammarProgress: GrammarProgress[]; mistakes: MistakeRecord[]; streak: number; activities: Activity[] }
+export interface SessionSummary extends Activity { vocabularyReviewed: number; newVocabulary: number; grammarExercises: number; mistakesCorrected: number }
+export interface AppState { settings: UserSettings; vocabularyProgress: VocabularyProgress[]; grammarProgress: GrammarProgress[]; mistakes: MistakeRecord[]; streak: number; activities: SessionSummary[] }
