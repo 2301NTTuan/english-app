@@ -1,15 +1,17 @@
 export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
-export type ExerciseType = "recognition" | "recall" | "fill-blank" | "synonym" | "antonym" | "collocation";
-export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "error-correction" | "sentence-building" | "translation" | "choose-tense" | "rewrite";
+export type FrequencyBand = "very-common" | "common" | "less-common" | "advanced";
+export type ExerciseType = "recognition" | "recall" | "fill-blank" | "context" | "definition-match" | "synonym" | "antonym" | "word-family" | "collocation";
+export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "error-correction" | "sentence-building" | "sentence-transformation" | "translation" | "choose-tense" | "grammar-contrast" | "rewrite";
 export type Rating = "again" | "hard" | "good" | "easy";
 export type KnowledgeType = "vocabulary" | "grammar" | "expression";
 
 export interface LexicalRelation { word: string; strength: number; register?: string; usage?: string; notes?: string }
 export interface VocabularyItem {
-  id: string; word: string; cefrLevel: CEFRLevel; partOfSpeech: string; ipa?: string;
-  meanings: { definition: string; vietnamese?: string }[]; examples: string[];
+  id: string; word: string; lemma?: string; cefrLevel: CEFRLevel; partOfSpeech: string; ipa?: string;
+  frequencyRank?: number; frequencyBand?: FrequencyBand;
+  meanings: { definition: string; vietnamese?: string; usageNotes?: string }[]; examples: string[];
   synonyms: LexicalRelation[]; antonyms: LexicalRelation[];
-  wordFamily: { word: string; partOfSpeech: string }[]; collocations: string[]; tags: string[];
+  wordFamily: { word: string; partOfSpeech: string }[]; collocations: string[]; topics?: string[]; tags: string[];
 }
 export interface MasteryDimensions { recognition: number; recall: number; context: number; spelling: number; overall: number }
 export interface ReviewState {
@@ -32,7 +34,7 @@ export interface ExpressionItem {
   meaning: string; vietnameseMeaning: string; cefrLevel: CEFRLevel; examples: string[]; usageNotes: string; tags: string[];
   relatedVerb?: string; separability?: "separable" | "inseparable" | "both";
 }
-export interface Exercise { id: string; knowledgeType: KnowledgeType; itemId: string; type: ExerciseType | GrammarExerciseType; prompt: string; options?: string[]; answer: string; explanation?: string }
+export interface Exercise { id: string; knowledgeType: KnowledgeType; itemId: string; type: ExerciseType | GrammarExerciseType; prompt: string; options?: string[]; answer: string; explanation?: string; difficulty?: 1 | 2 | 3 | 4 | 5 }
 export interface SessionExercise extends Exercise { source: PlanCategory; targetDimension?: keyof Omit<MasteryDimensions, "overall"> }
 export interface MistakeRecord { id: string; itemId: string; subtopicId?: string; label: string; knowledgeType: KnowledgeType; exerciseType: string; wrongAnswer: string; correctAnswer: string; timestamp: string; repeatedCount: number; resolved: boolean }
 export interface UserSettings { currentLevel: CEFRLevel; dailyTarget: number; maxNewWordsPerDay: number; maxNewGrammarTopicsPerDay: number; desiredRetention: number; interfaceLanguage: "en" | "vi"; showVietnamese: boolean }
@@ -42,4 +44,10 @@ export interface PlanAllocation { category: PlanCategory; count: number; minutes
 export interface DailyPlan { allocations: PlanAllocation[]; totalItems: number; estimatedMinutes: number; reviewBacklog: number; newWords: number }
 export interface Activity { id: string; date: string; label: string; correct: number; total: number; minutes?: number; masteryDelta?: number }
 export interface SessionSummary extends Activity { vocabularyReviewed: number; newVocabulary: number; grammarExercises: number; mistakesCorrected: number }
-export interface AppState { settings: UserSettings; vocabularyProgress: VocabularyProgress[]; grammarProgress: GrammarProgress[]; mistakes: MistakeRecord[]; streak: number; activities: SessionSummary[] }
+export type PlacementDimension = "vocabulary" | "grammar" | "context";
+export interface PlacementQuestion extends Exercise { level: CEFRLevel; dimension: PlacementDimension; topic: string }
+export interface PlacementAnswer { questionId: string; answer: string; correct: boolean; level: CEFRLevel; dimension: PlacementDimension; topic: string }
+export interface PlacementResult { completedAt: string; estimatedLevel: CEFRLevel; dimensionScores: Record<PlacementDimension, number>; topicScores: Record<string, number>; strongAreas: string[]; weakAreas: string[]; answers: PlacementAnswer[] }
+export type LearningPathState = "needs-foundation" | "recommended" | "in-progress" | "reviewing" | "strong" | "mastered" | "locked";
+export interface LearningPathItem { id: string; itemId: string; knowledgeType: "vocabulary" | "grammar"; title: string; level: CEFRLevel; state: LearningPathState; priority: number; reason: string }
+export interface AppState { settings: UserSettings; vocabularyProgress: VocabularyProgress[]; grammarProgress: GrammarProgress[]; mistakes: MistakeRecord[]; streak: number; activities: SessionSummary[]; placement?: PlacementResult }

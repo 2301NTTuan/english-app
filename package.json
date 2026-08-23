@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "validate:content": "vitest run src/lib/content/content.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

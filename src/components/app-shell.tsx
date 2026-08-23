@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BookMarked, BookOpen, Brain, ClipboardCheck, Gauge, GraduationCap, LibraryBig, Menu, Settings, Sparkles, X } from "lucide-react";
+import { BarChart3, BookMarked, BookOpen, Brain, ClipboardCheck, Gauge, GraduationCap, LibraryBig, Map, Menu, Settings, Sparkles, TestTube2, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAppState } from "@/components/app-provider";
 import { calculateStreak } from "@/lib/learning/streak";
@@ -12,7 +12,7 @@ import { vocabulary } from "@/data/vocabulary";
 const navigation = [
   ["Dashboard", "/", Gauge], ["Learn", "/learn", GraduationCap], ["Vocabulary", "/vocabulary", BookOpen],
   ["Grammar", "/grammar", BookMarked], ["Expressions", "/expressions", Sparkles], ["Review", "/review", Brain],
-  ["Mistakes", "/mistakes", ClipboardCheck], ["Progress", "/progress", BarChart3], ["Settings", "/settings", Settings],
+  ["Mistakes", "/mistakes", ClipboardCheck], ["Learning Path", "/path", Map], ["Placement", "/placement", TestTube2], ["Progress", "/progress", BarChart3], ["Settings", "/settings", Settings],
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

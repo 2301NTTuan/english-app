@@ -1,0 +1,1922 @@
+You are continuing development of my existing English-learning application.
+
+Repository:
+
+`/mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app`
+
+Environment:
+
+* Ubuntu on WSL2
+* Node.js installed through NVM
+* Existing Next.js + TypeScript application
+* Local persistence only
+* Git repository already exists
+* Do not clone or move the repository
+
+The current application already has approximately:
+
+* 120 vocabulary items
+* 137 A1–C2 grammar curriculum topics
+* 15 detailed grammar lessons
+* 30 idioms
+* 30 phrasal verbs
+* 40 collocations
+* 7 common expressions
+* reusable exercise generators
+* adaptive daily planning
+* spaced repetition
+* multidimensional mastery
+* mistake bank
+* daily sessions
+* progress tracking
+* local persistence
+* JSON backup/restore
+
+Previous validation passed:
+
+* lint
+* typecheck
+* tests
+* production build
+* runtime routes
+
+Your goal is to turn the current MVP into a substantially more complete English-learning application.
+
+Do NOT rebuild the project from scratch.
+
+Preserve good existing architecture and improve it incrementally.
+
+---
+
+# PRIMARY OBJECTIVES
+
+Implement this development phase:
+
+1. Expand vocabulary toward a standard learning-app dataset
+2. Complete detailed grammar lessons from A1 to C2
+3. Add a real Placement Test
+4. Add Personalized Learning Paths
+5. Dramatically improve exercise generation
+6. Expand idioms, phrasal verbs, collocations and word relations
+7. Integrate all new content with the existing adaptive learning engine
+8. Validate all generated/imported learning content
+9. Keep performance reasonable with several thousand learning records
+
+Prioritize correctness and maintainability over raw content count.
+
+---
+
+# 1. Inspect the existing repository first
+
+Start with:
+
+```bash
+cd /mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app
+
+git status
+git log --oneline -5
+git diff --stat
+
+find src -maxdepth 4 -type f | sort
+cat package.json
+```
+
+Inspect existing:
+
+* vocabulary data model
+* grammar data model
+* grammar curriculum
+* grammar lesson format
+* expressions
+* FSRS/scheduler
+* mastery logic
+* daily-plan engine
+* exercises
+* persistence
+* tests
+* routes
+* settings
+* progress tracking
+
+Do not modify working architecture until you understand it.
+
+Do not discard existing user changes.
+
+Never use:
+
+```bash
+git reset --hard
+git clean -fd
+git restore .
+```
+
+---
+
+# 2. Vocabulary scale target
+
+The application should eventually support approximately:
+
+```text
+A1     ~700 words
+A2     ~900 words
+B1    ~1,200 words
+B2    ~1,400 words
+C1    ~1,200 words
+C2     ~800 words
+
+Total target: approximately 6,000 headwords
+```
+
+These counts are targets, not rigid requirements.
+
+Quality and useful metadata are more important than hitting exactly 6,000.
+
+Do NOT blindly generate thousands of poor-quality records just to satisfy a number.
+
+---
+
+# 3. Important vocabulary strategy
+
+Do NOT create one giant TypeScript file containing thousands of entries.
+
+Refactor data loading if necessary so vocabulary can be divided cleanly.
+
+Preferred conceptual structure:
+
+```text
+src/data/vocabulary/
+  a1/
+  a2/
+  b1/
+  b2/
+  c1/
+  c2/
+```
+
+or:
+
+```text
+src/data/vocabulary/
+  a1.json
+  a2.json
+  b1.json
+  b2.json
+  c1.json
+  c2.json
+```
+
+You may choose a more maintainable structure based on the existing architecture.
+
+Avoid creating extremely large application bundles unnecessarily.
+
+Keep content separate from business logic.
+
+---
+
+# 4. Build a content pipeline before bulk population
+
+Before expanding to thousands of words, create or improve a vocabulary content pipeline.
+
+It should support:
+
+```text
+raw vocabulary data
+        ↓
+normalization
+        ↓
+schema validation
+        ↓
+duplicate detection
+        ↓
+relation validation
+        ↓
+CEFR validation
+        ↓
+application dataset
+```
+
+Create reusable validation scripts/functions.
+
+Do not rely only on TypeScript compilation to validate learning content.
+
+The validator should detect at least:
+
+* duplicate IDs
+* duplicate headwords at same sense/part-of-speech where inappropriate
+* invalid CEFR levels
+* missing meanings
+* empty definitions
+* malformed examples
+* self-referencing synonyms
+* self-referencing antonyms
+* synonym/antonym conflicts
+* malformed word-family relations
+* invalid collocation references
+* duplicate relations
+* broken prerequisite IDs
+* invalid exercise references
+
+Provide useful validation errors.
+
+---
+
+# 5. Vocabulary data model
+
+Review the current model and evolve it carefully if needed.
+
+A vocabulary record should conceptually support:
+
+```ts
+interface VocabularyItem {
+  id: string
+  word: string
+  lemma?: string
+
+  cefrLevel:
+    | "A1"
+    | "A2"
+    | "B1"
+    | "B2"
+    | "C1"
+    | "C2"
+
+  partOfSpeech: string
+
+  ipa?: string
+
+  frequencyRank?: number
+  frequencyBand?: "very-common" | "common" | "less-common" | "advanced"
+
+  meanings: {
+    englishDefinition: string
+    vietnameseMeaning?: string
+    usageNotes?: string
+  }[]
+
+  examples: {
+    sentence: string
+    vietnameseTranslation?: string
+  }[]
+
+  synonyms: VocabularyRelation[]
+  antonyms: VocabularyRelation[]
+
+  wordFamily: WordFamilyRelation[]
+
+  collocations: CollocationRelation[]
+
+  topics: string[]
+  tags: string[]
+}
+```
+
+Do not introduce unnecessary fields if equivalent functionality already exists.
+
+---
+
+# 6. Frequency-aware learning
+
+Introduce vocabulary frequency/commonness if the current app does not already support it.
+
+The learning engine should prefer useful and common vocabulary before obscure words.
+
+New-word candidate selection should consider:
+
+```text
+CEFR suitability
++
+frequency/commonness
++
+user mastery
++
+previous exposure
++
+topic relevance
++
+learning-path priority
+```
+
+Example:
+
+An A2 learner should generally receive:
+
+```text
+high-frequency A1/A2 vocabulary
+```
+
+before rare C1/C2 vocabulary.
+
+Do not use alphabetical order as the default learning sequence.
+
+---
+
+# 7. Vocabulary topic taxonomy
+
+Support practical topic tagging such as:
+
+```text
+daily-life
+family
+home
+food
+work
+education
+travel
+health
+technology
+money
+relationships
+emotions
+communication
+nature
+environment
+society
+business
+science
+media
+culture
+academic
+```
+
+Do not overcomplicate taxonomy.
+
+The goal is to allow:
+
+* topic filtering
+* themed sessions
+* learning-path recommendations
+
+---
+
+# 8. Expand vocabulary progressively
+
+Populate the vocabulary dataset in manageable batches.
+
+Do not generate or edit all 6,000 entries inside one enormous source file.
+
+Prefer batching by CEFR and/or topic.
+
+At minimum during this phase, substantially increase the dataset beyond the current 120 entries.
+
+Continue toward the ~6,000 target as far as can be done with high quality during this run.
+
+If completing all ~6,000 high-quality enriched entries in one pass would degrade quality, prioritize:
+
+1. complete infrastructure
+2. high-quality A1
+3. high-quality A2
+4. high-quality B1
+5. B2
+6. C1
+7. C2
+
+Report final counts honestly.
+
+Do not pretend unfinished content is complete.
+
+---
+
+# 9. Do not use proprietary word lists carelessly
+
+Do not copy or scrape copyrighted proprietary vocabulary lists or commercial learning content.
+
+If external lexical resources are available and used:
+
+* use only resources whose licensing permits this use
+* preserve required attribution where applicable
+* document their origin/license in the repository
+
+If reliable licensed external content is not available, use internally authored seed content rather than copying commercial course material.
+
+Do not fabricate a source or license.
+
+---
+
+# 10. Rich vocabulary learning
+
+High-value vocabulary records should support more than:
+
+```text
+word → translation
+```
+
+Where appropriate include:
+
+* English definition
+* Vietnamese meaning
+* example sentences
+* IPA
+* synonyms
+* antonyms
+* word family
+* collocations
+* usage notes
+* register
+* topic
+* CEFR
+* frequency/commonness
+
+Not every word requires every optional field.
+
+Avoid low-quality filler metadata.
+
+---
+
+# 11. Synonym nuance
+
+Synonyms must not be represented as fully interchangeable words.
+
+Support concepts such as:
+
+```ts
+interface VocabularyRelation {
+  wordId?: string
+  word: string
+
+  strength?: number
+
+  register?:
+    | "informal"
+    | "neutral"
+    | "formal"
+
+  usageNote?: string
+}
+```
+
+Example concept:
+
+```text
+good
+great
+excellent
+outstanding
+exceptional
+```
+
+Teach intensity and usage differences.
+
+Examples:
+
+```text
+big mistake
+huge mistake
+large amount
+```
+
+The application should explain why synonyms may not be interchangeable in every sentence.
+
+---
+
+# 12. Antonyms
+
+Expand meaningful antonym relationships.
+
+Examples:
+
+```text
+accept ↔ reject
+increase ↔ decrease
+temporary ↔ permanent
+expand ↔ contract
+ancient ↔ modern
+optimistic ↔ pessimistic
+flexible ↔ rigid
+```
+
+Integrate antonyms with exercise generation.
+
+---
+
+# 13. Word families
+
+Expand word-family relationships.
+
+Examples:
+
+```text
+decide
+decision
+decisive
+decisively
+indecisive
+```
+
+and:
+
+```text
+success
+succeed
+successful
+successfully
+unsuccessful
+```
+
+and:
+
+```text
+analyse
+analysis
+analytical
+analytically
+```
+
+Word-family exercises should test correct grammatical form.
+
+---
+
+# 14. Collocations
+
+Increase collocations significantly.
+
+Target eventually:
+
+```text
+1,000+ useful collocations
+```
+
+Prioritize high-value patterns such as:
+
+```text
+make a decision
+take responsibility
+gain experience
+acquire knowledge
+deeply concerned
+highly recommended
+strongly disagree
+heavy rain
+strong coffee
+meet a requirement
+reach an agreement
+raise awareness
+```
+
+Where pedagogically useful, include common incorrect combinations:
+
+```text
+make homework ❌
+do homework ✅
+```
+
+```text
+strong rain ❌
+heavy rain ✅
+```
+
+Integrate collocations with exercises.
+
+---
+
+# 15. Phrasal verbs
+
+Increase phrasal verbs toward approximately:
+
+```text
+300–500
+```
+
+Organize them by:
+
+* CEFR
+* base verb
+* topic
+* frequency/commonness
+
+A phrasal verb should support:
+
+```text
+expression
+base verb
+English meaning
+Vietnamese meaning
+CEFR
+examples
+separable/inseparable
+register
+usage notes
+```
+
+Examples:
+
+```text
+give up
+look after
+look into
+take over
+take up
+come across
+figure out
+carry out
+put off
+bring up
+work out
+```
+
+Teach them in context.
+
+---
+
+# 16. Idioms
+
+Increase idioms toward approximately:
+
+```text
+300–500
+```
+
+Use useful categories:
+
+```text
+Daily Life
+Work
+Money
+Relationships
+Emotions
+Success & Failure
+Time
+Communication
+Education
+Business
+Technology
+```
+
+Do not prioritize obscure literary idioms over common modern expressions.
+
+Each idiom should support:
+
+```text
+expression
+meaning
+Vietnamese meaning
+example
+context
+register
+usage note
+CEFR/difficulty
+```
+
+---
+
+# 17. Complete grammar detailed lessons
+
+The curriculum already contains approximately 137 topics.
+
+Keep the curriculum map unless there is a concrete structural issue.
+
+Expand detailed grammar lessons from the current ~15 toward approximately:
+
+```text
+110–130 detailed lessons
+```
+
+Cover:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+Prioritize common/high-value grammar first.
+
+---
+
+# 18. Detailed grammar lesson structure
+
+Each detailed lesson should support relevant fields such as:
+
+```text
+Title
+CEFR level
+Overview
+Prerequisites
+Vietnamese explanation
+English explanation
+Usage
+Formula / structure
+Positive form
+Negative form
+Question form
+Examples
+Common mistakes
+Related grammar
+Contrast with similar structures
+Subtopics
+Mini exercises
+Review exercises
+```
+
+Do not force irrelevant fields into every lesson.
+
+---
+
+# 19. Grammar quality
+
+Do not create superficial grammar lessons like:
+
+```text
+Present Perfect:
+have/has + V3
+```
+
+A useful lesson should explain:
+
+* when it is used
+* why it is used
+* how it differs from nearby structures
+* typical learner mistakes
+* several natural examples
+* practice
+
+Example:
+
+```text
+Present Perfect
+├── form
+├── life experience
+├── unfinished time
+├── recent events
+├── for / since
+├── ever / never
+├── already / yet / just
+├── common mistakes
+└── Present Perfect vs Past Simple
+```
+
+---
+
+# 20. Preserve grammar prerequisites
+
+Maintain/use the grammar dependency graph.
+
+Examples:
+
+```text
+Present Simple
+   ↓
+Past Simple
+   ↓
+Present Perfect
+   ↓
+Present Perfect vs Past Simple
+```
+
+```text
+First Conditional
+   ↓
+Second Conditional
+   ↓
+Third Conditional
+   ↓
+Mixed Conditionals
+```
+
+```text
+Passive Voice
+   ↓
+Advanced Passive
+   ↓
+Advanced Passive Structures
+```
+
+Validate all prerequisite IDs automatically.
+
+---
+
+# 21. Placement Test
+
+Implement a real first-use Placement Test.
+
+Create a route and user flow such as:
+
+```text
+Welcome
+   ↓
+Take Placement Test
+   ↓
+Vocabulary
+Grammar
+Context
+   ↓
+Adaptive difficulty
+   ↓
+Estimated Learning Level
+```
+
+Do not claim it is an official CEFR certification test.
+
+Use wording such as:
+
+```text
+Estimated learning level
+```
+
+---
+
+# 22. Placement Test sections
+
+The test should evaluate at least:
+
+### Vocabulary
+
+* meaning recognition
+* context vocabulary
+* synonym/basic relation
+
+### Grammar
+
+* tense choice
+* articles
+* prepositions
+* conditionals
+* clauses
+* advanced structures depending on test level
+
+### Context
+
+* choose the most natural sentence/word in context
+
+Optionally support a small reading-context section if the current architecture allows it cleanly.
+
+Do not add speaking/listening in this phase.
+
+---
+
+# 23. Adaptive Placement Test
+
+Avoid making every user answer a massive fixed test.
+
+Implement adaptive behavior where practical.
+
+Example concept:
+
+```text
+start around A2/B1
+        ↓
+correct several
+        ↓
+increase difficulty
+        ↓
+incorrect several
+        ↓
+decrease difficulty
+```
+
+Use a bounded test length.
+
+A reasonable target could be approximately:
+
+```text
+25–45 questions
+```
+
+depending on adaptive progression.
+
+The exact implementation may differ if a more robust scoring approach fits the current architecture.
+
+---
+
+# 24. Placement scoring
+
+Produce a result such as:
+
+```text
+Estimated learning level: B1
+
+Vocabulary
+B1 — 68%
+
+Grammar
+A2/B1 — 72%
+
+Context
+B1 — 61%
+
+Strong areas
+- Present Simple
+- Past Simple
+- Everyday vocabulary
+
+Weak areas
+- Present Perfect
+- Prepositions
+- Word families
+```
+
+Do not reduce the result to only one level label.
+
+Store diagnostic strengths and weaknesses.
+
+---
+
+# 25. Placement Test persistence
+
+Save:
+
+```text
+test date
+estimated level
+dimension scores
+topic scores
+strong areas
+weak areas
+answers
+```
+
+Allow user to retake the test later.
+
+Do not force users to retake it every time.
+
+---
+
+# 26. Personalized Learning Path
+
+After placement, generate a personalized learning path.
+
+Conceptual example:
+
+```text
+Current estimated level: B1
+
+Foundation repair
+✓ A2 weak grammar
+✓ High-frequency A2 vocabulary gaps
+
+Current focus
+→ B1 core vocabulary
+→ Present Perfect
+→ Relative Clauses
+→ Modal verbs
+→ Common phrasal verbs
+
+Next
+🔒 B2 preparation
+```
+
+The path should be based on actual learner state.
+
+Do not hardcode one path for everyone.
+
+---
+
+# 27. Learning Path factors
+
+Learning-path recommendations should consider:
+
+```text
+placement results
+current mastery
+grammar prerequisites
+FSRS due state
+mistake history
+vocabulary frequency
+CEFR
+content exposure
+session performance
+```
+
+Avoid recommending advanced topics when foundational prerequisites are weak.
+
+---
+
+# 28. Dynamic Personalized Path
+
+The learning path must evolve.
+
+Example:
+
+```text
+Week 1:
+Present Perfect mastery = 45%
+
+Week 3:
+Present Perfect mastery = 84%
+```
+
+Then the app should reduce priority and move the learner toward another weakness.
+
+The path should not remain frozen after the placement test.
+
+---
+
+# 29. Learning Path states
+
+Support states conceptually such as:
+
+```text
+Needs Foundation
+Recommended
+In Progress
+Reviewing
+Strong
+Mastered
+Locked
+```
+
+Reuse current mastery state systems where possible instead of creating duplicate concepts.
+
+---
+
+# 30. Exercise engine redesign/improvement
+
+Substantially expand the reusable exercise system.
+
+Do not manually write thousands of fixed exercises.
+
+Create robust generators using vocabulary/grammar metadata.
+
+A vocabulary item should potentially generate multiple exercise types.
+
+---
+
+# 31. Vocabulary exercise types
+
+Support at least:
+
+### 1. Recognition
+
+```text
+acquire means:
+
+A. obtain
+B. reject
+C. lose
+D. avoid
+```
+
+### 2. Recall
+
+```text
+"đạt được / có được"
+
+________
+```
+
+### 3. Context fill
+
+```text
+She ______ valuable experience during the project.
+```
+
+### 4. Context multiple choice
+
+Choose the most natural vocabulary item.
+
+### 5. Synonym
+
+```text
+Closest in meaning to "rapid"?
+```
+
+### 6. Antonym
+
+```text
+Opposite of "temporary"?
+```
+
+### 7. Word family
+
+```text
+She made an important ______.
+
+decide
+decision
+decisive
+decisively
+```
+
+### 8. Collocation
+
+```text
+___ a decision
+
+make
+do
+create
+build
+```
+
+### 9. Definition matching
+
+Word ↔ English definition.
+
+### 10. Vietnamese ↔ English
+
+Use where Vietnamese translations are enabled.
+
+---
+
+# 32. Distractor quality
+
+Do not generate ridiculous answer choices.
+
+For example, this is poor:
+
+```text
+acquire means:
+
+A. obtain
+B. banana
+C. television
+D. blue
+```
+
+Distractors should preferably share:
+
+* CEFR proximity
+* part of speech
+* semantic category
+* similar spelling
+* related meaning
+
+while remaining clearly incorrect.
+
+Build reusable distractor-selection logic.
+
+---
+
+# 33. Avoid ambiguous exercises
+
+Generated exercises must have one defensible best answer.
+
+Create validation safeguards against:
+
+* multiple valid options
+* synonym ambiguity
+* grammatically equivalent answers
+* duplicate choices
+* correct answer appearing twice
+* blank examples with insufficient context
+
+Skip generating an exercise if data is insufficient.
+
+Quality beats count.
+
+---
+
+# 34. Grammar exercise types
+
+Support:
+
+```text
+multiple choice
+fill in blank
+error correction
+choose correct tense
+sentence building
+sentence transformation
+translation
+rewrite
+grammar contrast
+```
+
+Use current architecture when possible.
+
+---
+
+# 35. Grammar contrast exercises
+
+These are especially important.
+
+Examples:
+
+```text
+Present Simple vs Present Continuous
+Past Simple vs Present Perfect
+Past Simple vs Past Continuous
+Present Perfect vs Present Perfect Continuous
+Will vs Going to
+Must vs Have to
+Gerund vs Infinitive
+Second vs Third Conditional
+```
+
+Generate focused exercises based on weak subtopics.
+
+---
+
+# 36. Error correction
+
+Expand error-correction generation.
+
+Examples:
+
+```text
+She don't like coffee.
+```
+
+→
+
+```text
+She doesn't like coffee.
+```
+
+```text
+I have went to London.
+```
+
+→
+
+```text
+I have gone to London.
+```
+
+```text
+He suggested to go home.
+```
+
+→
+
+```text
+He suggested going home.
+```
+
+Wrong answers must enter the Mistake Bank.
+
+---
+
+# 37. Exercise difficulty
+
+Exercises should have difficulty metadata or inference.
+
+Possible conceptual scale:
+
+```text
+1 — basic recognition
+2 — simple recall
+3 — contextual application
+4 — contrast / transformation
+5 — advanced production
+```
+
+Use difficulty to adapt sessions.
+
+---
+
+# 38. Connect exercise types to mastery dimensions
+
+Example:
+
+Recognition question:
+
+```text
+updates recognition mastery
+```
+
+Recall question:
+
+```text
+updates recall mastery
+```
+
+Context question:
+
+```text
+updates context mastery
+```
+
+Spelling/typed answer:
+
+```text
+updates spelling mastery
+```
+
+Do not let one easy multiple-choice answer make a vocabulary item appear fully mastered.
+
+---
+
+# 39. Improve adaptive sessions
+
+Daily sessions should select exercises based on the learner's weak dimensions.
+
+Example:
+
+```text
+acquire
+
+Recognition 94%
+Recall      61%
+Context     47%
+```
+
+The session should prefer:
+
+```text
+Recall
+Context
+```
+
+instead of repeatedly asking recognition questions.
+
+---
+
+# 40. Integrate placement with daily planning
+
+After placement:
+
+```text
+placement result
+       ↓
+learning path
+       ↓
+daily-plan candidate selection
+       ↓
+today's study session
+```
+
+Do not create Placement Test as an isolated feature that has no effect on learning.
+
+---
+
+# 41. Integrate learning path with FSRS
+
+Learning path determines:
+
+```text
+what new material is appropriate
+```
+
+FSRS determines:
+
+```text
+when learned material should return
+```
+
+Do not mix these responsibilities unnecessarily.
+
+Conceptual flow:
+
+```text
+Learning Path
+      ↓
+new knowledge candidates
+
+FSRS
+      ↓
+review candidates
+
+        ↓
+
+Daily Planner
+        ↓
+
+Today's Session
+```
+
+---
+
+# 42. Improve first-time user experience
+
+For a new user with no progress:
+
+```text
+Welcome to English Mastery
+```
+
+Offer choices such as:
+
+```text
+Take Placement Test
+Start from A1
+Choose my level
+```
+
+Do not force advanced users through A1.
+
+---
+
+# 43. Allow manual level choice
+
+Some users may skip the placement test.
+
+Allow:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+But explain that Placement Test gives a more personalized starting point.
+
+---
+
+# 44. Progress integration
+
+Update Progress so it can show:
+
+```text
+Estimated learning level
+Vocabulary level progress
+Grammar level progress
+Expressions progress
+Placement result
+Learning-path progress
+Mastery
+Retention
+Recent accuracy
+Study history
+Weaknesses
+```
+
+Do not imply official CEFR certification.
+
+---
+
+# 45. Dataset performance
+
+With several thousand items, review current data-loading performance.
+
+Avoid unnecessarily hydrating/rendering thousands of rows at once.
+
+For vocabulary browser:
+
+* paginate
+* virtualize
+* or otherwise limit rendered rows
+
+Use whichever solution best matches the existing implementation.
+
+Search/filter should remain responsive.
+
+Do not introduce a heavy dependency without a clear reason.
+
+---
+
+# 46. Search/indexing
+
+Improve local search if necessary for thousands of entries.
+
+Support:
+
+```text
+word
+meaning
+Vietnamese meaning
+topic
+synonym
+collocation
+```
+
+Simple normalized client-side indexing is acceptable.
+
+Do not introduce Elasticsearch or another server.
+
+---
+
+# 47. Persistence
+
+Continue using the existing local persistence architecture.
+
+Do NOT add:
+
+```text
+Supabase
+Firebase
+PostgreSQL
+authentication
+cloud sync
+payments
+```
+
+during this phase.
+
+But ensure existing saved user data survives schema evolution.
+
+---
+
+# 48. Data migration
+
+If data models change:
+
+* increment storage schema version
+* migrate old saved user state safely
+* preserve progress where possible
+* provide sensible defaults
+
+Do not reset users' progress simply because a field was added.
+
+Add tests for migrations.
+
+---
+
+# 49. Content IDs must remain stable
+
+Learning progress references content IDs.
+
+Therefore:
+
+Do not casually regenerate IDs every build.
+
+Vocabulary, grammar and expression IDs must be deterministic/stable.
+
+Otherwise existing mastery/FSRS state becomes orphaned.
+
+Add validation for unique IDs.
+
+---
+
+# 50. Tests
+
+Expand meaningful tests.
+
+Prioritize:
+
+```text
+content validation
+duplicate detection
+vocabulary normalization
+frequency-aware candidate selection
+placement scoring
+adaptive placement difficulty
+learning-path generation
+learning-path reprioritization
+grammar prerequisites
+exercise generation
+distractor generation
+ambiguous-answer prevention
+mastery dimension updates
+FSRS integration
+storage migrations
+```
+
+Avoid excessive trivial UI snapshot tests.
+
+---
+
+# 51. Content validation command
+
+If appropriate, add a script such as:
+
+```bash
+npm run validate:content
+```
+
+It should validate the entire learning dataset.
+
+If adding this script fits the current architecture, do so.
+
+It should fail CI/build validation for genuinely broken content.
+
+---
+
+# 52. Documentation
+
+Update README with:
+
+* vocabulary architecture
+* grammar content architecture
+* content validation
+* Placement Test
+* Personalized Learning Path
+* exercise generator
+* CEFR/frequency selection
+* how to add new vocabulary
+* how to add grammar lessons
+* how content IDs work
+* current dataset counts
+
+Keep documentation useful to developers.
+
+---
+
+# 53. Validation after implementation
+
+Run all available validation.
+
+At minimum:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+If you add:
+
+```bash
+npm run validate:content
+```
+
+run that too.
+
+Fix failures before completion.
+
+---
+
+# 54. Runtime validation
+
+Start:
+
+```bash
+npm run dev
+```
+
+Verify major existing routes and all newly added routes.
+
+At minimum verify:
+
+```text
+Dashboard
+Vocabulary
+Grammar
+Expressions
+Review
+Mistakes
+Progress
+Settings
+Placement Test
+Learning Path
+Daily Session
+```
+
+Check HTTP responses and obvious runtime errors.
+
+---
+
+# 55. Manual functional smoke tests
+
+Perform reasonable smoke testing of these flows:
+
+### New learner
+
+```text
+Open app
+→ Placement Test
+→ Receive estimated level
+→ Learning Path created
+→ Dashboard updated
+```
+
+### Vocabulary
+
+```text
+Study vocabulary
+→ answer incorrectly
+→ mistake recorded
+→ mastery updates
+→ FSRS/relearning updates
+```
+
+### Grammar
+
+```text
+Study grammar
+→ weak subtopic detected
+→ related exercises prioritized
+```
+
+### Returning learner
+
+```text
+Reload app
+→ progress persists
+→ due reviews remain correct
+→ learning path remains available
+```
+
+---
+
+# 56. Inspect Git changes
+
+When implementation and validation are complete:
+
+```bash
+git status
+git diff --stat
+git diff
+```
+
+Review everything.
+
+Do not commit:
+
+```text
+node_modules
+.next
+logs
+temporary files
+secrets
+.env credentials
+generated build outputs
+```
+
+Make sure `.gitignore` remains correct.
+
+---
+
+# 57. Stage changes
+
+After reviewing changes:
+
+```bash
+git add -A
+```
+
+Then inspect:
+
+```bash
+git status
+git diff --cached --stat
+git diff --cached
+```
+
+Do not blindly commit generated junk.
+
+---
+
+# 58. Commit
+
+If validation passes, create one commit for this development phase.
+
+Suggested commit message:
+
+```bash
+git commit -m "Expand English content and personalized learning"
+```
+
+Use another concise message only if it more accurately reflects the actual implementation.
+
+Do NOT push.
+
+---
+
+# 59. Final Git state
+
+Run:
+
+```bash
+git status
+git log --oneline -5
+git branch --show-current
+git remote -v
+git status -sb
+```
+
+The working tree should ideally be clean.
+
+Do not run `git push`.
+
+I will push manually.
+
+---
+
+# 60. Final report
+
+Provide a detailed but concise report.
+
+## Vocabulary
+
+Report actual final counts:
+
+```text
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+Total:
+```
+
+Also report counts for:
+
+```text
+synonym relations
+antonym relations
+word-family relations
+collocations
+```
+
+## Grammar
+
+Report:
+
+```text
+curriculum topics
+detailed lessons
+A1 detailed lessons
+A2 detailed lessons
+B1 detailed lessons
+B2 detailed lessons
+C1 detailed lessons
+C2 detailed lessons
+```
+
+## Expressions
+
+Report:
+
+```text
+idioms
+phrasal verbs
+collocations
+common expressions
+```
+
+## Placement Test
+
+Report:
+
+```text
+implemented/not implemented
+question pool size
+adaptive behavior
+score dimensions
+persistence
+```
+
+## Personalized Learning Path
+
+Explain:
+
+* inputs used
+* how recommendations are created
+* how the path changes over time
+
+## Exercise Engine
+
+List implemented exercise types.
+
+Explain distractor generation and ambiguity prevention.
+
+## Validation
+
+Report:
+
+```text
+content validation:
+lint:
+typecheck:
+tests:
+production build:
+runtime:
+```
+
+Also report the number of tests.
+
+## Performance
+
+Briefly report any changes made to support thousands of vocabulary items.
+
+## Git
+
+Report:
+
+```text
+branch
+latest commit
+working tree
+remote
+upstream
+```
+
+Do NOT push.
+
+If the repository already has an upstream, end with:
+
+```bash
+git push
+```
+
+as the command I should run myself.
+
+---
+
+# DEVELOPMENT PRIORITY
+
+If implementing everything at full scale in one run becomes too large, use this priority order:
+
+```text
+1. Data architecture and validation
+2. Placement Test
+3. Personalized Learning Path
+4. Exercise Generator
+5. Grammar detailed lessons
+6. A1 vocabulary
+7. A2 vocabulary
+8. B1 vocabulary
+9. B2 vocabulary
+10. C1 vocabulary
+11. C2 vocabulary
+12. Idioms / phrasal verbs / collocations expansion
+13. Visual polish
+```
+
+Do not sacrifice correctness to hit arbitrary content counts.
+
+A smaller validated dataset is better than thousands of incorrect entries.
+
+However, continue implementing autonomously as far as practical during this run.
+
+Do not stop after producing a plan.
+
+Start by inspecting the current repository and existing learning/data architecture.

@@ -1,4 +1,5 @@
 import type { VocabularyItem } from "@/types/domain";
+import { extendedVocabulary } from "@/data/vocabulary/extended";
 
 type Seed = [string, string, VocabularyItem["cefrLevel"], string, string, string, string[], string[]];
 const seeds: Seed[] = [
@@ -124,11 +125,43 @@ const seeds: Seed[] = [
   ["equivocal", "adjective", "C2", "open to more than one interpretation", "nước đôi, mơ hồ", "His response was deliberately equivocal.", ["ambiguous"], ["unequivocal"]],
 ];
 
-export const vocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLevel, definition, vietnamese, example, synonyms, antonyms], index) => ({
+const levelIndex = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 } as const;
+const topicGroups: Record<string, string[]> = {
+  education: ["learn", "study", "practice", "knowledge", "skill", "example", "sentence", "translate", "answer", "evaluate", "analyze"],
+  communication: ["communicate", "conversation", "explain", "clarify", "describe", "respond", "meaning", "interpret", "convey", "rhetorical"],
+  work: ["acquire", "develop", "progress", "maintain", "effective", "strategy", "method", "achieve", "contribute", "establish"],
+  emotions: ["confident", "agree", "challenge", "difficult", "careful", "flexible", "tentative"],
+  society: ["evidence", "influence", "consequence", "significant", "relevant", "ubiquitous"],
+  "daily-life": ["habit", "notice", "remember", "borrow", "lend", "choice", "advice", "useful"],
+};
+const topicFor = (word: string) => Object.entries(topicGroups).find(([, words]) => words.includes(word))?.[0] ?? "general";
+const wordFamilies: Record<string, { word: string; partOfSpeech: string }[]> = {
+  decide: [{ word: "decision", partOfSpeech: "noun" }, { word: "decisive", partOfSpeech: "adjective" }, { word: "decisively", partOfSpeech: "adverb" }],
+  analyze: [{ word: "analysis", partOfSpeech: "noun" }, { word: "analytical", partOfSpeech: "adjective" }],
+  achieve: [{ word: "achievement", partOfSpeech: "noun" }, { word: "achievable", partOfSpeech: "adjective" }],
+  communicate: [{ word: "communication", partOfSpeech: "noun" }, { word: "communicative", partOfSpeech: "adjective" }],
+  compare: [{ word: "comparison", partOfSpeech: "noun" }, { word: "comparative", partOfSpeech: "adjective" }],
+  contribute: [{ word: "contribution", partOfSpeech: "noun" }, { word: "contributor", partOfSpeech: "noun" }],
+  effective: [{ word: "effect", partOfSpeech: "noun" }, { word: "effectively", partOfSpeech: "adverb" }],
+  improve: [{ word: "improvement", partOfSpeech: "noun" }, { word: "improved", partOfSpeech: "adjective" }],
+  reliable: [{ word: "reliability", partOfSpeech: "noun" }, { word: "reliably", partOfSpeech: "adverb" }],
+  significant: [{ word: "significance", partOfSpeech: "noun" }, { word: "significantly", partOfSpeech: "adverb" }],
+};
+const collocationsByWord: Record<string, string[]> = {
+  acquire: ["acquire knowledge", "acquire skills"], decide: ["make a decision"], significant: ["significant progress"], frequent: ["frequent practice"],
+  advice: ["give advice", "useful advice"], attention: ["pay attention"], challenge: ["face a challenge"], conclusion: ["draw a conclusion"],
+  consequence: ["serious consequence"], experience: ["gain experience"], knowledge: ["acquire knowledge"], progress: ["make progress"], responsibility: ["take responsibility"],
+};
+
+const coreVocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLevel, definition, vietnamese, example, synonyms, antonyms], index) => ({
   id: `v${index + 1}`, word, partOfSpeech, cefrLevel, meanings: [{ definition, vietnamese }], examples: [example],
+  lemma: word, frequencyRank: levelIndex[cefrLevel] * 1000 + index + 1,
+  frequencyBand: cefrLevel === "A1" ? "very-common" : cefrLevel === "A2" || cefrLevel === "B1" ? "common" : cefrLevel === "B2" ? "less-common" : "advanced",
   synonyms: synonyms.map((item, i) => ({ word: item, strength: 70 + i * 10, register: "neutral", notes: "Similar in this context, but not always interchangeable." })),
   antonyms: antonyms.map((item) => ({ word: item, strength: 80, register: "neutral" })),
-  wordFamily: word === "decide" ? [{ word: "decision", partOfSpeech: "noun" }, { word: "decisive", partOfSpeech: "adjective" }] : [],
-  collocations: ({ acquire: ["acquire knowledge", "acquire skills"], decide: ["make a decision"], significant: ["significant progress"], frequent: ["frequent practice"] } as Record<string, string[]>)[word] ?? [],
-  tags: [cefrLevel.toLowerCase(), partOfSpeech],
+  wordFamily: wordFamilies[word] ?? [], collocations: collocationsByWord[word] ?? [], topics: [topicFor(word)],
+  tags: [cefrLevel.toLowerCase(), partOfSpeech, topicFor(word)],
 }));
+
+/** Stable, modular content catalogue. Add future CEFR batches under src/data/vocabulary/. */
+export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary];
