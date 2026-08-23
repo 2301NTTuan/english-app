@@ -1,0 +1,851 @@
+You are working inside this repository:
+
+/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app
+
+Build a clean, maintainable MVP for a personal English learning application focused primarily on:
+
+Vocabulary
+Grammar
+Adaptive spaced repetition
+Daily learning plans
+
+Do not try to generate thousands of vocabulary words or hundreds of grammar lessons yet. Focus on building the application architecture, learning engine, reusable UI, data models, and enough seed content to demonstrate the full workflow.
+
+1. First inspect the repository
+
+Before modifying anything:
+
+Inspect the current repository structure.
+Check existing package.json, README, configs, and source files.
+Reuse the existing stack if the project is already initialized.
+If the repository is empty, initialize a modern React/Next.js application using:
+Next.js
+TypeScript
+App Router
+Tailwind CSS
+Use the current stable versions available in the environment.
+Do not unnecessarily replace working project configuration.
+Do not modify unrelated files.
+
+Keep dependencies minimal.
+
+2. Product goal
+
+Create an application called:
+
+English Mastery
+
+The app should help a learner systematically improve English from beginner to advanced level.
+
+The application must eventually support CEFR:
+
+A1
+A2
+B1
+B2
+C1
+C2
+
+The core philosophy is:
+
+Review old knowledge first, strengthen weak knowledge second, then learn new knowledge.
+
+Do NOT implement a simple fixed rule such as "learn exactly 10 new words every day".
+
+Instead, the application must generate an adaptive daily learning plan based on:
+
+review items due today
+weak vocabulary
+weak grammar concepts
+previous mistakes
+user mastery
+daily study target
+maximum new vocabulary per day
+3. Main navigation
+
+Create these main sections:
+
+Dashboard
+Learn
+Vocabulary
+Grammar
+Expressions
+Review
+Mistakes
+Progress
+Settings
+
+Use a responsive sidebar for desktop and a suitable mobile navigation layout.
+
+The UI should look modern, clean, simple, and focused on studying.
+
+Do not over-design it.
+
+4. Dashboard
+
+Build a useful Dashboard displaying:
+
+current CEFR level
+study streak
+today's study plan
+vocabulary due for review
+grammar due for review
+weak knowledge count
+new vocabulary available today
+study progress
+estimated study time
+
+Example:
+
+Today's Study
+
+12 vocabulary reviews
+4 grammar reviews
+7 new words
+1 grammar topic
+3 weakness exercises
+
+Estimated time: 18 minutes
+
+Include a clear:
+
+Start Today's Session
+
+button.
+
+5. Adaptive daily learning plan
+
+Implement a reusable learning-plan engine.
+
+Suggested priority:
+
+Overdue reviews
+Due reviews
+Weak vocabulary
+Weak grammar
+Mistake review
+New vocabulary
+New grammar
+
+Example user settings:
+
+dailyTarget: 25
+maxNewWordsPerDay: 10
+desiredRetention: 0.9
+
+Example behavior:
+
+If:
+
+due reviews = 8
+
+the learner may receive:
+
+8 review
+10 new words
+
+If:
+
+due reviews = 20
+
+the learner may receive:
+
+20 review
+5 new words
+
+If:
+
+due reviews = 30
+
+the learner should receive primarily reviews and possibly:
+
+30 review
+0 new words
+
+Do not force new words when review backlog is high.
+
+Write this logic as reusable TypeScript functions, not directly inside UI components.
+
+6. Spaced repetition
+
+Use FSRS concepts for vocabulary review scheduling.
+
+Prefer an existing well-maintained TypeScript FSRS library if appropriate instead of inventing a complicated spaced repetition algorithm.
+
+Each vocabulary learning item should track fields such as:
+
+difficulty
+stability
+state
+lastReview
+nextReview
+reviewCount
+correctCount
+incorrectCount
+lapses
+
+The learner should be able to rate an answer using:
+
+Again
+Hard
+Good
+Easy
+
+The next review should change accordingly.
+
+Keep the scheduling implementation isolated behind a service/module so it can be replaced or upgraded later.
+
+7. Vocabulary data model
+
+Create a rich vocabulary model.
+
+Example:
+
+interface VocabularyItem {
+  id: string
+  word: string
+  cefrLevel: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
+  partOfSpeech: string
+  ipa?: string
+
+  meanings: {
+    definition: string
+    vietnamese?: string
+  }[]
+
+  examples: string[]
+
+  synonyms: string[]
+  antonyms: string[]
+
+  wordFamily: {
+    word: string
+    partOfSpeech: string
+  }[]
+
+  collocations: string[]
+  tags: string[]
+}
+
+The schema can be improved if necessary.
+
+8. Vocabulary learning modes
+
+Support the architecture for multiple exercise types:
+
+Recognition
+
+English → meaning
+
+Example:
+
+acquire
+
+A. từ bỏ
+B. có được
+C. từ chối
+D. phân tích
+Recall
+
+Meaning → English word
+
+Fill in the blank
+
+Example:
+
+She _____ considerable experience while working abroad.
+Context recognition
+
+Choose the correct word based on context.
+
+Synonym
+
+Example:
+
+Which word is closest in meaning to "acquire"?
+Antonym
+
+Example:
+
+Choose the opposite of "temporary".
+Word family
+
+Example:
+
+She made an important _____.
+
+decide
+decision
+decisive
+decisively
+
+For MVP, implement at least:
+
+Recognition
+Recall
+Fill in the blank
+Synonym / Antonym
+
+Design the code so more exercise types can be added later.
+
+9. Vocabulary mastery
+
+Vocabulary mastery should not be represented by only one boolean such as learned = true.
+
+Support mastery dimensions such as:
+
+recognition
+recall
+context
+spelling
+overall
+
+Each can range from 0 to 100.
+
+Example:
+
+acquire
+
+Recognition: 95%
+Recall:      65%
+Context:     55%
+Overall:     72%
+
+The learning engine should be able to prioritize weaker dimensions.
+
+10. Grammar system
+
+Create a structured grammar curriculum from:
+
+A1 → A2 → B1 → B2 → C1 → C2
+
+Do NOT populate every possible lesson yet.
+
+Build the structure and include representative lessons for each level.
+
+Grammar lessons should support:
+
+interface GrammarTopic {
+  id: string
+  title: string
+  level: CEFRLevel
+  description: string
+
+  prerequisites: string[]
+
+  explanation: string
+
+  structures: string[]
+
+  examples: {
+    sentence: string
+    explanation?: string
+  }[]
+
+  commonMistakes: {
+    incorrect: string
+    correct: string
+    explanation: string
+  }[]
+
+  subtopics: string[]
+}
+
+Improve this model if needed.
+
+11. Grammar curriculum structure
+
+Prepare curriculum categories including:
+
+A1
+be: am / is / are
+pronouns
+possessives
+articles
+singular and plural nouns
+this / that / these / those
+there is / there are
+present simple
+present continuous
+can / can't
+basic prepositions
+question words
+adverbs of frequency
+A2
+past simple
+past continuous
+future with will
+be going to
+comparatives
+superlatives
+present perfect basics
+for / since
+already / yet / just
+first conditional
+basic relative clauses
+should / must / have to
+quantifiers
+B1
+present perfect vs past simple
+present perfect continuous
+past perfect
+passive voice
+reported speech
+relative clauses
+modal verbs
+gerund vs infinitive
+used to
+be used to
+question tags
+indirect questions
+B2
+third conditional
+mixed conditionals
+advanced passive
+causative
+modal perfect
+wish / if only
+participle clauses
+reduced relative clauses
+inversion basics
+cleft sentences
+C1
+advanced inversion
+conditional inversion
+advanced modality
+advanced passive structures
+reporting verbs
+nominalisation
+ellipsis
+fronting
+advanced participle clauses
+hedging
+formal vs informal grammar
+C2
+stylistic inversion
+advanced modality
+complex ellipsis
+subtle tense and aspect distinctions
+advanced subjunctive
+register-dependent grammar
+complex embedded clauses
+rhetorical structures
+
+Store the curriculum as structured data rather than hardcoding it into page components.
+
+12. Grammar prerequisites
+
+Grammar topics should support dependencies.
+
+Example:
+
+Present Simple
+    ↓
+Past Simple
+    ↓
+Present Perfect
+    ↓
+Present Perfect vs Past Simple
+
+The app should be capable of determining whether a grammar topic should be recommended based on prerequisites.
+
+For MVP, create the dependency model and demonstrate it with several topics.
+
+13. Grammar mastery
+
+Track mastery at topic and subtopic level.
+
+Example:
+
+Present Perfect                  76%
+
+Structure                       96%
+Past participle                 87%
+Since / For                     72%
+Already / Yet / Just            84%
+Present Perfect vs Past Simple  48%
+
+The learning engine should detect that the learner is weak specifically at:
+
+Present Perfect vs Past Simple
+
+instead of treating the entire Present Perfect topic as weak.
+
+14. Grammar exercise types
+
+Support architecture for:
+
+multiple choice
+fill in the blank
+error correction
+sentence building
+translation
+choose correct tense
+rewrite sentence
+
+Implement at least:
+
+multiple choice
+fill in the blank
+error correction
+
+for MVP.
+
+15. Expressions
+
+Create an Expressions section with:
+
+Idioms
+Phrasal Verbs
+Collocations
+Common Expressions
+
+Each expression should support:
+
+expression
+meaning
+vietnameseMeaning
+cefrLevel
+examples
+usageNotes
+tags
+
+For idioms also include context/usage information.
+
+Example:
+
+break the ice
+
+Meaning:
+make people feel more comfortable in a new social situation
+
+Vietnamese:
+phá tan sự ngượng ngùng, bắt đầu làm quen
+
+Example:
+I told a joke to break the ice.
+
+Do not generate a huge idiom database.
+
+Create only enough seed content to demonstrate the feature.
+
+16. Synonyms and antonyms
+
+Synonyms must not be treated as perfectly interchangeable.
+
+The data model should allow notes about nuance and strength.
+
+Example:
+
+good
+great
+excellent
+outstanding
+exceptional
+
+Support information such as:
+
+strength
+usage
+register
+notes
+
+Example:
+
+big mistake
+huge mistake
+large amount
+
+This allows the application to teach natural usage rather than raw translations.
+
+17. Collocations
+
+Support common word combinations.
+
+Examples:
+
+make a decision
+do homework
+heavy rain
+strong coffee
+acquire knowledge
+acquire skills
+
+Create a simple collocation exercise.
+
+Example:
+
+___ a decision
+
+A. do
+B. make
+C. create
+D. build
+18. Phrasal verbs
+
+Support phrasal verbs as structured learning items.
+
+Example:
+
+take off
+take over
+take up
+take after
+
+Include:
+
+meaning
+examples
+separable/inseparable information if appropriate
+CEFR level
+related verb
+
+Only create a small seed dataset.
+
+19. Mistake Bank
+
+Create a mistake tracking system.
+
+Whenever the learner gets an exercise wrong, save enough information to identify:
+
+item
+knowledge type
+exercise type
+wrong answer
+correct answer
+timestamp
+number of repeated mistakes
+
+Create a Mistakes page such as:
+
+Frequent mistakes
+
+Present Perfect vs Past Simple     8
+Since vs For                       5
+Articles                           4
+affect vs effect                   3
+borrow vs lend                     2
+
+Allow mistakes to be included in future review sessions.
+
+20. Daily Session
+
+Create a study session flow.
+
+Suggested sequence:
+
+1. Due vocabulary reviews
+2. Due grammar reviews
+3. Mistake review
+4. Weak vocabulary
+5. Weak grammar
+6. New vocabulary
+7. New grammar
+8. Mixed practice
+
+Display progress during a session:
+
+7 / 20
+
+At the end show:
+
+correct answers
+mistakes
+vocabulary reviewed
+new vocabulary learned
+grammar practiced
+mastery changes
+21. Progress page
+
+Create a useful Progress page.
+
+Include:
+
+vocabulary mastery
+grammar mastery
+CEFR progress
+words learned
+words mastered
+grammar topics mastered
+weak topics
+study streak
+recent activity
+
+Simple charts/progress bars are enough.
+
+Do not introduce a heavy charting dependency unless needed.
+
+22. Data persistence
+
+For this MVP:
+
+Use local persistence.
+
+Preferred:
+
+localStorage or IndexedDB
+clean repository/service abstraction
+
+Do not add authentication, Supabase, Firebase, or a backend yet.
+
+However, structure data-access code so a real database can replace local persistence later.
+
+Avoid accessing localStorage directly from many UI components.
+
+Create a persistence/repository layer.
+
+23. Seed data
+
+Create only enough high-quality seed data for testing.
+
+Suggested:
+
+25–40 vocabulary words across several CEFR levels
+synonyms and antonyms for some words
+word families
+collocations
+2–4 grammar lessons per selected CEFR levels
+a few idioms
+a few phrasal verbs
+sample exercises
+
+Quality is more important than quantity.
+
+Do NOT waste tokens generating thousands of learning records.
+
+24. Code architecture
+
+Keep business logic outside React components.
+
+Suggested organization:
+
+src/
+  app/
+  components/
+  features/
+    dashboard/
+    vocabulary/
+    grammar/
+    expressions/
+    review/
+    mistakes/
+    progress/
+  lib/
+    learning/
+    fsrs/
+    storage/
+  data/
+  types/
+
+Adjust based on the actual framework and existing repository.
+
+Important rules:
+
+reusable components
+TypeScript types
+small focused modules
+avoid giant components
+avoid giant files
+avoid duplicated logic
+no unnecessary abstraction
+no premature backend architecture
+25. UI requirements
+
+The design should be:
+
+modern
+minimal
+responsive
+readable
+suitable for long daily study sessions
+
+Use:
+
+cards
+progress bars
+badges
+clear typography
+clear success/error feedback
+
+Support light mode first.
+
+Do not spend excessive time on animation.
+
+26. Language
+
+The interface may primarily use English, but vocabulary and grammar explanations should support Vietnamese translations.
+
+Keep the data model ready for bilingual English/Vietnamese content.
+
+27. Testing and validation
+
+After implementation:
+
+run lint
+run TypeScript checks
+run tests if configured
+run production build
+
+Fix errors before finishing.
+
+Add a few focused unit tests for important pure logic, especially:
+
+daily learning-plan calculation
+mastery calculation
+prerequisite checking
+
+Do not create excessive tests for trivial UI.
+
+28. README
+
+Update README.md with:
+
+project purpose
+current implemented features
+architecture overview
+how to install
+how to run
+how the adaptive learning system works
+current limitations
+recommended next development phase
+29. Important scope restrictions
+
+For this phase, DO NOT implement:
+
+authentication
+cloud database
+payments
+social features
+AI chatbot
+speech recognition
+full text-to-speech infrastructure
+admin panel
+thousands of vocabulary records
+complete A1–C2 lesson content
+unnecessary microservices
+
+The goal is a solid learning MVP and architecture.
+
+30. Work autonomously
+
+Do not stop after only giving me a plan.
+
+Inspect the repository and implement the application.
+
+Make reasonable engineering decisions when details are unspecified.
+
+Do not ask questions unless you are completely blocked.
+
+Prefer completing a working vertical slice over creating many unfinished features.
+
+At the end, report:
+
+What you implemented
+Important architecture decisions
+Files/modules created
+Commands you ran
+Build/test status
+Remaining limitations
+The best next 3 tasks to implement
+
+Do not create a git commit unless I explicitly request it.

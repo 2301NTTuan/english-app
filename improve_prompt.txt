@@ -1,0 +1,1702 @@
+You are continuing development of my existing English learning application.
+
+Repository:
+
+`/mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app`
+
+You are running inside Ubuntu/WSL.
+
+The project already contains an MVP implementation created in previous work.
+
+Your goal now is NOT to rebuild the project from scratch.
+
+Your goal is to inspect the existing implementation, preserve working architecture, and substantially develop the application into a genuinely usable personal English learning system.
+
+The main focus remains:
+
+1. Vocabulary
+2. Grammar from A1 to C2
+3. Adaptive spaced repetition
+4. Daily learning plans
+5. Synonyms and antonyms
+6. Idioms
+7. Phrasal verbs
+8. Collocations
+9. Mistake-based learning
+10. Progress tracking
+
+Work autonomously.
+
+Do not stop after giving me a plan.
+
+Inspect the current repository and implement the next development phase.
+
+---
+
+# 1. Inspect current implementation first
+
+Start with:
+
+```bash
+cd /mnt/c/Users/tuann/OneDrive/Desktop/GIT/my-english-app
+
+git status
+git log --oneline -5
+
+find . -maxdepth 3 \
+  -not -path "./node_modules/*" \
+  -not -path "./.next/*" \
+  | sort
+
+cat package.json
+```
+
+Inspect the important existing files.
+
+Understand:
+
+* current Next.js architecture
+* routes
+* data models
+* learning engine
+* FSRS integration
+* local persistence
+* vocabulary implementation
+* grammar implementation
+* daily session
+* mistake bank
+* progress page
+* seed data
+
+Do not rewrite working code simply because you prefer a different architecture.
+
+Identify gaps before implementing.
+
+---
+
+# 2. Preserve existing user work
+
+Before modifying anything:
+
+```bash
+git status
+git diff
+```
+
+Do not discard existing uncommitted changes.
+
+Do not use:
+
+```bash
+git reset --hard
+git clean -fd
+git restore .
+```
+
+Do not delete working features.
+
+---
+
+# 3. Product goal
+
+The application should become a serious personal English-learning application called:
+
+**English Mastery**
+
+It should support learners from:
+
+```text
+A1 → A2 → B1 → B2 → C1 → C2
+```
+
+The app should not behave like a static dictionary.
+
+It should behave like a learning system.
+
+Core philosophy:
+
+```text
+Due Reviews
+    ↓
+Weak Knowledge
+    ↓
+Past Mistakes
+    ↓
+New Knowledge
+```
+
+The system should continuously decide:
+
+* what the learner should review
+* what the learner is weak at
+* how many new words should be introduced
+* which grammar concepts are ready to learn
+* what type of exercise should be shown
+
+---
+
+# 4. Complete the learning engine
+
+Review the existing learning engine.
+
+Create or improve a clean domain layer that can calculate a daily session.
+
+The learning engine should consider:
+
+```ts
+dailyStudyTarget
+maxNewWordsPerDay
+maxNewGrammarTopicsPerDay
+dueVocabulary
+dueGrammar
+overdueItems
+weakVocabulary
+weakGrammar
+recentMistakes
+mastery
+reviewBacklog
+```
+
+Priority should generally be:
+
+```text
+1. Overdue items
+2. Due vocabulary
+3. Due grammar
+4. Repeated mistakes
+5. Weak vocabulary
+6. Weak grammar
+7. New vocabulary
+8. New grammar
+9. Mixed practice
+```
+
+Do not use a naive fixed:
+
+```text
+10 new words every day
+```
+
+rule.
+
+New knowledge should decrease when the review backlog increases.
+
+Example:
+
+```text
+Daily target: 25
+
+Due = 8
+New words may be 10
+
+Due = 18
+New words may fall to 7
+
+Due = 24
+New words may fall to 1
+
+Due >= 25
+New words may be 0
+```
+
+Keep this logic testable and independent from React components.
+
+---
+
+# 5. FSRS review system
+
+Review the current spaced repetition implementation.
+
+Use FSRS properly if already integrated.
+
+Each reviewable knowledge item should have appropriate scheduling information such as:
+
+```ts
+state
+difficulty
+stability
+due
+lastReview
+scheduledDays
+elapsedDays
+reps
+lapses
+```
+
+Support review ratings:
+
+```text
+Again
+Hard
+Good
+Easy
+```
+
+The rating must affect future scheduling.
+
+Do not implement a hard-coded review schedule such as:
+
+```text
+1 day
+3 days
+7 days
+14 days
+30 days
+```
+
+if FSRS is available.
+
+Keep FSRS behind an abstraction such as:
+
+```ts
+ReviewScheduler
+```
+
+so scheduling can be changed later without rewriting UI components.
+
+---
+
+# 6. Improve vocabulary domain model
+
+A vocabulary item should support rich learning information.
+
+Use or evolve the existing model toward something conceptually similar to:
+
+```ts
+interface VocabularyItem {
+  id: string
+  word: string
+
+  cefrLevel:
+    | "A1"
+    | "A2"
+    | "B1"
+    | "B2"
+    | "C1"
+    | "C2"
+
+  partOfSpeech: string
+
+  ipa?: string
+
+  meanings: {
+    englishDefinition: string
+    vietnameseMeaning?: string
+    usageNotes?: string
+  }[]
+
+  examples: {
+    sentence: string
+    translation?: string
+  }[]
+
+  synonyms: VocabularyRelation[]
+  antonyms: VocabularyRelation[]
+
+  wordFamily: WordFamilyItem[]
+
+  collocations: Collocation[]
+
+  tags: string[]
+}
+```
+
+Avoid duplicating separate models unnecessarily if the current schema already handles these concepts.
+
+---
+
+# 7. Vocabulary mastery dimensions
+
+Do not model vocabulary learning as:
+
+```ts
+learned: boolean
+```
+
+Track different dimensions.
+
+For example:
+
+```ts
+recognition
+recall
+spelling
+context
+meaning
+overall
+```
+
+Potential future dimensions may include listening and pronunciation, but audio is not required in this phase.
+
+Example:
+
+```text
+acquire
+
+Recognition   92%
+Recall        63%
+Spelling      85%
+Context       58%
+
+Overall       72%
+```
+
+The learning engine should be able to identify:
+
+```text
+Context is weak
+```
+
+and create context exercises instead of repeatedly showing easy recognition questions.
+
+---
+
+# 8. Implement richer vocabulary exercises
+
+The application should support reusable exercise generators/components for:
+
+### Recognition
+
+English → Vietnamese/definition.
+
+### Recall
+
+Vietnamese/definition → English.
+
+### Fill in the blank
+
+Example:
+
+```text
+She ______ valuable experience while working overseas.
+```
+
+### Context selection
+
+Select the best word for a sentence.
+
+### Synonym
+
+```text
+Which word is closest in meaning to "rapid"?
+```
+
+### Antonym
+
+```text
+Which word is the opposite of "temporary"?
+```
+
+### Word family
+
+```text
+She made an important ______.
+
+decide
+decision
+decisive
+decisively
+```
+
+### Collocation
+
+```text
+___ a decision
+
+do
+make
+build
+perform
+```
+
+Implement a clean exercise abstraction rather than writing unrelated page-specific implementations.
+
+---
+
+# 9. Synonyms must teach nuance
+
+Synonyms are NOT simply interchangeable lists.
+
+Support metadata such as:
+
+```ts
+interface VocabularyRelation {
+  word: string
+  strength?: number
+  register?: "informal" | "neutral" | "formal"
+  usageNote?: string
+}
+```
+
+Example:
+
+```text
+good
+great
+excellent
+outstanding
+exceptional
+```
+
+Allow the application to explain intensity.
+
+Example:
+
+```text
+good          ●●
+great         ●●●
+excellent     ●●●●
+outstanding   ●●●●●
+```
+
+Also allow usage notes such as:
+
+```text
+big mistake
+huge mistake
+large amount
+```
+
+Teach natural English, not direct word substitution.
+
+---
+
+# 10. Antonyms
+
+Create/use structured antonym relations.
+
+Examples:
+
+```text
+accept ↔ reject
+increase ↔ decrease
+temporary ↔ permanent
+expand ↔ contract
+ancient ↔ modern
+```
+
+Exercises should use these relations.
+
+---
+
+# 11. Word families
+
+Support word-family learning.
+
+Example:
+
+```text
+decide        verb
+decision      noun
+decisive      adjective
+decisively    adverb
+indecisive    adjective
+```
+
+Another example:
+
+```text
+success
+succeed
+successful
+successfully
+unsuccessful
+```
+
+Create exercises that require selecting the grammatically correct family member.
+
+---
+
+# 12. Collocations
+
+Make collocations a first-class learning concept.
+
+Examples:
+
+```text
+make a decision
+do homework
+heavy rain
+strong coffee
+highly recommended
+deeply concerned
+acquire knowledge
+gain experience
+take responsibility
+```
+
+Teach incorrect combinations where useful:
+
+```text
+make homework ❌
+do homework ✅
+```
+
+and:
+
+```text
+strong rain ❌
+heavy rain ✅
+```
+
+Support collocation exercises.
+
+---
+
+# 13. Phrasal verbs
+
+Improve or implement a structured phrasal verb model.
+
+Include:
+
+```text
+expression
+baseVerb
+meaning
+vietnameseMeaning
+examples
+cefrLevel
+separable
+usageNotes
+```
+
+Examples:
+
+```text
+take off
+take over
+take up
+take after
+look after
+look into
+give up
+carry out
+come across
+figure out
+```
+
+Teach them through context rather than isolated translation.
+
+---
+
+# 14. Idioms
+
+Implement/improve Idioms section.
+
+Organize idioms by useful categories:
+
+```text
+Daily Life
+Work
+Money
+Relationships
+Emotions
+Success & Failure
+Time
+Communication
+Education
+Business
+Technology
+```
+
+Example:
+
+```text
+break the ice
+```
+
+Data should include:
+
+```text
+meaning
+Vietnamese meaning
+example
+usage
+register
+context
+similar expressions
+```
+
+Avoid literal Vietnamese translations when they would be misleading.
+
+---
+
+# 15. Grammar curriculum architecture
+
+Grammar must support the complete curriculum structure:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+Do NOT create one giant component containing every lesson.
+
+Grammar content must be structured data.
+
+Create a curriculum catalogue with topics and prerequisites.
+
+---
+
+# 16. A1 grammar curriculum
+
+Ensure the curriculum contains at least these topic definitions:
+
+```text
+Verb to be
+Subject pronouns
+Object pronouns
+Possessive adjectives
+Possessive pronouns
+Articles: a / an / the
+Plural nouns
+Demonstratives
+There is / There are
+Have / Have got
+Present Simple
+Present Continuous
+Present Simple vs Present Continuous
+Can / Can't
+Imperatives
+Possessive 's
+Some / Any
+Much / Many
+Countable / Uncountable nouns
+Prepositions of place
+Prepositions of time
+Wh- questions
+Adverbs of frequency
+Basic conjunctions
+```
+
+---
+
+# 17. A2 grammar curriculum
+
+Include:
+
+```text
+Past Simple
+Past Continuous
+Past Simple vs Past Continuous
+Future with will
+Be going to
+Present Continuous for future
+Comparatives
+Superlatives
+Too / Enough
+Should
+Must
+Have to
+Must vs Have to
+Gerund basics
+Infinitive basics
+Present Perfect basics
+For / Since
+Already / Yet / Just
+Ever / Never
+First Conditional
+Relative clauses basics
+Adverbs
+Quantifiers
+Both / Either / Neither basics
+```
+
+---
+
+# 18. B1 grammar curriculum
+
+Include:
+
+```text
+Present Perfect vs Past Simple
+Present Perfect Continuous
+Present Perfect vs Present Perfect Continuous
+Past Perfect
+Past Perfect vs Past Simple
+Future Continuous
+Future Perfect
+Zero Conditional
+First Conditional review
+Second Conditional
+Passive Voice
+Reported Speech
+Defining Relative Clauses
+Non-defining Relative Clauses
+Modal verbs
+Modal deduction basics
+Gerund vs Infinitive
+Used to
+Be used to
+Get used to
+Question tags
+Indirect questions
+So / Such
+Too / Enough
+Both / Either / Neither
+Articles intermediate
+```
+
+---
+
+# 19. B2 grammar curriculum
+
+Include:
+
+```text
+Third Conditional
+Mixed Conditionals
+Advanced Passive
+Causative: have something done
+Causative: get something done
+Should have
+Could have
+Might have
+Must have
+Can't have
+Wish
+If only
+Reported Speech advanced
+Reporting verbs basics
+Participle clauses
+Reduced relative clauses
+Inversion basics
+Emphasis
+Cleft sentences
+Future Perfect Continuous
+Advanced gerund and infinitive patterns
+Subjunctive basics
+Advanced linking structures
+Complex noun phrases
+```
+
+---
+
+# 20. C1 grammar curriculum
+
+Include:
+
+```text
+Advanced inversion
+Negative inversion
+Not only... but also inversion
+Conditional inversion
+Had I known...
+Were I to...
+Should you need...
+Advanced modality
+Advanced passive structures
+Advanced reporting verbs
+Nominalisation
+Ellipsis
+Substitution
+Fronting
+Cleft sentences
+Pseudo-cleft sentences
+Advanced participle clauses
+Complex prepositions
+Discourse markers
+Hedging
+Advanced emphasis
+Formal vs informal grammar
+Advanced relative structures
+Advanced conditionals
+```
+
+---
+
+# 21. C2 grammar curriculum
+
+Include curriculum definitions for:
+
+```text
+Stylistic inversion
+Complex ellipsis
+Advanced modality nuances
+Tense and aspect nuance
+Formal subjunctive
+Literary grammatical structures
+Register-dependent grammar
+Advanced discourse structures
+Nuanced conditionals
+Complex embedded clauses
+Rhetorical structures
+Information structure
+Stylistic fronting
+Academic grammar conventions
+Advanced cohesive devices
+```
+
+C2 should represent advanced language control rather than simply adding obscure grammar rules.
+
+---
+
+# 22. Grammar prerequisites
+
+Grammar topics should form a dependency graph.
+
+Examples:
+
+```text
+Present Simple
+      ↓
+Past Simple
+      ↓
+Present Perfect
+      ↓
+Present Perfect vs Past Simple
+```
+
+and:
+
+```text
+First Conditional
+       ↓
+Second Conditional
+       ↓
+Third Conditional
+       ↓
+Mixed Conditionals
+```
+
+and:
+
+```text
+Passive Voice
+       ↓
+Advanced Passive
+       ↓
+Advanced Passive Structures
+```
+
+Implement reusable prerequisite-checking logic.
+
+The application should be able to determine:
+
+```text
+Ready to learn
+Locked because prerequisites are weak
+Recommended
+Mastered
+```
+
+---
+
+# 23. Grammar lesson structure
+
+Each grammar lesson should support:
+
+```text
+Title
+CEFR Level
+Overview
+Explanation
+Structure / Formula
+Positive form
+Negative form
+Question form
+Examples
+Vietnamese explanation
+Usage
+Common mistakes
+Comparison with related grammar
+Exercises
+Prerequisites
+Subtopics
+```
+
+Not every field has to appear for every lesson when it is irrelevant.
+
+---
+
+# 24. Grammar mastery
+
+Grammar mastery must support subtopics.
+
+Example:
+
+```text
+Present Perfect                     77%
+
+Structure                           94%
+Past participle                     87%
+For / Since                         68%
+Already / Yet / Just                82%
+Ever / Never                        90%
+Present Perfect vs Past Simple      48%
+```
+
+Weakness detection must operate on subtopics when possible.
+
+---
+
+# 25. Grammar exercises
+
+Support:
+
+```text
+Multiple choice
+Fill in the blank
+Error correction
+Choose correct tense
+Sentence building
+Sentence transformation
+Translation
+Rewrite
+```
+
+Implement reusable architecture.
+
+The app should be able to mix exercises from different grammar topics.
+
+---
+
+# 26. Error correction exercises
+
+This should be an important grammar feature.
+
+Example:
+
+```text
+I have went to London.
+```
+
+Learner identifies:
+
+```text
+went ❌
+gone ✅
+```
+
+Another:
+
+```text
+She don't like coffee.
+```
+
+Correct:
+
+```text
+She doesn't like coffee.
+```
+
+Store the mistake in the Mistake Bank when answered incorrectly.
+
+---
+
+# 27. Mistake Bank
+
+Improve the mistake tracking system.
+
+Each mistake should capture:
+
+```ts
+id
+knowledgeType
+knowledgeId
+subtopicId?
+exerciseType
+question
+userAnswer
+correctAnswer
+timestamp
+repeatCount
+resolved
+```
+
+Aggregate recurring weaknesses.
+
+Example UI:
+
+```text
+Your Frequent Mistakes
+
+Present Perfect vs Past Simple     12
+Since vs For                        7
+Articles                            6
+affect vs effect                    4
+borrow vs lend                      3
+```
+
+Repeated mistakes should receive higher review priority.
+
+---
+
+# 28. Daily study session
+
+Build/improve a coherent session experience.
+
+Suggested order:
+
+```text
+1. Due reviews
+2. Weak knowledge
+3. Mistake review
+4. New vocabulary
+5. New grammar
+6. Mixed practice
+```
+
+Do not expose implementation categories too mechanically to the learner.
+
+The UI should feel like one continuous study session.
+
+Display:
+
+```text
+Progress
+7 / 22
+```
+
+and current category.
+
+At the end show a session summary.
+
+---
+
+# 29. Session summary
+
+Display:
+
+```text
+Study Complete
+
+18 / 22 correct
+82% accuracy
+
+Vocabulary reviewed: 12
+New vocabulary: 6
+Grammar exercises: 4
+Mistakes corrected: 3
+
+Strong improvement:
+Since vs For +8%
+
+Needs more practice:
+Present Perfect vs Past Simple
+```
+
+Persist session history.
+
+---
+
+# 30. Dashboard improvements
+
+The Dashboard should become actionable.
+
+Include:
+
+```text
+Current CEFR level
+Today's review count
+Today's new knowledge
+Weak areas
+Streak
+Recent progress
+Estimated study time
+```
+
+Primary CTA:
+
+```text
+Start Today's Session
+```
+
+Add secondary actions where appropriate:
+
+```text
+Review Weak Words
+Practice Grammar
+Review Mistakes
+```
+
+Do not clutter the dashboard.
+
+---
+
+# 31. Vocabulary browser
+
+Improve the Vocabulary section so users can:
+
+```text
+search
+filter by CEFR
+filter by part of speech
+filter by mastery
+filter by learned/unseen
+```
+
+Vocabulary detail should show:
+
+```text
+word
+IPA
+part of speech
+meaning
+Vietnamese meaning
+examples
+synonyms
+antonyms
+word family
+collocations
+mastery
+next review
+```
+
+---
+
+# 32. Grammar browser
+
+Grammar page should allow:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+Show topic state:
+
+```text
+Not started
+Learning
+Weak
+Strong
+Mastered
+Locked
+```
+
+Show prerequisite relationship where relevant.
+
+Allow users to open a topic and study it independently.
+
+---
+
+# 33. Expressions browser
+
+Expressions page should organize:
+
+```text
+Idioms
+Phrasal Verbs
+Collocations
+Common Expressions
+```
+
+Allow filtering by:
+
+```text
+CEFR
+category
+mastery
+```
+
+---
+
+# 34. Search
+
+If architecture allows it without excessive complexity, implement a unified search capable of finding:
+
+```text
+vocabulary
+grammar
+idioms
+phrasal verbs
+collocations
+```
+
+Do not add a heavy external search service.
+
+Client-side search is sufficient for the current dataset.
+
+---
+
+# 35. Progress system
+
+Improve the Progress page.
+
+Include:
+
+```text
+Words encountered
+Words learning
+Words mastered
+Grammar topics started
+Grammar topics mastered
+Overall mastery
+CEFR progress
+Weak topics
+Study history
+Accuracy
+Review activity
+```
+
+Use lightweight visualization.
+
+Avoid adding a large charting dependency unless clearly useful.
+
+---
+
+# 36. CEFR progress
+
+Implement a reasonable progress model.
+
+Do NOT claim that the user has officially achieved a CEFR level.
+
+Display app-based progress, such as:
+
+```text
+B1 Learning Progress
+
+Vocabulary        62%
+Grammar           71%
+Expressions       45%
+Review retention  87%
+```
+
+Make clear internally that this is application mastery, not formal CEFR certification.
+
+---
+
+# 37. Settings
+
+Ensure settings allow configuration such as:
+
+```text
+Daily study target
+Maximum new vocabulary per day
+Maximum new grammar topics per day
+Desired retention
+Interface language
+Show Vietnamese translations
+```
+
+Persist settings.
+
+Changing the daily target should affect the Daily Learning Plan.
+
+---
+
+# 38. Persistence architecture
+
+Continue using local persistence for now.
+
+Do NOT add:
+
+```text
+Supabase
+Firebase
+PostgreSQL
+authentication
+cloud synchronization
+```
+
+yet.
+
+However, keep storage behind repositories/services.
+
+React components should not directly scatter calls to:
+
+```ts
+localStorage.getItem(...)
+```
+
+throughout the codebase.
+
+Centralize persistence.
+
+---
+
+# 39. Data versioning
+
+Because local data models may evolve, introduce a simple storage schema version if one does not already exist.
+
+Example concept:
+
+```ts
+schemaVersion: 1
+```
+
+Provide safe migration/default behavior for existing local data.
+
+Do not build an overengineered migration framework.
+
+---
+
+# 40. Seed content strategy
+
+Do NOT attempt to generate a dictionary of tens of thousands of words.
+
+But now create enough realistic seed content to properly exercise the app.
+
+Target approximately:
+
+```text
+Vocabulary:          120–200 words
+Grammar topics:      full curriculum catalogue
+Detailed lessons:    representative lessons across A1–C2
+Idioms:              30–50
+Phrasal verbs:       30–50
+Collocations:        40–60
+```
+
+Prioritize quality over hitting exact counts.
+
+Not every grammar curriculum topic needs a massive explanation yet.
+
+However, curriculum metadata should cover A1–C2 comprehensively.
+
+Detailed lesson content can be richer for representative/high-value topics.
+
+---
+
+# 41. Seed vocabulary distribution
+
+Distribute seed vocabulary approximately across:
+
+```text
+A1
+A2
+B1
+B2
+C1
+C2
+```
+
+Focus most data on A1–B2 because those levels are more immediately useful.
+
+Each seed item should have meaningful metadata rather than empty placeholder fields.
+
+---
+
+# 42. Bilingual support
+
+The learner is Vietnamese.
+
+Support Vietnamese explanations without making the UI Vietnamese-only.
+
+Suggested approach:
+
+```text
+English first
+Vietnamese explanation available
+```
+
+Settings should allow hiding/showing Vietnamese translations.
+
+Do not duplicate entire UI implementations.
+
+---
+
+# 43. UX principles
+
+Keep the app:
+
+```text
+clean
+modern
+responsive
+fast
+easy to study for 15–30 minutes
+```
+
+Avoid:
+
+```text
+excessive animations
+giant gradients everywhere
+overly decorative dashboards
+tiny text
+dense screens
+```
+
+Learning should be the focus.
+
+---
+
+# 44. Mobile responsiveness
+
+Ensure important flows work on mobile-sized layouts:
+
+```text
+Dashboard
+Daily Session
+Vocabulary
+Grammar
+Review
+```
+
+Do not optimize only for desktop.
+
+---
+
+# 45. Accessibility
+
+Maintain reasonable accessibility:
+
+```text
+labels
+button names
+keyboard interaction
+visible focus
+semantic HTML
+sufficient contrast
+```
+
+Do not spend excessive time on edge-case WCAG work, but do not regress basic accessibility.
+
+---
+
+# 46. Code quality
+
+Maintain:
+
+```text
+strict TypeScript
+small components
+clear feature boundaries
+pure learning logic
+reusable exercise components
+centralized storage
+```
+
+Avoid:
+
+```text
+any everywhere
+giant 1000-line React components
+duplicated exercise logic
+business logic directly inside JSX
+```
+
+---
+
+# 47. Tests
+
+Add meaningful tests for important logic.
+
+Prioritize:
+
+```text
+daily learning plan
+FSRS adapter behavior
+mastery calculations
+grammar prerequisite resolution
+weakness detection
+mistake prioritization
+exercise answer evaluation
+storage migration/default handling
+```
+
+Do not waste time writing trivial snapshot tests for every visual component.
+
+---
+
+# 48. Validation
+
+After implementation run:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Use only scripts that exist.
+
+If a script fails:
+
+* inspect the error
+* fix it
+* rerun it
+
+Do not leave known compilation errors.
+
+---
+
+# 49. Runtime validation
+
+Run:
+
+```bash
+npm run dev
+```
+
+Verify that important routes load.
+
+At minimum manually/runtime-check:
+
+```text
+/
+Dashboard
+Vocabulary
+Grammar
+Expressions
+Review
+Mistakes
+Progress
+Settings
+Daily Study Session
+```
+
+Fix runtime errors discovered during this validation.
+
+---
+
+# 50. Git review
+
+After development is complete:
+
+```bash
+git status
+git diff --stat
+git diff
+```
+
+Inspect changes.
+
+Do not commit:
+
+```text
+node_modules
+.next
+logs
+temporary files
+secrets
+.env with credentials
+```
+
+Update `.gitignore` if necessary.
+
+---
+
+# 51. Stage and commit
+
+If validation passes and changes are legitimate:
+
+```bash
+git add -A
+```
+
+Then review:
+
+```bash
+git diff --cached --stat
+git diff --cached
+```
+
+Create ONE commit for this development phase.
+
+Suggested commit message:
+
+```bash
+git commit -m "Expand adaptive English learning experience"
+```
+
+Use a different concise message only if it describes the actual work significantly better.
+
+Do NOT push.
+
+---
+
+# 52. Final report
+
+At the end report:
+
+## Implemented
+
+Summarize the features implemented.
+
+## Architecture
+
+Explain important architecture changes.
+
+## Content
+
+Report approximate counts of:
+
+```text
+Vocabulary
+Grammar curriculum topics
+Detailed grammar lessons
+Idioms
+Phrasal verbs
+Collocations
+Exercises
+```
+
+## Tests
+
+Report:
+
+```text
+lint
+typecheck
+tests
+build
+```
+
+as:
+
+```text
+PASS
+FAIL
+NOT AVAILABLE
+```
+
+## Runtime
+
+Report whether the dev server worked and its URL.
+
+## Git
+
+Report:
+
+```text
+Branch
+Latest commit
+Working tree
+Remote
+Upstream
+```
+
+Do NOT push.
+
+If the repository already has a configured upstream, the final instruction to me should simply be:
+
+```bash
+git push
+```
+
+---
+
+# IMPORTANT DEVELOPMENT PRIORITY
+
+If time, token budget, or implementation complexity becomes significant, prioritize in this order:
+
+```text
+1. Correct learning engine
+2. Review scheduling
+3. Grammar curriculum and mastery
+4. Vocabulary learning exercises
+5. Mistake Bank
+6. Daily Session
+7. Vocabulary enrichment
+8. Expressions
+9. Progress
+10. Visual polish
+```
+
+Working functionality is more important than decorative UI.
+
+Do not stop at analysis or planning.
+
+Inspect the existing implementation and start coding.

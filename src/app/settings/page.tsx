@@ -1,0 +1,57 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { Check, Download, RotateCcw, Upload } from "lucide-react";
+import { useAppState } from "@/components/app-provider";
+import { PageHeader } from "@/components/ui";
+import type { CEFRLevel, UserSettings } from "@/types/domain";
+import { createInitialState, localAppRepository, normalizeState } from "@/lib/storage/app-repository";
+
+type Notice = { kind: "success" | "error"; message: string } | null;
+
+export default function SettingsPage() {
+  const { state, setState } = useAppState();
+  const [draft, setDraft] = useState<UserSettings | null>(null);
+  const [notice, setNotice] = useState<Notice>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const settings = draft ?? state.settings;
+
+  const showNotice = (next: Notice) => { setNotice(next); window.setTimeout(() => setNotice(null), 2400); };
+  const save = () => { setState((current) => ({ ...current, settings })); setDraft(null); showNotice({ kind: "success", message: "Learning preferences saved." }); };
+  const reset = () => { const initial = createInitialState(); localAppRepository.clear(); setState(initial); setDraft(null); showNotice({ kind: "success", message: "Demo data restored." }); };
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `english-mastery-${new Date().toISOString().slice(0, 10)}.json`; anchor.click(); URL.revokeObjectURL(url);
+  };
+  const importData = async (file?: File) => {
+    if (!file) return;
+    try { const imported = normalizeState(JSON.parse(await file.text())); setState(imported); setDraft(null); showNotice({ kind: "success", message: "Learning data imported." }); }
+    catch { showNotice({ kind: "error", message: "That file is not valid English Mastery data." }); }
+    if (fileInput.current) fileInput.current.value = "";
+  };
+
+  return <>
+    <PageHeader eyebrow="Make the plan yours" title="Settings" description="Set a sustainable target. The adaptive engine reduces new material when reviews or weaknesses need attention."/>
+    <div aria-live="polite">{notice && <div className={`mb-4 rounded-xl border p-3 text-sm font-bold ${notice.kind === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800"}`}>{notice.message}</div>}</div>
+    <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+      <section className="card p-5 sm:p-6">
+        <h2 className="text-lg font-extrabold">Learning preferences</h2>
+        <div className="mt-6 space-y-7">
+          <label className="block"><div className="mb-2 flex justify-between"><b className="text-sm">Current CEFR level</b><span className="badge">{settings.currentLevel}</span></div><select value={settings.currentLevel} onChange={(event) => setDraft({ ...settings, currentLevel: event.target.value as CEFRLevel })} className="h-12 w-full rounded-xl border border-[#dce6e1] bg-white px-3">{["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => <option key={level}>{level}</option>)}</select></label>
+          <Range label="Daily study target" value={settings.dailyTarget} min={10} max={60} suffix="items" onChange={(dailyTarget) => setDraft({ ...settings, dailyTarget })}/>
+          <Range label="Maximum new words per day" value={settings.maxNewWordsPerDay} min={0} max={20} suffix="words" onChange={(maxNewWordsPerDay) => setDraft({ ...settings, maxNewWordsPerDay })}/>
+          <Range label="Desired retention" value={Math.round(settings.desiredRetention * 100)} min={80} max={97} suffix="%" onChange={(value) => setDraft({ ...settings, desiredRetention: value / 100 })}/>
+        </div>
+        <div className="mt-8 flex flex-wrap gap-2"><button onClick={save} className="btn-primary"><Check size={17}/>Save preferences</button><button onClick={reset} className="btn-secondary gap-2"><RotateCcw size={15}/>Reset demo data</button></div>
+      </section>
+      <div className="space-y-5">
+        <aside className="card p-5"><div className="eyebrow">How adaptation works</div><h2 className="mt-2 text-lg font-extrabold">Reviews protect memory</h2><ol className="muted mt-4 space-y-3 text-sm"><li><b className="text-[#15241f]">1.</b> Overdue and due reviews always stay in the plan.</li><li><b className="text-[#15241f]">2.</b> Weak dimensions and recurring mistakes come next.</li><li><b className="text-[#15241f]">3.</b> New words use remaining target capacity.</li><li><b className="text-[#15241f]">4.</b> A full backlog reduces new words to zero.</li></ol></aside>
+        <section className="card p-5"><h2 className="font-extrabold">Your data</h2><p className="muted mt-1 text-sm">Back up or move your local learning history.</p><div className="mt-4 grid grid-cols-2 gap-2"><button className="btn-secondary gap-2" onClick={exportData}><Download size={15}/>Export</button><button className="btn-secondary gap-2" onClick={() => fileInput.current?.click()}><Upload size={15}/>Import</button></div><input ref={fileInput} type="file" accept="application/json" className="sr-only" onChange={(event) => void importData(event.target.files?.[0])}/></section>
+      </div>
+    </div>
+  </>;
+}
+
+function Range({ label, value, min, max, suffix, onChange }: { label: string; value: number; min: number; max: number; suffix: string; onChange: (value: number) => void }) {
+  return <label className="block"><div className="mb-2 flex justify-between"><b className="text-sm">{label}</b><span className="text-sm font-extrabold text-[#17795b]">{value} {suffix}</span></div><input type="range" min={min} max={max} value={value} onChange={(event) => onChange(Number(event.target.value))} className="w-full accent-[#17795b]"/><div className="muted mt-1 flex justify-between text-[10px]"><span>{min}</span><span>{max}</span></div></label>;
+}
