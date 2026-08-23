@@ -4,7 +4,12 @@ import { MAX_STATE_BYTES } from "@/lib/validation/app-state";
 export function assertSameOrigin(request: Request): boolean {
   const origin = request.headers.get("origin");
   if (!origin) return process.env.NODE_ENV !== "production";
-  try { return new URL(origin).host === new URL(request.url).host; } catch { return false; }
+  try {
+    const requestHost = request.headers.get("host")?.trim().toLowerCase() || new URL(request.url).host.toLowerCase();
+    return new URL(origin).host.toLowerCase() === requestHost;
+  } catch {
+    return false;
+  }
 }
 
 export async function readJson(request: Request, maxBytes = MAX_STATE_BYTES): Promise<unknown> {

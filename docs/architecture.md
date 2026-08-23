@@ -10,7 +10,7 @@ The production foundation adds PostgreSQL and Drizzle without moving learning ru
 
 - `src/data`: authored source content, stable content identifiers, and application fallback data.
 - `scripts/seed-content.ts`: idempotent content import with version/checksum tracking.
-- `src/lib/learning` and `src/lib/fsrs`: deterministic business rules with unit tests.
+- `src/lib/learning` and `src/lib/fsrs`: deterministic business rules and a stable adapter around `ts-fsrs` FSRS v6.
 - `src/lib/auth`: password, opaque-session, request-origin, body-size, and rate-limit boundaries.
 - `src/app/api`: HTTP orchestration. User identity always comes from a verified session.
 - `src/db`: normalized PostgreSQL schema and a lazy, bounded connection pool.
@@ -19,13 +19,15 @@ The production foundation adds PostgreSQL and Drizzle without moving learning ru
 
 ## Persistence decision
 
-The normalized schema is the intended system of record. The current user flow persists a validated, versioned `AppState` snapshot scoped to the account. This bridge avoids an unsafe rewrite of the tested learning engine and enables authentication and cross-device sync. It is deliberately transitional: session completion should ultimately write `study_sessions`, `study_session_items`, review state, mastery, mistakes, and activity in one server transaction with optimistic version checks.
+The normalized schema is the system of record for core learning events. Session completion atomically inserts one idempotent session and its answers, then upserts vocabulary/grammar mastery, review state, mistakes, preferences, an active learning path, audit evidence, and the hydration snapshot. Placement completion follows the same pattern for attempts and diagnostic answers. Unknown content references abort the whole transaction. Replaying an idempotency key returns success without changing review counts or path versions.
+
+The validated, versioned `AppState` snapshot remains a compatibility projection for fast hydration and explicit browser-data import. General debounced state saves also normalize current progress in one transaction, but simultaneous-device conflict resolution remains last-write-wins outside event idempotency boundaries.
 
 ## Technology decisions
 
 Drizzle was selected because its SQL-visible migrations and typed schema fit the existing TypeScript/Next.js code without a generated client runtime. PostgreSQL provides constraints, JSONB for bounded evolving structures, transactional updates, mature backup tools, and local operation with Docker.
 
-Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit tokens. Only SHA-256 token digests are stored. This is simpler to revoke than stateless JWTs and keeps authorization anchored to current database state.
+Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit tokens. Only SHA-256 token digests are stored for sessions, password recovery, and email verification. Successful password reset consumes its token and revokes all prior sessions in one transaction.
 
 ## Scaling and performance
 
@@ -33,9 +35,8 @@ The pool defaults to 10 connections per process. Composite indexes support due-r
 
 ## Known limitations
 
-- Snapshot persistence is not yet the final normalized write path and uses last-write-wins across devices.
+- Non-event snapshot synchronization still uses last-write-wins across simultaneous devices.
 - Middleware checks cookie presence for navigation protection; every API independently verifies the hashed session in PostgreSQL. A forged cookie may reach the shell but cannot read or write account data.
-- No password-reset delivery, email verification, MFA, administrator/content-editor roles, or session management UI.
+- Password-reset and email-verification lifecycles exist, but outbound delivery adapters, MFA, administrator/content-editor roles, and session management UI remain pending.
 - No telemetry backend, error tracker, queue, object storage, CDN design, or shared rate-limit store.
-- No real-browser E2E suite or verified database integration run in the current WSL environment.
-- The scheduler is FSRS-inspired, not a complete audited FSRS implementation.
+- Playwright requires the standard Ubuntu Chromium system libraries (`sudo npx playwright install-deps chromium`) in a fresh WSL distribution.

@@ -4,6 +4,7 @@ import { getDb } from "@/db/client";
 import { userStateSnapshots } from "@/db/schema";
 import { currentUser } from "@/lib/auth/server";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
+import { saveLearningState } from "@/lib/learning/persistence";
 import { appStateSchema, stateEnvelopeSchema } from "@/lib/validation/app-state";
 
 export async function GET() {
@@ -25,8 +26,7 @@ export async function PUT(request: Request) {
     if (!user) return jsonError("Authentication required.", 401);
     const parsed = stateEnvelopeSchema.safeParse(await readJson(request));
     if (!parsed.success) return jsonError("Invalid learning state.", 400);
-    await getDb().insert(userStateSnapshots).values({ userId: user.id, schemaVersion: 1, state: parsed.data.state, updatedAt: new Date() })
-      .onConflictDoUpdate({ target: userStateSnapshots.userId, set: { state: parsed.data.state, schemaVersion: 1, updatedAt: new Date() } });
+    await saveLearningState(user.id, parsed.data.state);
     return NextResponse.json({ ok: true });
   } catch (error) {
     const bodyError = bodyErrorResponse(error); if (bodyError) return bodyError;

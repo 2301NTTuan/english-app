@@ -4,6 +4,8 @@ All browser input is untrusted. APIs accept JSON with content-type and size limi
 
 Passwords are limited to 128 characters, require a minimum of 12 with basic complexity, and are hashed with bcrypt cost 12. Login performs a dummy bcrypt comparison for unknown emails. Login responses use a generic invalid-credentials error. Sessions expire after 30 days, use HttpOnly, SameSite=Lax, Path=/, and Secure in production, and are revocable on logout.
 
+Password reset uses random 256-bit opaque tokens, stores only SHA-256 hashes, expires tokens after one hour, invalidates an earlier outstanding token, and atomically marks the token used, changes the bcrypt hash, and revokes existing sessions. Requests do not reveal whether an email exists. Production responses and logs never expose reset tokens. Email verification uses the same hashed, expiring, single-use design; outbound delivery for both flows is pending.
+
 Mutating routes check same-origin requests and require JSON. Security headers disable framing and MIME sniffing, restrict referrers and browser permissions, and establish a CSP/HSTS baseline. Database failures and health responses do not expose stack traces, credentials, or query details.
 
 ## Threats and remaining controls
@@ -13,7 +15,7 @@ Mutating routes check same-origin requests and require JSON. Security headers di
 - CSRF: same-origin checks and SameSite cookies; add explicit tokens if cross-origin clients or form endpoints are introduced.
 - XSS: React escaping and CSP baseline; remove `unsafe-inline` through CSP nonces before a high-assurance launch.
 - SQL injection: parameterized Drizzle/pg calls; restrict runtime and migration database roles separately.
-- Cross-account access: session-derived predicates and integration coverage; add API-level E2E authorization tests.
+- Cross-account access: session-derived predicates plus integration and API-level browser coverage; user-supplied account IDs are ignored.
 - Dependency risk: lockfile and CI audit; triage advisories and configure automated dependency updates.
 
-The authentication limiter is in process only. A horizontally scaled deployment requires a shared atomic store and trusted-proxy configuration. Logs must never contain passwords, session tokens, request bodies, or complete learner answers. Password recovery and email verification remain unavailable until secure delivery and support workflows exist.
+The authentication limiter is in process only. A horizontally scaled deployment requires a shared atomic store and trusted-proxy configuration. Structured logs preserve request IDs and event names while filtering passwords, tokens, secrets, email/name fields, and answers. Password recovery and email verification cannot be launched until a secure outbound delivery adapter and support workflow are configured.

@@ -1,28 +1,34 @@
+import { fsrs, Rating as FsrsRating, State as FsrsState, type CardInput, type Grade } from "ts-fsrs";
 import type { Rating, ReviewState } from "@/types/domain";
 
-const DAY = 86_400_000;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+const stateToFsrs: Record<ReviewState["state"], FsrsState> = { new: FsrsState.New, learning: FsrsState.Learning, review: FsrsState.Review, relearning: FsrsState.Relearning };
+const stateFromFsrs: Record<FsrsState, ReviewState["state"]> = { [FsrsState.New]: "new", [FsrsState.Learning]: "learning", [FsrsState.Review]: "review", [FsrsState.Relearning]: "relearning" };
+const ratingToFsrs: Record<Rating, Grade> = { again: FsrsRating.Again, hard: FsrsRating.Hard, good: FsrsRating.Good, easy: FsrsRating.Easy };
 
-/** FSRS-inspired scheduling kept behind a stable adapter so a full FSRS implementation can replace it later. */
+/** Stable application adapter around the maintained ts-fsrs implementation (FSRS v6). */
 export interface ReviewScheduler { schedule(current: ReviewState, rating: Rating, reviewedAt?: Date, desiredRetention?: number): ReviewState }
 
 export function scheduleReview(current: ReviewState, rating: Rating, reviewedAt = new Date(), desiredRetention = 0.9): ReviewState {
   const failed = rating === "again";
-  const elapsedDays = current.lastReview ? Math.max(0, (reviewedAt.getTime() - new Date(current.lastReview).getTime()) / DAY) : 0;
-  const retrievability = Math.pow(1 + elapsedDays / Math.max(0.9, 9 * current.stability), -1);
-  const difficultyDelta: Record<Rating, number> = { again: 0.9, hard: 0.3, good: -0.15, easy: -0.45 };
-  const difficulty = clamp(current.difficulty + difficultyDelta[rating], 1, 10);
-  const growth: Record<Rating, number> = { again: 0.35, hard: 1.15, good: 1.75, easy: 2.45 };
-  const recallBonus = failed ? 1 : 1 + (1 - retrievability) * (11 - difficulty) / 5;
-  const stability = clamp(current.stability * growth[rating] * recallBonus, 0.1, 36_500);
-  const retention = clamp(desiredRetention, 0.8, 0.97);
-  const targetInterval = 9 * stability * (1 / retention - 1);
-  const ratingFloor: Record<Rating, number> = { again: 10 / 1_440, hard: 1, good: 2, easy: 4 };
-  const intervalDays = failed ? ratingFloor.again : Math.max(ratingFloor[rating], Math.round(targetInterval));
+  const isNew = current.state === "new" && current.reviewCount === 0;
+  const card: CardInput = {
+    due: current.nextReview,
+    stability: isNew ? 0 : clamp(current.stability, 0.1, 36_500),
+    difficulty: isNew ? 0 : clamp(current.difficulty, 1, 10),
+    elapsed_days: current.elapsedDays,
+    scheduled_days: current.scheduledDays,
+    learning_steps: 0,
+    reps: current.reviewCount,
+    lapses: current.lapses,
+    state: stateToFsrs[current.state],
+    last_review: current.lastReview,
+  };
+  const result = fsrs({ request_retention: clamp(desiredRetention, 0.8, 0.97), maximum_interval: 36_500, enable_fuzz: false }).next(card, reviewedAt, ratingToFsrs[rating]).card;
   return {
-    ...current, difficulty, stability, state: failed ? "relearning" : "review", lastReview: reviewedAt.toISOString(),
-    nextReview: new Date(reviewedAt.getTime() + intervalDays * DAY).toISOString(), scheduledDays: intervalDays, elapsedDays,
-    reviewCount: current.reviewCount + 1,
+    ...current, difficulty: result.difficulty, stability: result.stability, state: stateFromFsrs[result.state], lastReview: result.last_review?.toISOString() ?? reviewedAt.toISOString(),
+    nextReview: result.due.toISOString(), scheduledDays: result.scheduled_days, elapsedDays: result.elapsed_days,
+    reviewCount: result.reps,
     correctCount: current.correctCount + (failed ? 0 : 1), incorrectCount: current.incorrectCount + (failed ? 1 : 0), lapses: current.lapses + (failed ? 1 : 0),
   };
 }

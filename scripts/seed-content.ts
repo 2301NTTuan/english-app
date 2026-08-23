@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { loadEnvConfig } from "@next/env";
 import { eq } from "drizzle-orm";
 import { vocabulary } from "../src/data/vocabulary";
 import { detailedGrammarTopics, grammarTopics } from "../src/data/grammar";
@@ -6,11 +7,14 @@ import { expressions as expressionData } from "../src/data/expressions";
 import { getDb, getPool } from "../src/db/client";
 import { collocations, contentVersions, expressions, grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, vocabularyContent, vocabularyExamples, vocabularyMeanings, vocabularyRelations, wordFamilies } from "../src/db/schema";
 
+loadEnvConfig(process.cwd());
+
 const version = process.env.CONTENT_VERSION ?? "bundled-v1";
 const checksum = createHash("sha256").update(JSON.stringify({ vocabulary, grammarTopics, expressionData })).digest("hex");
-const db = getDb();
 
-try {
+async function main() {
+  const db = getDb();
+  try {
   await db.transaction(async (tx) => {
     const [contentVersion] = await tx.insert(contentVersions).values({ version, checksum, publishedAt: new Date() })
       .onConflictDoUpdate({ target: contentVersions.version, set: { checksum, publishedAt: new Date() } }).returning({ id: contentVersions.id });
@@ -51,5 +55,8 @@ try {
     for (const item of expressionData.filter((item) => item.kind === "collocation")) await tx.insert(collocations).values({ contentId: item.id, phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags })
       .onConflictDoUpdate({ target: collocations.contentId, set: { phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags, updatedAt: new Date() } });
   });
-  console.log(`Seeded ${vocabulary.length} vocabulary items, ${grammarTopics.length} grammar topics, and ${expressionData.length} expressions (${checksum.slice(0, 12)}).`);
-} finally { await getPool().end(); }
+    console.log(`Seeded ${vocabulary.length} vocabulary items, ${grammarTopics.length} grammar topics, and ${expressionData.length} expressions (${checksum.slice(0, 12)}).`);
+  } finally { await getPool().end(); }
+}
+
+void main().catch((error: unknown) => { console.error(error instanceof Error ? error.message : "Content seed failed"); process.exitCode = 1; });

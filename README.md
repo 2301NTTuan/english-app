@@ -1,15 +1,16 @@
 # English Mastery
 
-English Mastery is an adaptive CEFR A1–C2 learning platform for Vietnamese learners. This repository contains a production-oriented foundation: Next.js, PostgreSQL/Drizzle migrations, credentials authentication with database-backed sessions, server-enforced account isolation, cloud learning-state sync, deterministic content seeding, validation, and CI.
+English Mastery is an adaptive CEFR A1–C2 learning platform for Vietnamese learners. This repository contains a production-oriented foundation: Next.js, PostgreSQL/Drizzle migrations, credentials authentication with database-backed sessions, server-enforced account isolation, transactional normalized learning writes, cloud hydration, deterministic content seeding, password-recovery token lifecycle, validation, and CI.
 
 It is not yet approved for a public production launch. See [production gates](docs/test-report.md) and [known limitations](docs/architecture.md).
 
 ## Local setup
 
-Requirements: a current Node.js LTS release, npm, and PostgreSQL 17 (Docker Compose is provided).
+Requirements: Node.js 20 or newer, npm, and PostgreSQL 17 or newer (Docker Compose is provided).
 
 ```bash
 cp .env.example .env.local
+cp .env.example .env.test.local
 docker compose up -d postgres
 npm install
 npm run db:migrate
@@ -28,9 +29,10 @@ npm run typecheck
 npm test
 npm run test:integration
 npm run build
+npm run test:e2e
 ```
 
-Integration tests require a migrated, disposable database in `TEST_DATABASE_URL`; never point them at production. The application uses `DATABASE_URL` for migrations, seeding, and runtime access.
+Integration and E2E tests prefer local credentials from the ignored `.env.test.local` file and fall back to `.env.local`. They require a migrated, seeded, disposable database in `TEST_DATABASE_URL`; both suites refuse a database name without `test`. `npm run db:test:reset` deletes both application and Drizzle journal schemas and has the same safety refusal. Build before E2E and install Chromium once with `npx playwright install --with-deps chromium`. The application uses `DATABASE_URL` for migrations, seeding, and runtime access.
 
 ## Architecture
 
@@ -42,7 +44,7 @@ Browser → Next.js routes/middleware → validated API/auth boundary
                          Drizzle repositories → PostgreSQL
 ```
 
-Static authored content is versioned and seeded into normalized content tables. Mutable learner data is account-owned. A validated, versioned `user_state_snapshots` document is currently the compatibility bridge between the existing pure learning engine and normalized progress tables; moving every session write to transactional normalized rows is the next persistence milestone.
+Static authored content is versioned and seeded into normalized content tables. Mutable learner data is account-owned. Session and placement completion use idempotent transactions across normalized mastery, review, mistake, activity, placement, and learning-path rows. A validated, versioned `user_state_snapshots` document remains as the hydration/legacy-import compatibility view.
 
 Key documentation:
 
@@ -56,7 +58,7 @@ Key documentation:
 
 ## Content and learning system
 
-The existing pure TypeScript systems remain intact: backlog-first daily planning, an FSRS-inspired scheduling adapter, multidimensional mastery, recurring-mistake practice, a bounded 30-question placement test, prerequisite-aware personalized paths, and metadata-driven exercises. Content validation checks stable identifiers, duplicate senses, references, relations, prerequisites, examples, and answer ambiguity.
+The existing pure TypeScript systems remain intact: backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 30-question placement test, prerequisite-aware personalized paths, and metadata-driven exercises. Content validation checks stable identifiers, duplicate senses, references, relations, prerequisites, examples, and answer ambiguity.
 
 Current bundled content: 192 vocabulary entries, 138 grammar topics (35 fully detailed lessons), and 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions).
 
@@ -64,6 +66,6 @@ Current bundled content: 192 vocabulary entries, 138 grammar topics (35 fully de
 
 - Secrets belong in the deployment environment, never in Git. `.env*` is ignored except `.env.example`.
 - `/api/health` returns only `ok` or `degraded`; a database failure produces HTTP 503 without leaking connection details.
-- Password reset email delivery and email verification are not enabled. Do not claim these capabilities at launch.
+- Password reset and email-verification tokens are hashed, expiring, and single-use. Outbound email delivery is still pending; `PASSWORD_RESET_DELIVERY=development` returns a local reset URL only outside production.
 - The in-process authentication limiter must be replaced with a shared store before horizontal scaling.
 - Review the placeholder Privacy and Terms pages with qualified counsel and add the actual operator details before launch.

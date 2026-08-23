@@ -10,10 +10,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:e2e": "playwright test",
     "validate:content": "vitest run src/lib/content/content.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed-content.ts",
+    "db:test:reset": "tsx scripts/reset-test-database.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
@@ -24,9 +26,13 @@
     "pg": "^8.23.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "ts-fsrs": "^5.4.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@next/env": "^16.3.2",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^22.10.2",
     "@types/pg": "^8.23.1",

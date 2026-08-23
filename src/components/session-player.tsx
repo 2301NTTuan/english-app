@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, ChevronRight, Clock3, RotateCcw, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAppState } from "@/components/app-provider";
 import { ProgressBar } from "@/components/ui";
 import { scheduleReview } from "@/lib/fsrs/scheduler";
@@ -11,7 +11,10 @@ import { updateMastery } from "@/lib/learning/mastery";
 import { evaluateAnswer, ratingForAnswer } from "@/lib/learning/evaluation";
 import { upsertMistake } from "@/lib/storage/app-repository";
 import { grammarTopics } from "@/data/grammar";
-import type { GrammarProgress, MasteryDimensions, Rating, ReviewState, SessionExercise } from "@/types/domain";
+import type { AppState, GrammarProgress, MasteryDimensions, Rating, ReviewState, SessionExercise } from "@/types/domain";
+
+type RecordedAttempt = { knowledgeType: "vocabulary" | "grammar" | "expression"; knowledgeContentId: string; exerciseType: string; answer: string; correct: boolean; rating: Rating; position: number };
+type CompletionPayload = { idempotencyKey: string; startedAt: string; completedAt: string; state: AppState; items: RecordedAttempt[] };
 
 const ratingStyle: Record<Rating, string> = {
   again: "border-red-200 bg-red-50 text-red-800 hover:bg-red-100",
@@ -47,7 +50,10 @@ export function SessionPlayer() {
 
 function HydratedSession({ initialState, setState }: { initialState: ReturnType<typeof useAppState>["state"]; setState: ReturnType<typeof useAppState>["setState"] }) {
   const [session] = useState(() => buildStudySession(initialState));
-  const [startedAt] = useState(() => Date.now());
+  const [startedAt] = useState(() => new Date().toISOString());
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  const stateRef = useRef(initialState);
+  const attemptsRef = useRef<RecordedAttempt[]>([]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [checked, setChecked] = useState(false);
@@ -55,7 +61,32 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
   const [mistakes, setMistakes] = useState(0);
   const [mistakesCorrected, setMistakesCorrected] = useState(0);
   const [missedPrompts, setMissedPrompts] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [completionPayload, setCompletionPayload] = useState<CompletionPayload | null>(null);
   const item = session[index];
+
+  const applyState = (update: (current: AppState) => AppState) => {
+    const next = update(stateRef.current);
+    stateRef.current = next;
+    setState(next);
+    return next;
+  };
+
+  const saveCompletion = async (payload: CompletionPayload) => {
+    setSaving(true);
+    setSaveError("");
+    try {
+      const response = await fetch("/api/study/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      if (!response.ok) throw new Error("The session could not be recorded.");
+      setCompletionPayload(null);
+      setIndex(session.length);
+    } catch {
+      setSaveError("We could not record this session. Your answers remain on this screen—please retry.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!item) {
     const accuracy = session.length ? Math.round(correct / session.length * 100) : 0;
@@ -81,12 +112,16 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
     setMistakes((value) => value + (isCorrect ? 0 : 1));
     if (isCorrect && item.source === "mistakes") setMistakesCorrected((value) => value + 1);
     if (!isCorrect) setMissedPrompts((value) => [...value, item.prompt]);
-    if (!isCorrect) setState((current) => ({ ...current, mistakes: upsertMistake(current.mistakes, { itemId: item.itemId, label: item.prompt, knowledgeType: item.knowledgeType, exerciseType: item.type, wrongAnswer: selected, correctAnswer: item.answer }) }));
+    if (!isCorrect) applyState((current) => ({ ...current, mistakes: upsertMistake(current.mistakes, { itemId: item.itemId, label: item.prompt, knowledgeType: item.knowledgeType, exerciseType: item.type, wrongAnswer: selected, correctAnswer: item.answer }) }));
   };
 
-  const rate = (rating: Rating) => {
-    setState((current) => {
-      const effectiveRating = ratingForAnswer(isCorrect, rating);
+  const rate = async (rating: Rating) => {
+    if (saving || completionPayload) return;
+    const effectiveRating = ratingForAnswer(isCorrect, rating);
+    const attempt: RecordedAttempt = { knowledgeType: item.knowledgeType, knowledgeContentId: item.itemId, exerciseType: item.type, answer: selected, correct: isCorrect, rating: effectiveRating, position: index };
+    attemptsRef.current = [...attemptsRef.current, attempt];
+    const finished = index === session.length - 1;
+    const finalState = applyState((current) => {
       const masteryCorrect = effectiveRating !== "again";
       let vocabularyProgress = current.vocabularyProgress;
       let grammarProgress = current.grammarProgress;
@@ -99,13 +134,17 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
       } else if (item.knowledgeType === "grammar") {
         grammarProgress = updateGrammarProgress(grammarProgress, item, masteryCorrect, effectiveRating, current.settings.desiredRetention);
       }
-      const finished = index === session.length - 1;
-      const minutes = Math.max(1, Math.round((Date.now() - startedAt) / 60_000));
-      const finalCorrect = correct + (isCorrect ? 1 : 0);
-      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct: finalCorrect, total: session.length, minutes, masteryDelta: finalCorrect > mistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
+      const minutes = Math.max(1, Math.round((Date.now() - new Date(startedAt).getTime()) / 60_000));
+      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct, total: session.length, minutes, masteryDelta: correct > mistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
       const mistakeRecords = item.source === "mistakes" && masteryCorrect ? current.mistakes.map((mistake) => mistake.itemId === item.itemId ? { ...mistake, resolved: true } : mistake) : current.mistakes;
       return { ...current, vocabularyProgress, grammarProgress, mistakes: mistakeRecords, activities };
     });
+    if (finished) {
+      const payload = { idempotencyKey, startedAt, completedAt: new Date().toISOString(), state: finalState, items: attemptsRef.current };
+      setCompletionPayload(payload);
+      await saveCompletion(payload);
+      return;
+    }
     setIndex((value) => value + 1);
     setSelected("");
     setChecked(false);
@@ -114,7 +153,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
   return <div className="mx-auto max-w-3xl">
     <div className="mb-5 flex items-center gap-3 sm:gap-4" aria-label={`Question ${index + 1} of ${session.length}`}>
       <span className="muted shrink-0 text-sm font-bold">{index + 1} / {session.length}</span>
-      <div className="flex-1"><ProgressBar value={index / session.length * 100}/></div>
+      <div className="flex-1"><ProgressBar value={index / session.length * 100} label="Session progress"/></div>
       <span className="badge hidden capitalize sm:inline-flex">{item.type.replaceAll("-", " ")}</span>
     </div>
     <section className="card overflow-hidden" aria-labelledby="exercise-prompt">
@@ -135,7 +174,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
           })}
         </div>
         <div aria-live="polite">{checked && <div className={`mt-5 rounded-xl p-4 ${isCorrect ? "bg-emerald-50 text-emerald-900" : "bg-red-50 text-red-900"}`}><b>{isCorrect ? "Correct — well done." : `Not quite. The answer is “${item.answer}”.`}</b>{item.explanation && <p className="mt-1 text-sm opacity-80">{item.explanation}</p>}</div>}</div>
-        {!checked ? <div className="mt-6 flex items-center justify-between"><button className="muted flex items-center gap-1 text-xs disabled:opacity-30" disabled={!selected} onClick={() => setSelected("")}><RotateCcw size={13}/>Clear</button><button className="btn-primary disabled:cursor-not-allowed disabled:opacity-40" disabled={!selected} onClick={submit}>Check answer <ChevronRight size={18}/></button></div> : <div className="mt-6"><p className="muted mb-2 text-center text-xs font-bold">How difficult was this to recall?</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["again", "hard", "good", "easy"] as Rating[]).map((rating) => <button key={rating} onClick={() => rate(rating)} className={`min-h-12 rounded-xl border px-3 py-2 text-xs font-extrabold capitalize transition ${ratingStyle[rating]}`}>{rating}<span className="mt-0.5 block text-[9px] font-medium opacity-70">{{ again: "< 10 min", hard: "~ 1 day", good: "~ 3 days", easy: "~ 1 week" }[rating]}</span></button>)}</div></div>}
+        {!checked ? <div className="mt-6 flex items-center justify-between"><button className="muted flex items-center gap-1 text-xs disabled:opacity-30" disabled={!selected} onClick={() => setSelected("")}><RotateCcw size={13}/>Clear</button><button className="btn-primary disabled:cursor-not-allowed disabled:opacity-40" disabled={!selected} onClick={submit}>Check answer <ChevronRight size={18}/></button></div> : <div className="mt-6"><p className="muted mb-2 text-center text-xs font-bold">How difficult was this to recall?</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["again", "hard", "good", "easy"] as Rating[]).map((rating) => <button key={rating} disabled={saving || Boolean(completionPayload)} onClick={() => void rate(rating)} className={`min-h-12 rounded-xl border px-3 py-2 text-xs font-extrabold capitalize transition disabled:cursor-wait disabled:opacity-50 ${ratingStyle[rating]}`}>{rating}<span className="mt-0.5 block text-[9px] font-medium opacity-70">{{ again: "< 10 min", hard: "~ 1 day", good: "~ 3 days", easy: "~ 1 week" }[rating]}</span></button>)}</div>{saving && <p className="muted mt-3 text-center text-sm" role="status">Recording your session…</p>}{saveError && completionPayload && <div className="mt-3 rounded-xl bg-red-50 p-3 text-center text-sm text-red-900" role="alert">{saveError}<button className="btn-secondary mt-3" onClick={() => void saveCompletion(completionPayload)}>Retry save</button></div>}</div>}
       </div>
     </section>
     <p className="muted mt-4 flex items-center justify-center gap-1 text-xs"><Clock3 size={13}/>Session order follows your live adaptive plan.</p>

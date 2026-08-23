@@ -18,7 +18,7 @@ const navigation = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const { state, syncStatus } = useAppState();
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, []);
-  if (["/login", "/register", "/privacy", "/terms"].includes(pathname)) return <main id="main-content">{children}</main>;
+  if (["/login", "/register", "/forgot-password", "/reset-password", "/privacy", "/terms"].includes(pathname)) return <main id="main-content">{children}</main>;
   const levelVocabularyIds = new Set(vocabulary.filter((item) => item.cefrLevel === state.settings.currentLevel).map((item) => item.id));
   const levelGrammarIds = new Set(grammarTopics.filter((item) => item.level === state.settings.currentLevel).map((item) => item.id));
   const levelScores = [...state.vocabularyProgress.filter((item) => levelVocabularyIds.has(item.itemId)).map((item) => item.mastery.overall), ...state.grammarProgress.filter((item) => levelGrammarIds.has(item.topicId)).map((item) => item.mastery)];
@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return <div className="min-h-screen lg:grid lg:grid-cols-[238px_1fr]">
     <a href="#main-content" className="skip-link">Skip to main content</a>
     <aside aria-label="Application navigation" className={`${open ? "fixed inset-0 z-50 flex" : "hidden"} bg-black/25 lg:sticky lg:top-0 lg:flex lg:h-screen lg:bg-transparent`} onClick={() => setOpen(false)}>
-      <div className="flex h-full w-[265px] flex-col border-r border-[#dce6e1] bg-white p-4" onClick={(event) => event.stopPropagation()}>
+      <div className="flex h-full w-[265px] flex-col overflow-y-auto border-r border-[#dce6e1] bg-white p-4" onClick={(event) => event.stopPropagation()}>
         <div className="mb-7 flex items-center justify-between px-2 pt-2">
           <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}><span className="grid size-9 place-items-center rounded-xl bg-[#17795b] text-white"><LibraryBig size={19}/></span><span><b className="block leading-tight">English Mastery</b><small className="muted">Learn with purpose</small></span></Link>
           <button className="icon-button lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)}><X/></button>
