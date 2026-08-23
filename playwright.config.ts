@@ -9,6 +9,7 @@ if (!databaseName.includes("test")) throw new Error(`Refusing to run Playwright 
 process.env.DATABASE_URL = testDatabaseUrl;
 process.env.PASSWORD_RESET_DELIVERY = "development";
 process.env.PLACEMENT_CONTENT_CHANNEL = "validated-preview";
+process.env.CONTENT_RELEASE_CHANNEL = "validated-preview";
 
 export default defineConfig({
   testDir: "./tests/e2e",

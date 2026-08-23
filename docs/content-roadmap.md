@@ -1,6 +1,6 @@
 # Content roadmap
 
-Current baseline: 192 vocabulary headwords against a long-term 5,000–8,000 target; 138 grammar topics with 35 fully detailed lessons against a target of 100+ detailed lessons; 30 idioms, 30 phrasal verbs, 40 collocations, and 7 common expressions.
+Current baseline: 298 vocabulary lexical units against a long-term 5,800–6,200 target; 138 grammar topics with 35 enriched records but zero lessons that meet the stricter production-detail rubric against a target of 110+; 30 idioms, 30 phrasal verbs, 40 collocations, and 7 common expressions.
 
 1. Add provenance fields, editorial workflow, reviewer sign-off, and versioned release notes.
 2. Expand high-frequency A1/A2 vocabulary and bilingual examples before advanced breadth.

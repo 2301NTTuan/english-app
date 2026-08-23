@@ -51,3 +51,14 @@ Automated simulations cover strong, foundation-level, uneven-domain, and random-
 | Inconsistent | chance-like contradictory pattern | continue to 50-item upper bound |
 
 These are regression expectations for the editorial heuristic, not empirical validity evidence.
+
+## Representative validated pilot items
+
+These examples are machine-validated and repository-authored. Their difficulty values are editorial priors, not empirical calibration, and none is educator-reviewed or production-published.
+
+| Domain | CEFR | Difficulty | Prompt | Correct answer | Distractors | Explanation |
+| --- | --- | ---: | --- | --- | --- | --- |
+| Vocabulary | A1 | 0.083 | Which word means “a place where you live”? | home | hour; hope; help | A home is the house, apartment, or other place where someone lives. |
+| Grammar | A1 | 0.083 | My sister ___ a student. | is | are; am; be | The singular third-person subject “my sister” takes “is” in the present tense. |
+| Context | A1 | 0.083 | Choose the most natural sentence. | I usually walk to work. | I walk usually to work.; Usually I to work walk.; I am usually walk to work. | With a main verb, the frequency adverb “usually” normally comes before the verb. |
+| Reading | A1 | 0.063 | When does Mina go to the library? | On Tuesday | On Monday; On Friday; On Sunday | The first sentence says that Mina visits on Tuesday. |

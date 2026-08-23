@@ -54,6 +54,7 @@ Key documentation:
 - [Security model](docs/security.md)
 - [Acceptance tests](docs/acceptance-tests.md)
 - [Content sources and licensing](docs/content-sources.md)
+- [Vocabulary quality audit](docs/vocabulary-quality-audit.md)
 - [Content roadmap](docs/content-roadmap.md)
 - [Latest test report and production gates](docs/test-report.md)
 
@@ -61,7 +62,7 @@ Key documentation:
 
 The existing pure TypeScript systems include backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 25–50-question four-domain placement assessment, prerequisite-aware personalized paths, and metadata-driven exercises. Placement selection and scoring remain server-scoped so the browser receives only the active item. Content validation checks stable identifiers, duplicate senses, references, relations, cyclic prerequisites, examples, provenance, item parameters, passage links, and answer ambiguity.
 
-Current bundled content: 192 vocabulary entries, 138 grammar topics (35 fully detailed lessons), 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions), and a 108-item validated placement pilot with six authored passages. Run `npm run content:stats` for exact coverage and release gates. Validated pilot content is not educator-reviewed or production-published.
+Current bundled content: 298 vocabulary entries, 138 grammar topics (35 enriched lesson records, but zero yet meet the stricter production-detail rubric), 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions), and a 108-item validated placement pilot with six authored passages. Run `npm run content:stats` for exact coverage and release gates. Validated content is not educator-reviewed or production-published.
 
 ## Operational notes
 

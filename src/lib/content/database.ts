@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
 import type { CEFRLevel } from "@/types/domain";
@@ -11,7 +11,8 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const page = Math.max(1, Math.trunc(input.page ?? 1));
   const pageSize = Math.max(1, Math.min(24, Math.trunc(input.pageSize ?? 24)));
   const search = input.search?.trim();
-  const conditions = [eq(vocabularyContent.active, true)];
+  const preview = process.env.NODE_ENV !== "production" || process.env.CONTENT_RELEASE_CHANNEL === "validated-preview";
+  const conditions = [eq(vocabularyContent.active, true), preview ? inArray(vocabularyContent.status, ["validated", "reviewed", "published"]) : eq(vocabularyContent.status, "published")];
   if (input.level) conditions.push(eq(vocabularyContent.level, input.level));
   if (input.partOfSpeech) conditions.push(eq(vocabularyContent.partOfSpeech, input.partOfSpeech));
   if (input.topic) conditions.push(sql`${input.topic} = any(${vocabularyContent.topics})`);
@@ -23,7 +24,7 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const items = await db.select({
     id: vocabularyContent.contentId, word: vocabularyContent.word, lemma: vocabularyContent.lemma,
     partOfSpeech: vocabularyContent.partOfSpeech, level: vocabularyContent.level, frequencyRank: vocabularyContent.frequencyRank,
-    frequencyBand: vocabularyContent.frequencyBand, topics: vocabularyContent.topics, tags: vocabularyContent.tags,
+    frequencyBand: vocabularyContent.frequencyBand, status: vocabularyContent.status, cefrBasis: vocabularyContent.cefrBasis, frequencyBasis: vocabularyContent.frequencyBasis, provenanceId: vocabularyContent.provenanceId, topics: vocabularyContent.topics, tags: vocabularyContent.tags,
     definition: vocabularyMeanings.englishDefinition, vietnamese: vocabularyMeanings.vietnameseMeaning, example: vocabularyExamples.sentence,
   }).from(vocabularyContent)
     .leftJoin(vocabularyMeanings, and(eq(vocabularyMeanings.vocabularyId, vocabularyContent.id), eq(vocabularyMeanings.position, 0)))

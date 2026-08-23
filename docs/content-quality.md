@@ -6,6 +6,10 @@ Run `npm run content:stats` for the exact machine-derived counts and release gat
 
 The long-term architecture targets roughly 6,000 vocabulary senses, 110–130 detailed grammar lessons, 300 idioms, 300 phrasal verbs, 1,000 collocations, and 750 calibrated placement items. These are capacity targets, not claims about the current bank. Quality gates take priority over bulk generation.
 
+The current vocabulary audit and representative records are documented in `docs/vocabulary-quality-audit.md`. Vocabulary records now carry status, provenance, CEFR basis, and frequency basis. All current CEFR assignments and coarse frequency bands are explicitly editorial estimates; positional pseudo-ranks were removed.
+
+The grammar statistics distinguish 35 records previously labelled detailed from lessons that meet the stricter production rubric. Under the automated structural rubric (multiple specific examples and mistakes, substantial phenomenon-specific explanation, and no shared generic explanation tail), zero current lessons qualify. This is an honest production gate failure, not a reason to manufacture templated lesson text.
+
 ## Lifecycle
 
 Content uses `draft → validated → reviewed → published → retired`.
@@ -19,7 +23,9 @@ Automated validation never promotes a record to `reviewed` or `published`. The c
 
 ## Automated gates
 
-`npm run validate:content` rejects duplicate IDs and duplicate semantic records, malformed meanings/examples/relations, invalid relation strengths and frequency ranks, broken or cyclic grammar prerequisites, ambiguous answers, repeated choices, weak placement metadata, invalid difficulty/discrimination, missing provenance, and broken reading-passage references. Placement items require four unique choices, one exact answer, a substantive explanation, domain/topic/subtopic tags, continuous parameters, status, and provenance.
+`npm run validate:content` rejects duplicate IDs and duplicate semantic records, malformed meanings/examples/relations, invalid relation strengths and frequency ranks, broken or cyclic grammar prerequisites, ambiguous answers, repeated choices, weak placement metadata, invalid difficulty/discrimination, missing provenance, and broken reading-passage references. Placement items require four unique choices, one exact answer, an item-specific instructional explanation, domain/topic/subtopic tags, continuous parameters, status, and provenance. Generic explanations that merely say the selected option is correct are rejected.
+
+Vocabulary validation also requires a supported POS, Vietnamese meaning, specific topic, lifecycle status, known provenance, honest CEFR/frequency basis, and consistency between an exact rank and its declared source basis. Exact/fuzzy duplicate reporting, stable-ID regression, distribution statistics, and deterministic per-level samples supplement the blocking validator; they do not claim to prove semantic correctness.
 
 Stable IDs are immutable. A legitimate new sense of an existing word receives its own ID and definition; an exact word/part-of-speech/definition duplicate is rejected. Retired IDs are never recycled.
 

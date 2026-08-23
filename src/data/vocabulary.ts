@@ -1,5 +1,6 @@
 import type { VocabularyItem } from "@/types/domain";
 import { extendedVocabulary } from "@/data/vocabulary/extended";
+import { foundationVocabulary001 } from "@/data/vocabulary/foundations-001";
 
 type Seed = [string, string, VocabularyItem["cefrLevel"], string, string, string, string[], string[]];
 const seeds: Seed[] = [
@@ -8,7 +9,7 @@ const seeds: Seed[] = [
   ["analyze", "verb", "B2", "to examine something carefully", "phân tích", "We analyzed the survey results.", ["examine"], ["ignore"]],
   ["approach", "noun", "B1", "a way of dealing with something", "cách tiếp cận", "This approach makes grammar clearer.", ["method"], []],
   ["benefit", "noun", "A2", "a helpful or good effect", "lợi ích", "Daily practice has a lasting benefit.", ["advantage"], ["drawback"]],
-  ["brief", "adjective", "B1", "lasting only a short time", "ngắn gọn", "We had a brief conversation.", ["short"], ["lengthy"]],
+  ["brief", "adjective", "B1", "lasting only a short time", "ngắn, trong thời gian ngắn", "We had a brief conversation.", ["short"], ["lengthy"]],
   ["challenge", "noun", "A2", "a difficult task that tests ability", "thử thách", "Speaking confidently is a challenge.", ["test"], ["ease"]],
   ["clarify", "verb", "B2", "to make something easier to understand", "làm rõ", "Could you clarify that point?", ["explain"], ["confuse"]],
   ["consistent", "adjective", "B2", "acting in the same way over time", "nhất quán", "Consistent practice builds fluency.", ["steady"], ["erratic"]],
@@ -21,7 +22,7 @@ const seeds: Seed[] = [
   ["frequent", "adjective", "B1", "happening often", "thường xuyên", "Frequent review prevents forgetting.", ["common"], ["rare"]],
   ["improve", "verb", "A2", "to become or make better", "cải thiện", "Her pronunciation improved quickly.", ["enhance"], ["worsen"]],
   ["knowledge", "noun", "A2", "information and understanding", "kiến thức", "Practice turns knowledge into skill.", ["understanding"], ["ignorance"]],
-  ["maintain", "verb", "B2", "to keep at the same level", "duy trì", "Maintain a steady study routine.", ["preserve"], ["neglect"]],
+  ["maintain", "verb", "B2", "to continue something or keep it in good condition", "duy trì", "Maintain a steady study routine.", ["preserve"], ["neglect"]],
   ["notice", "verb", "A2", "to become aware of something", "nhận thấy", "Did you notice the tense change?", ["observe"], ["overlook"]],
   ["progress", "noun", "A2", "movement toward improvement", "tiến bộ", "You are making good progress.", ["advancement"], ["setback"]],
   ["reliable", "adjective", "B2", "consistently good and trustworthy", "đáng tin cậy", "Use a reliable dictionary.", ["dependable"], ["unreliable"]],
@@ -92,7 +93,7 @@ const seeds: Seed[] = [
   ["compelling", "adjective", "C1", "very convincing or engaging", "thuyết phục", "She presented a compelling argument.", ["persuasive"], ["unconvincing"]],
   ["convey", "verb", "C1", "to communicate an idea or feeling", "truyền đạt", "Word order can convey emphasis.", ["communicate"], ["conceal"]],
   ["nuance", "noun", "C1", "a subtle difference in meaning", "sắc thái", "The translation misses an important nuance.", ["distinction"], []],
-  ["pragmatic", "adjective", "C2", "focused on practical effects and context", "thực dụng, ngữ dụng", "A pragmatic interpretation depends on context.", ["practical"], ["idealistic"]],
+  ["pragmatic", "adjective", "C1", "focused on practical solutions and effects", "thực tế, thực dụng", "We took a pragmatic approach to the budget problem.", ["practical"], ["idealistic"]],
   ["ability", "noun", "A2", "the skill to do something", "khả năng", "Reading builds your language ability.", ["skill"], ["inability"]],
   ["accept", "verb", "A2", "to agree to receive or allow something", "chấp nhận", "She accepted the correction.", ["approve"], ["reject"]],
   ["ancient", "adjective", "A2", "belonging to the very distant past", "cổ xưa", "They visited an ancient temple.", ["old"], ["modern"]],
@@ -125,7 +126,6 @@ const seeds: Seed[] = [
   ["equivocal", "adjective", "C2", "open to more than one interpretation", "nước đôi, mơ hồ", "His response was deliberately equivocal.", ["ambiguous"], ["unequivocal"]],
 ];
 
-const levelIndex = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 } as const;
 const topicGroups: Record<string, string[]> = {
   education: ["learn", "study", "practice", "knowledge", "skill", "example", "sentence", "translate", "answer", "evaluate", "analyze"],
   communication: ["communicate", "conversation", "explain", "clarify", "describe", "respond", "meaning", "interpret", "convey", "rhetorical"],
@@ -134,7 +134,20 @@ const topicGroups: Record<string, string[]> = {
   society: ["evidence", "influence", "consequence", "significant", "relevant", "ubiquitous"],
   "daily-life": ["habit", "notice", "remember", "borrow", "lend", "choice", "advice", "useful"],
 };
-const topicFor = (word: string) => Object.entries(topicGroups).find(([, words]) => words.includes(word))?.[0] ?? "general";
+const topicOverrides: Record<string, string> = {
+  adapt: "change", approach: "problem-solving", benefit: "success", brief: "time", consistent: "quality", context: "language",
+  decide: "decision-making", essential: "daily-life", frequent: "time", improve: "success", reliable: "quality", review: "education",
+  temporary: "time", understand: "communication", accurate: "quality", complex: "description", subtle: "communication", coherent: "communication",
+  correct: "education", difference: "comparison", focus: "education", similar: "comparison", specific: "communication", avoid: "daily-life",
+  compare: "comparison", determine: "decision-making", emphasize: "communication", indicate: "communication", likely: "prediction", occur: "events",
+  require: "daily-life", assume: "reasoning", distinguish: "comparison", enhance: "change", imply: "communication", justify: "argumentation",
+  retain: "education", sufficient: "quantity", vary: "change", ambiguous: "communication", compelling: "argumentation", nuance: "communication",
+  pragmatic: "problem-solving", ability: "education", accept: "relationships", ancient: "history", announce: "communication", attend: "education",
+  cause: "reasoning", decrease: "change", expand: "change", familiar: "experience", feature: "description", natural: "language", pattern: "language",
+  predict: "prediction", recognize: "perception", resolve: "problem-solving", appropriate: "communication", contract: "change", derive: "language",
+  explicit: "communication", infer: "reasoning", permanent: "time", precise: "communication", register: "language", equivocal: "communication",
+};
+const topicFor = (word: string, partOfSpeech?: string) => word === "temporary" && partOfSpeech === "noun" ? "work" : topicOverrides[word] ?? Object.entries(topicGroups).find(([, words]) => words.includes(word))?.[0] ?? "daily-life";
 const wordFamilies: Record<string, { word: string; partOfSpeech: string }[]> = {
   decide: [{ word: "decision", partOfSpeech: "noun" }, { word: "decisive", partOfSpeech: "adjective" }, { word: "decisively", partOfSpeech: "adverb" }],
   analyze: [{ word: "analysis", partOfSpeech: "noun" }, { word: "analytical", partOfSpeech: "adjective" }],
@@ -153,15 +166,24 @@ const collocationsByWord: Record<string, string[]> = {
   consequence: ["serious consequence"], experience: ["gain experience"], knowledge: ["acquire knowledge"], progress: ["make progress"], responsibility: ["take responsibility"],
 };
 
+const rejectedSynonyms = new Set(["sentence:statement", "translate:interpret", "avoid:prevent", "compare:contrast"]);
+const rejectedAntonyms = new Set([
+  "adapt:resist", "analyze:ignore", "challenge:ease", "decide:hesitate", "maintain:neglect", "answer:question", "borrow:lend",
+  "learn:forget", "consequence:cause", "contribute:withhold", "indicate:conceal", "respond:ignore", "assume:verify", "distinguish:confuse",
+  "establish:abolish", "justify:condemn", "ambiguous:explicit", "convey:conceal", "cause:effect", "lend:borrow", "recognize:overlook",
+  "resolve:complicate", "temporary:permanent employee", "ubiquitous:rare",
+]);
+
 const coreVocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLevel, definition, vietnamese, example, synonyms, antonyms], index) => ({
   id: `v${index + 1}`, word, partOfSpeech, cefrLevel, meanings: [{ definition, vietnamese }], examples: [example],
-  lemma: word, frequencyRank: levelIndex[cefrLevel] * 1000 + index + 1,
+  lemma: word, status: "validated", provenanceId: "vocabulary-core-2026-08", cefrBasis: "editorial-estimate", frequencyBasis: "editorial-band",
   frequencyBand: cefrLevel === "A1" ? "very-common" : cefrLevel === "A2" || cefrLevel === "B1" ? "common" : cefrLevel === "B2" ? "less-common" : "advanced",
-  synonyms: synonyms.map((item, i) => ({ word: item, strength: 70 + i * 10, register: "neutral", notes: "Similar in this context, but not always interchangeable." })),
-  antonyms: antonyms.map((item) => ({ word: item, strength: 80, register: "neutral" })),
-  wordFamily: wordFamilies[word] ?? [], collocations: collocationsByWord[word] ?? [], topics: [topicFor(word)],
-  tags: [cefrLevel.toLowerCase(), partOfSpeech, topicFor(word)],
+  synonyms: synonyms.filter((item) => !rejectedSynonyms.has(`${word}:${item}`)).map((item, i) => ({ word: item, strength: 70 + i * 10, register: "neutral", notes: "Similar in this context, but not always interchangeable." })),
+  antonyms: antonyms.filter((item) => !rejectedAntonyms.has(`${word}:${item}`)).map((item) => ({ word: item, strength: 80, register: "neutral" })),
+  wordFamily: wordFamilies[word] ?? [], collocations: collocationsByWord[word] ?? [], topics: [topicFor(word, partOfSpeech)],
+  tags: [cefrLevel.toLowerCase(), partOfSpeech, topicFor(word, partOfSpeech)],
 }));
 
 /** Stable, modular content catalogue. Add future CEFR batches under src/data/vocabulary/. */
-export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary];
+export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001];
+export const publishedVocabulary = vocabulary.filter((item) => item.status === "published");

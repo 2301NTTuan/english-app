@@ -78,10 +78,18 @@ const seeds: Seed[] = [
   ["b1-requirement", "requirement", "noun", "B1", "something that must be done or provided", "yêu cầu", "The course has a writing requirement.", "work", "condition", "option", "meet a requirement"],
 ];
 
-const levelBase: Record<CEFRLevel, number> = { A1: 200, A2: 1200, B1: 2200, B2: 3200, C1: 4200, C2: 5200 };
-export const extendedVocabulary: VocabularyItem[] = seeds.map(([id, word, partOfSpeech, cefrLevel, definition, vietnamese, example, topic, synonym, antonym, collocation], index) => ({
-  id, word, lemma: word, partOfSpeech, cefrLevel, frequencyRank: levelBase[cefrLevel] + index,
+const rejectedSynonyms = new Set(["city:urban area", "meal:dish", "morning:dawn", "read:study", "travel:journey", "invite:ask", "prepare:ready", "share:divide", "surprise:shock", "weather:climate", "priority:focus", "support:assist"]);
+const rejectedAntonyms = new Set([
+  "buy:sell", "carry:drop", "city:countryside", "family:strangers", "house:office", "job:unemployment", "meal:snack", "need:provide",
+  "question:answer", "read:write", "speak:listen", "teacher:student", "travel:stay", "appointment:cancellation", "customer:seller",
+  "journey:stay", "prepare:neglect", "relationship:separation", "schedule:delay", "solution:problem", "surprise:expectation",
+  "tradition:innovation", "concern:reassurance", "expectation:doubt", "negotiate:dictate", "outcome:cause", "prevent:cause",
+  "priority:distraction", "recover:decline", "resource:shortage", "requirement:option", "opportunity:obstacle", "issue:solution",
+  "recommend:discourage", "abroad:locally", "live:die", "commitment:indifference",
+]);
+export const extendedVocabulary: VocabularyItem[] = seeds.map(([id, word, partOfSpeech, cefrLevel, definition, vietnamese, example, topic, synonym, antonym, collocation]) => ({
+  id, word, lemma: word, partOfSpeech, cefrLevel, status: "validated", provenanceId: "vocabulary-core-2026-08", cefrBasis: "editorial-estimate", frequencyBasis: "editorial-band",
   frequencyBand: cefrLevel === "A1" ? "very-common" : "common", meanings: [{ definition, vietnamese }], examples: [example],
-  synonyms: synonym ? [{ word: synonym, strength: 75, register: "neutral", notes: "Similar in this context; check the example before substituting." }] : [],
-  antonyms: antonym ? [{ word: antonym, strength: 80, register: "neutral" }] : [], wordFamily: [], collocations: collocation ? [collocation] : [], topics: [topic], tags: [cefrLevel.toLowerCase(), partOfSpeech, topic],
+  synonyms: synonym && !rejectedSynonyms.has(`${word}:${synonym}`) ? [{ word: synonym, strength: 75, register: "neutral", notes: "Similar in this context; check the example before substituting." }] : [],
+  antonyms: antonym && !rejectedAntonyms.has(`${word}:${antonym}`) ? [{ word: antonym, strength: 80, register: "neutral" }] : [], wordFamily: [], collocations: collocation ? [collocation] : [], topics: [topic], tags: [cefrLevel.toLowerCase(), partOfSpeech, topic],
 }));

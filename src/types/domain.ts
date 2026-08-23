@@ -5,10 +5,13 @@ export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "error-corr
 export type Rating = "again" | "hard" | "good" | "easy";
 export type KnowledgeType = "vocabulary" | "grammar" | "expression";
 export type ContentStatus = "draft" | "validated" | "reviewed" | "published" | "retired";
+export type CefrBasis = "editorial-estimate" | "source-backed";
+export type FrequencyBasis = "editorial-band" | "source-backed-rank";
 
 export interface LexicalRelation { word: string; strength: number; register?: string; usage?: string; notes?: string }
 export interface VocabularyItem {
   id: string; word: string; lemma?: string; cefrLevel: CEFRLevel; partOfSpeech: string; ipa?: string;
+  status: ContentStatus; provenanceId: string; cefrBasis: CefrBasis; frequencyBasis: FrequencyBasis;
   frequencyRank?: number; frequencyBand?: FrequencyBand;
   meanings: { definition: string; vietnamese?: string; usageNotes?: string }[]; examples: string[];
   synonyms: LexicalRelation[]; antonyms: LexicalRelation[];

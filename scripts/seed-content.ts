@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
-import { eq } from "drizzle-orm";
+import { eq, notInArray } from "drizzle-orm";
 import { vocabulary } from "../src/data/vocabulary";
 import { contentProvenanceBatches } from "../src/data/content-provenance";
 import { exercises } from "../src/data/exercises";
@@ -16,18 +16,20 @@ loadEnvConfig(process.cwd());
 
 const version = process.env.CONTENT_VERSION ?? "bundled-v1";
 const checksum = createHash("sha256").update(JSON.stringify({ vocabulary, grammarTopics, expressionData, placementQuestions, readingPassages })).digest("hex");
+const hasPublishedContent = vocabulary.some((item) => item.status === "published") || placementQuestions.some((item) => item.status === "published") || readingPassages.some((item) => item.status === "published");
 
 async function main() {
   assertValidLearningContent({ vocabulary, grammar: grammarTopics, expressions: expressionData, exercises, placement: placementQuestions, readingPassages, provenance: contentProvenanceBatches });
   const db = getDb();
   try {
   await db.transaction(async (tx) => {
-    const [contentVersion] = await tx.insert(contentVersions).values({ version, checksum, publishedAt: new Date() })
-      .onConflictDoUpdate({ target: contentVersions.version, set: { checksum, publishedAt: new Date() } }).returning({ id: contentVersions.id });
+    const [contentVersion] = await tx.insert(contentVersions).values({ version, checksum, publishedAt: hasPublishedContent ? new Date() : null })
+      .onConflictDoUpdate({ target: contentVersions.version, set: { checksum, publishedAt: hasPublishedContent ? new Date() : null } }).returning({ id: contentVersions.id });
+    await tx.update(vocabularyContent).set({ active: false, updatedAt: new Date() }).where(notInArray(vocabularyContent.contentId, vocabulary.map((item) => item.id)));
     const vocabularyIds = new Map<string, string>();
     for (const item of vocabulary) {
-      const [row] = await tx.insert(vocabularyContent).values({ contentId: item.id, word: item.word, lemma: item.lemma, partOfSpeech: item.partOfSpeech, level: item.cefrLevel, frequencyRank: item.frequencyRank, frequencyBand: item.frequencyBand, topics: item.topics ?? [], tags: item.tags, contentVersionId: contentVersion.id })
-        .onConflictDoUpdate({ target: vocabularyContent.contentId, set: { word: item.word, lemma: item.lemma, partOfSpeech: item.partOfSpeech, level: item.cefrLevel, frequencyRank: item.frequencyRank, frequencyBand: item.frequencyBand, topics: item.topics ?? [], tags: item.tags, contentVersionId: contentVersion.id, updatedAt: new Date() } }).returning({ id: vocabularyContent.id });
+      const [row] = await tx.insert(vocabularyContent).values({ contentId: item.id, word: item.word, lemma: item.lemma, partOfSpeech: item.partOfSpeech, level: item.cefrLevel, cefrBasis: item.cefrBasis, frequencyRank: item.frequencyRank, frequencyBand: item.frequencyBand, frequencyBasis: item.frequencyBasis, status: item.status, provenanceId: item.provenanceId, topics: item.topics ?? [], tags: item.tags, active: true, contentVersionId: contentVersion.id })
+        .onConflictDoUpdate({ target: vocabularyContent.contentId, set: { word: item.word, lemma: item.lemma, partOfSpeech: item.partOfSpeech, level: item.cefrLevel, cefrBasis: item.cefrBasis, frequencyRank: item.frequencyRank, frequencyBand: item.frequencyBand, frequencyBasis: item.frequencyBasis, status: item.status, provenanceId: item.provenanceId, topics: item.topics ?? [], tags: item.tags, active: true, contentVersionId: contentVersion.id, updatedAt: new Date() } }).returning({ id: vocabularyContent.id });
       vocabularyIds.set(item.id, row.id);
       await tx.delete(vocabularyMeanings).where(eq(vocabularyMeanings.vocabularyId, row.id)); await tx.delete(vocabularyExamples).where(eq(vocabularyExamples.vocabularyId, row.id)); await tx.delete(vocabularyRelations).where(eq(vocabularyRelations.sourceVocabularyId, row.id)); await tx.delete(wordFamilies).where(eq(wordFamilies.vocabularyId, row.id));
       if (item.meanings.length) await tx.insert(vocabularyMeanings).values(item.meanings.map((meaning, position) => ({ vocabularyId: row.id, position, englishDefinition: meaning.definition, vietnameseMeaning: meaning.vietnamese, usageNotes: meaning.usageNotes })));

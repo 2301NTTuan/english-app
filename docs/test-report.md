@@ -9,7 +9,7 @@ Final local verification date: 23 August 2026.
 | Content validation | PASS | 3/3 tests |
 | ESLint | PASS | zero errors/warnings |
 | TypeScript | PASS | `tsc --noEmit` |
-| Unit tests | PASS | 67/67 tests across 21 files |
+| Unit tests | PASS | 79/79 tests across 22 files |
 | PostgreSQL integration | PASS | 10/10 tests against the migrated and seeded disposable test database |
 | Browser E2E | PASS | 2/2 Chromium tests against the production server and disposable test database |
 | Production build | PASS | Next.js 16.3.2 Webpack build; all application and API routes compiled and prerendered as expected |
@@ -32,7 +32,16 @@ The configured disposable PostgreSQL database is reachable and all integration t
 - Placement item delivery is server-scoped; production E2E verifies that the current-item response omits the answer and explanation: pass.
 - Password recovery/email verification token lifecycle: pass; secure outbound delivery and support workflows remain launch blockers.
 - Normalized transactional learning-session and placement persistence: pass; non-event snapshot sync remains last-write-wins.
-- Content provenance: pass for the repository-authored pilot; educator review and production publication: fail.
+- Content provenance: pass for repository-authored placement and vocabulary batches; educator review and production publication: fail.
 - Monitoring, alerting, backup retention, and restore drill: fail (runbook only).
 
 Result: **not production-ready**. The repository is a coherent production foundation with explicit launch blockers.
+
+## Content Quality Audit
+
+- Machine validated: all 298 vocabulary records, all 108 placement items, six reading passages, stable IDs, provenance links, exact/fuzzy duplicate candidates, examples, metadata consistency, relation structure, grammar prerequisites, and deterministic learning/placement simulations.
+- Manually inspected in this run: the full 106-record foundational vocabulary batch, corrected vocabulary seed rules and relation removals, deterministic level/edge samples, and the 36 core placement explanations rewritten to teach the specific answer.
+- Still requires independent review: English/Vietnamese editorial review, CEFR judgments, synonym/antonym/collocation nuance, polysemy modelling, placement ambiguity and distractor review, publication approval, learner calibration, reliability/fairness analysis, and psychometric validation.
+- Current gates: vocabulary corpus **FAIL** (298/5,800; four CEFR levels below the 100-record sample minimum; zero published), grammar corpus **FAIL** (0/110 strictly qualifying), placement bank **FAIL** (108/600 validated, zero reviewed/published).
+
+See [the vocabulary audit](vocabulary-quality-audit.md) and [representative placement items](placement-assessment.md#representative-validated-pilot-items) for inspectable content samples and exact limitations.

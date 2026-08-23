@@ -1,0 +1,1356 @@
+# CRITICAL QUALITY OVERRIDE
+
+The ~6,000 vocabulary target remains a required production goal.
+
+However:
+
+**QUALITY HAS HIGHER PRIORITY THAN COUNT.**
+
+Never fabricate, guess, pad, duplicate, or publish questionable educational content merely to reach 5,800–6,200 entries.
+
+If there is a conflict between:
+
+```text
+hitting the numeric target
+```
+
+and:
+
+```text
+maintaining trustworthy educational quality
+```
+
+choose quality.
+
+Then report the numeric gate honestly as FAIL rather than publishing bad content.
+
+---
+
+# 1. DEFINITION OF "PRODUCTION-QUALITY VOCABULARY"
+
+A vocabulary record is NOT production-ready merely because it passes TypeScript/schema validation.
+
+Every published vocabulary item must be linguistically coherent.
+
+At minimum verify:
+
+```text
+lemma
+part of speech
+CEFR level
+frequency/commonness
+English definition
+Vietnamese meaning
+natural example sentence
+topic
+stable ID
+provenance
+```
+
+These fields must agree with each other.
+
+For example:
+
+```text
+lemma: acquire
+POS: verb
+definition: to obtain or gain something
+Vietnamese: có được / đạt được
+example: She acquired valuable experience during the internship.
+```
+
+is internally coherent.
+
+A record where definition, translation, POS, CEFR, or example conflict must fail validation.
+
+---
+
+# 2. NEVER GENERATE FILLER TO SATISFY THE COUNT
+
+Forbidden behavior includes:
+
+```text
+duplicating the same word with trivial wording changes
+
+inventing unnecessary senses
+
+artificially splitting one normal sense into multiple entries
+
+using obscure dictionary words only to fill C1/C2
+
+adding weak synonyms to increase relation counts
+
+adding questionable antonyms
+
+inventing unnatural collocations
+
+creating unnatural example sentences
+
+assigning CEFR randomly
+
+assigning frequency randomly
+
+copying commercial dictionary definitions
+```
+
+The 6,000-item corpus must represent useful English-learning content.
+
+---
+
+# 3. BATCH SIZE
+
+Do NOT generate thousands of records in one uncontrolled operation.
+
+Use small reviewable batches.
+
+Preferred:
+
+```text
+100–200 vocabulary records per batch
+```
+
+Maximum normal batch:
+
+```text
+300
+```
+
+Workflow:
+
+```text
+create/import batch
+        ↓
+structural validation
+        ↓
+linguistic validation
+        ↓
+duplicate detection
+        ↓
+relationship validation
+        ↓
+quality sampling
+        ↓
+accept/reject batch
+        ↓
+continue
+```
+
+A failed batch must be fixed before proceeding.
+
+---
+
+# 4. CONTENT STATUS MUST BE HONEST
+
+Use lifecycle states such as:
+
+```text
+draft
+validated
+reviewed
+published
+retired
+```
+
+Important:
+
+Do NOT mark content:
+
+```text
+reviewed
+```
+
+unless genuine editorial/human review has occurred.
+
+Automated validation by Codex is NOT equivalent to human editorial review.
+
+If content has only automated checks, represent that honestly.
+
+Do not falsify editorial status merely to satisfy a production metric.
+
+---
+
+# 5. ENGLISH DEFINITIONS
+
+Definitions must be:
+
+```text
+accurate
+concise
+learner-friendly
+self-contained
+appropriate for the intended sense
+```
+
+Avoid circular definitions.
+
+Bad:
+
+```text
+decision:
+the act of deciding a decision
+```
+
+Bad:
+
+```text
+enormous:
+something enormous
+```
+
+Good:
+
+```text
+enormous:
+extremely large in size or amount
+```
+
+Do not copy proprietary dictionary wording.
+
+Repository-authored paraphrased definitions are preferred where licensing is uncertain.
+
+---
+
+# 6. VIETNAMESE TRANSLATION QUALITY
+
+Vietnamese meanings must represent the intended English sense.
+
+Do not blindly translate word-for-word.
+
+Validate common polysemous words carefully.
+
+Example:
+
+```text
+issue
+```
+
+cannot simply always be:
+
+```text
+vấn đề
+```
+
+because it may mean:
+
+```text
+problem
+topic
+edition
+act of issuing
+```
+
+Model senses appropriately without excessive fragmentation.
+
+Vietnamese should be natural and useful to Vietnamese learners.
+
+---
+
+# 7. PART-OF-SPEECH VALIDATION
+
+Ensure examples correspond to the declared POS.
+
+Example:
+
+```text
+record (noun)
+record (verb)
+```
+
+may legitimately be separate entries/senses.
+
+But this is invalid:
+
+```text
+POS: noun
+
+Example:
+"They record the meeting every week."
+```
+
+because the example uses the verb sense.
+
+Add validator/test coverage where practical.
+
+---
+
+# 8. CEFR QUALITY
+
+CEFR must NOT be assigned merely from intuition without documentation.
+
+For every CEFR assignment, distinguish whether it is:
+
+```text
+source-backed
+```
+
+or:
+
+```text
+editorial estimate
+```
+
+If an external CEFR source is used:
+
+* verify license
+* document provenance
+* do not copy proprietary definitions/examples along with it unless permitted
+
+If no licensed authoritative mapping is available:
+
+use:
+
+```text
+editorial CEFR estimate
+```
+
+and document that limitation.
+
+Do NOT claim the mapping is official CEFR certification.
+
+---
+
+# 9. CEFR SANITY VALIDATION
+
+Perform distribution sanity checks.
+
+For example:
+
+A1 should overwhelmingly contain:
+
+```text
+very common everyday vocabulary
+```
+
+C1/C2 should not contain large numbers of words more appropriate to A1/A2.
+
+Flag suspicious cases.
+
+Examples requiring investigation:
+
+```text
+water → C1
+house → B2
+ephemeral → A1
+ubiquitous → A2
+```
+
+Do not assume these exact examples define authoritative levels; use them as sanity-check patterns.
+
+---
+
+# 10. FREQUENCY QUALITY
+
+Frequency/commonness must affect learning priority.
+
+Do not pretend to have precise corpus rankings if no reliable licensed source supports them.
+
+If exact ranks are unavailable, use a documented coarse classification such as:
+
+```text
+very-common
+common
+less-common
+advanced
+```
+
+A coarse but honest signal is better than fabricated numerical precision.
+
+---
+
+# 11. EXAMPLE SENTENCE QUALITY
+
+Every published core vocabulary item requires at least one useful natural example.
+
+Examples must:
+
+```text
+use the intended sense
+use the declared POS
+be grammatically correct
+sound natural
+avoid unnecessary rare words
+avoid circularly defining the target word
+be appropriate to the approximate learner level when practical
+```
+
+Bad:
+
+```text
+The acquisition was acquired through acquisition.
+```
+
+Bad:
+
+```text
+I ameliorated my sesquipedalian circumlocution.
+```
+
+for an intermediate learner.
+
+Good:
+
+```text
+She acquired useful skills during the course.
+```
+
+---
+
+# 12. EXAMPLE TRANSLATIONS
+
+If Vietnamese example translations are included:
+
+* translate the sentence meaning, not each token mechanically
+* preserve tense/aspect when relevant
+* do not introduce information absent from the English sentence
+* ensure the translation matches the intended vocabulary sense
+
+---
+
+# 13. SYNONYM QUALITY
+
+Never treat synonyms as exact substitutes by default.
+
+Validate:
+
+```text
+meaning overlap
+register
+strength
+grammar pattern
+collocation restrictions
+```
+
+Example:
+
+```text
+big
+large
+huge
+enormous
+```
+
+have overlap but are not universally interchangeable.
+
+When useful record nuance.
+
+Do NOT create synonym relations merely because words are vaguely related.
+
+---
+
+# 14. ANTONYM QUALITY
+
+Only create defensible antonym relationships.
+
+Good candidates:
+
+```text
+increase ↔ decrease
+accept ↔ reject
+temporary ↔ permanent
+optimistic ↔ pessimistic
+```
+
+Reject weak relations such as two words that are merely different rather than opposites.
+
+---
+
+# 15. WORD-FAMILY QUALITY
+
+Relations must reflect real derivational families.
+
+Example:
+
+```text
+decide
+decision
+decisive
+indecisive
+decisively
+```
+
+Validate POS and relation.
+
+Do not connect words merely because their spelling looks similar.
+
+---
+
+# 16. COLLOCATION QUALITY
+
+This gate is especially strict.
+
+A collocation must be natural English.
+
+Good:
+
+```text
+make a decision
+take responsibility
+strongly recommend
+heavy rain
+gain experience
+raise awareness
+```
+
+Reject unnatural combinations.
+
+Where a common learner error is useful:
+
+```text
+make homework ❌
+do homework ✅
+```
+
+store it explicitly as a teaching contrast rather than treating the incorrect phrase as a valid collocation.
+
+---
+
+# 17. POLYSEMY
+
+Common English words often have several senses.
+
+Handle this intentionally.
+
+Examples:
+
+```text
+run
+set
+issue
+matter
+charge
+current
+```
+
+Do not:
+
+```text
+collapse unrelated major senses into one confusing definition
+```
+
+and do not:
+
+```text
+explode every minor dictionary nuance into dozens of learner entries
+```
+
+Focus on pedagogically useful senses.
+
+---
+
+# 18. HOMOGRAPHS / MULTIPLE POS
+
+Support legitimate cases such as:
+
+```text
+light (noun)
+light (adjective)
+light (verb)
+```
+
+without treating them as accidental duplicates.
+
+IDs must distinguish the relevant lexical unit deterministically.
+
+---
+
+# 19. DUPLICATE QUALITY CHECK
+
+Run exact and fuzzy duplicate checks.
+
+Detect:
+
+```text
+same normalized lemma + POS + effectively same sense
+near-identical definitions
+duplicate example sentences
+duplicate IDs
+duplicate relations
+```
+
+Generate a duplicate report.
+
+Any suspicious duplicates should be reviewed before publication.
+
+---
+
+# 20. TOPIC QUALITY
+
+Do not randomly assign topics.
+
+A word may have several appropriate topics.
+
+Example:
+
+```text
+salary
+→ work
+→ money
+```
+
+Do not tag unrelated topics merely to increase metadata.
+
+---
+
+# 21. C1/C2 QUALITY IS ESPECIALLY IMPORTANT
+
+Do not turn C1/C2 into a collection of obscure dictionary trivia.
+
+Prioritize:
+
+```text
+precision
+nuance
+academic usefulness
+professional usefulness
+formal register
+advanced argumentation
+advanced communication
+```
+
+C2 content should help sophisticated English use, not test whether someone memorized rare archaic vocabulary.
+
+---
+
+# 22. AUTOMATED LINGUISTIC VALIDATION
+
+Extend `npm run validate:content` to detect as much as reasonably possible.
+
+Checks should include:
+
+```text
+required fields
+valid IDs
+valid CEFR
+valid POS
+valid frequency category
+non-empty definitions
+non-empty translations
+non-empty examples
+duplicate IDs
+duplicate lexical units
+relation targets exist
+self-relations
+grammar prerequisite cycles
+invalid publication states
+broken references
+```
+
+Add semantic heuristics where safe.
+
+Do not pretend heuristics can prove semantic correctness.
+
+---
+
+# 23. QUALITY SAMPLING — HARD REQUIREMENT
+
+After corpus generation, use deterministic random sampling.
+
+At least:
+
+```text
+A1: 100 random entries
+A2: 100
+B1: 100
+B2: 100
+C1: 100
+C2: 100
+
+TOTAL: >= 600 audited vocabulary records
+```
+
+This supersedes the earlier minimum sample of 50 per level.
+
+Audit:
+
+```text
+lemma
+POS
+CEFR reasonableness
+English definition
+Vietnamese meaning
+example
+frequency
+topic
+relations
+```
+
+Record findings.
+
+If systematic errors appear, do NOT merely fix sampled rows.
+
+Identify the generating rule/data source responsible and fix the entire affected batch.
+
+---
+
+# 24. TARGETED EDGE-CASE AUDIT
+
+In addition to random sampling, inspect difficult categories:
+
+```text
+50 highly polysemous words
+50 phrasal/verb-like lexical entries if present
+50 advanced C1/C2 words
+50 words with synonyms
+50 words with antonyms
+50 words with word families
+50 words with multiple collocations
+```
+
+Overlap is allowed.
+
+Look specifically for semantic errors.
+
+---
+
+# 25. QUALITY ERROR RATE
+
+For the audited sample, classify issues:
+
+```text
+critical
+major
+minor
+```
+
+Critical examples:
+
+```text
+wrong meaning
+wrong Vietnamese translation
+wrong answer
+wrong POS
+nonsensical example
+copyright/provenance violation
+```
+
+Major:
+
+```text
+bad CEFR assignment
+unnatural example
+misleading synonym
+unnatural collocation
+```
+
+Minor:
+
+```text
+style inconsistency
+minor wording problem
+non-critical metadata issue
+```
+
+Production acceptance requirement:
+
+```text
+Critical issues: 0
+```
+
+Any critical issue requires:
+
+```text
+fix
++
+revalidation
++
+new sample
+```
+
+Do not hide discovered defects.
+
+---
+
+# 26. CONTENT PROVENANCE — HARD GATE
+
+Every corpus source must be documented.
+
+Never use:
+
+```text
+Oxford
+Cambridge
+Longman
+Merriam-Webster
+commercial textbooks
+paid word lists
+commercial example banks
+```
+
+as copied content without explicit compatible redistribution rights.
+
+If using external open data, record:
+
+```text
+source
+license
+version/date
+fields imported
+required attribution
+commercial-use restrictions
+modification requirements
+```
+
+If uncertain:
+
+```text
+do not import
+```
+
+---
+
+# 27. NO FAKE SOURCES
+
+Never invent:
+
+```text
+source names
+URLs
+license names
+CEFR authorities
+frequency corpora
+editorial reviewers
+```
+
+If provenance cannot be established, say so.
+
+---
+
+# 28. GRAMMAR QUALITY OVERRIDE
+
+The >=110 detailed grammar lesson target remains.
+
+But a lesson counts as "detailed" only if it contains real instructional content.
+
+A lesson must not be generated from a generic template with only nouns replaced.
+
+Each lesson should accurately explain its specific grammar phenomenon.
+
+Audit especially:
+
+```text
+tense contrasts
+articles
+prepositions
+conditionals
+modals
+gerund vs infinitive
+passive
+reported speech
+relative clauses
+advanced clause structures
+inversion
+discourse grammar
+```
+
+---
+
+# 29. GRAMMAR EXAMPLE QUALITY
+
+All grammar examples must actually demonstrate the claimed rule.
+
+Common mistakes must genuinely be wrong or contextually wrong.
+
+Never create false rules simply to simplify explanation.
+
+When English usage has nuance, state the nuance.
+
+---
+
+# 30. GRAMMAR CONTRAST QUALITY
+
+Contrast lessons must explain meaningful differences.
+
+Examples:
+
+```text
+Present Perfect vs Past Simple
+Past Simple vs Past Continuous
+will vs going to
+must vs have to
+gerund vs infinitive
+used to vs be used to
+```
+
+Do not reduce nuanced distinctions to inaccurate one-line rules.
+
+---
+
+# 31. PLACEMENT QUESTION QUALITY OVERRIDE
+
+The >=600 placement-item target remains.
+
+However, every item used by the live placement engine must have:
+
+```text
+one defensible best answer
+plausible distractors
+correct explanation
+appropriate target skill
+reasonable difficulty
+stable ID
+valid domain
+valid CEFR metadata
+```
+
+A structurally valid but ambiguous question is a failed question.
+
+---
+
+# 32. AMBIGUITY TEST
+
+Before publishing an item ask:
+
+```text
+Could another option reasonably be correct in normal English?
+```
+
+If yes:
+
+```text
+rewrite or reject
+```
+
+Do not rely on an intended answer when ordinary speakers could reasonably choose another answer.
+
+---
+
+# 33. DISTRACTOR QUALITY
+
+Distractors should be plausible learner mistakes.
+
+Avoid:
+
+```text
+one obvious answer + three absurd choices
+```
+
+Where appropriate use:
+
+```text
+same POS
+similar CEFR
+common confusion
+nearby grammar structure
+semantic neighborhood
+```
+
+but preserve exactly one best answer.
+
+---
+
+# 34. PLACEMENT ITEM DEDUPLICATION
+
+Prevent the item bank from containing hundreds of superficial variants such as:
+
+```text
+He ___ to work every day.
+She ___ to school every day.
+John ___ to work every day.
+```
+
+These do not meaningfully increase assessment diversity.
+
+Detect repeated templates and lexical-only substitutions where practical.
+
+---
+
+# 35. READING QUALITY
+
+Reading passages must be repository-authored or compatibly licensed.
+
+Questions must truly test:
+
+```text
+main idea
+detail
+reference
+inference
+vocabulary in context
+```
+
+Do not create "inference" questions whose answer is explicitly copied from one sentence.
+
+---
+
+# 36. ASSESSMENT RELIABILITY OVER ITEM COUNT
+
+Do not claim:
+
+```text
+750 items = accurate placement test
+```
+
+Item count alone does not establish reliability.
+
+Final report must distinguish:
+
+```text
+engineering validation
+content validation
+editorial validation
+empirical calibration
+psychometric validation
+```
+
+Only claim what has actually been demonstrated.
+
+---
+
+# 37. NO FAKE PSYCHOMETRIC CLAIMS
+
+If no real learner-response dataset exists, difficulty and discrimination parameters are not empirically calibrated.
+
+Label them appropriately:
+
+```text
+editorially estimated
+```
+
+or:
+
+```text
+initial prior
+```
+
+Do not claim:
+
+```text
+scientifically calibrated
+validated IRT
+official CEFR accuracy
+```
+
+without evidence.
+
+---
+
+# 38. DATABASE MUST CONTAIN ONLY ACCEPTED CONTENT
+
+Do not seed rejected draft items into the production-active corpus.
+
+Production queries should use appropriate publication state.
+
+Historical/testing content may remain available where architecture requires it, but must not leak into normal learner sessions.
+
+---
+
+# 39. CORPUS-WIDE STATISTICAL SANITY CHECKS
+
+After reaching target scale, report:
+
+```text
+number of words by CEFR
+number by POS
+number by topic
+number by frequency band
+average examples per item
+percentage with synonyms
+percentage with antonyms
+percentage with word families
+percentage with collocations
+duplicate count
+missing-field count
+```
+
+Inspect suspicious distributions.
+
+Examples:
+
+```text
+90% of C2 words tagged technology
+70% of vocabulary nouns
+almost no verbs at A1
+```
+
+should trigger investigation.
+
+---
+
+# 40. DO NOT REQUIRE OPTIONAL METADATA FOR EVERY WORD
+
+Quality does NOT mean forcing all fields.
+
+It is acceptable that:
+
+```text
+some words have no meaningful antonym
+some words have no useful synonym
+some words need only one example
+some advanced words have limited collocations
+```
+
+Missing optional information is better than fake information.
+
+---
+
+# 41. STABLE ID REGRESSION
+
+Before and after expansion, verify all existing vocabulary IDs still exist unless intentionally retired/migrated.
+
+Existing user progress must not silently lose references because vocabulary IDs were regenerated.
+
+Add regression tests.
+
+---
+
+# 42. LEARNING ENGINE QUALITY CHECK
+
+After expanding to ~6,000 entries, verify the learning planner does not select strange content.
+
+Simulate learners:
+
+```text
+A1 beginner
+A2 learner
+B1 learner
+B2 learner
+C1 learner
+```
+
+Inspect actual generated learning queues.
+
+Confirm:
+
+```text
+level appropriateness
+frequency priority
+prerequisite behavior
+no unexpected rare-word dominance
+mastered words excluded appropriately
+review items prioritized correctly
+```
+
+---
+
+# 43. HUMAN-REVIEW LIMITATION MUST BE REPORTED
+
+Codex must explicitly state in the final report:
+
+```text
+What was machine validated
+What was manually inspected during this run
+What still requires independent human/editorial review
+```
+
+Never equate self-review by the implementation agent with independent editorial review.
+
+---
+
+# 44. PRODUCTION CONTENT GATE
+
+The vocabulary gate is now TWO-dimensional.
+
+It is not:
+
+```text
+count >= 5,800 → PASS
+```
+
+It is:
+
+```text
+COUNT GATE
++
+QUALITY GATE
+```
+
+Required:
+
+```text
+Vocabulary >= 5,800
+AND
+content validation PASS
+AND
+critical sample defects = 0
+AND
+duplicate validation PASS
+AND
+provenance validation PASS
+AND
+stable-ID validation PASS
+AND
+database-count validation PASS
+```
+
+Only then report:
+
+```text
+Vocabulary production corpus: PASS
+```
+
+---
+
+# 45. GRAMMAR PRODUCTION GATE
+
+Require:
+
+```text
+>=110 detailed lessons
++
+prerequisite validation PASS
++
+lesson structural validation PASS
++
+sample semantic QA PASS
++
+exercise answer validation PASS
+```
+
+Otherwise:
+
+```text
+Grammar production corpus: FAIL
+```
+
+---
+
+# 46. PLACEMENT PRODUCTION GATE
+
+Require:
+
+```text
+>=600 usable validated items
++
+ambiguity validation PASS
++
+duplicate/template validation PASS
++
+adaptive simulations PASS
++
+random-guesser simulation PASS
++
+domain coverage PASS
++
+retake exposure control PASS
+```
+
+Otherwise:
+
+```text
+Placement production bank: FAIL
+```
+
+---
+
+# 47. FINAL QUALITY REPORT
+
+Add a dedicated section:
+
+## Content Quality Audit
+
+Report:
+
+```text
+Vocabulary records audited:
+A1:
+A2:
+B1:
+B2:
+C1:
+C2:
+
+Critical defects found:
+Major defects found:
+Minor defects found:
+
+Batches rejected:
+Batches corrected:
+
+Duplicate candidates:
+Resolved:
+Remaining:
+
+Provenance issues:
+Resolved:
+Remaining:
+```
+
+---
+
+# 48. SAMPLE ACTUAL CONTENT IN FINAL REPORT
+
+Show representative final samples from each CEFR.
+
+At least:
+
+```text
+3 A1
+3 A2
+3 B1
+3 B2
+3 C1
+3 C2
+```
+
+For each include:
+
+```text
+word
+POS
+CEFR
+definition
+Vietnamese meaning
+example
+frequency
+```
+
+This allows immediate inspection of corpus quality.
+
+Also show several:
+
+```text
+synonym relations
+word families
+collocations
+```
+
+---
+
+# 49. SAMPLE PLACEMENT ITEMS IN FINAL REPORT
+
+Show representative examples across:
+
+```text
+Vocabulary
+Grammar
+Context
+Reading
+```
+
+including:
+
+```text
+difficulty
+CEFR
+correct answer
+distractors
+explanation
+```
+
+This allows immediate inspection of item quality.
+
+---
+
+# 50. FINAL RULE
+
+Never optimize the report to make the project look successful.
+
+Optimize the corpus to make the learner receive correct, natural, useful English.
+
+If the choice is:
+
+```text
+5,300 trustworthy words
+```
+
+versus:
+
+```text
+6,000 words containing hundreds of questionable entries
+```
+
+keep the 5,300 trustworthy words, mark the numerical production gate FAIL, explain the shortfall, and leave the bad entries unpublished.
+
+Then continue improving the corpus rather than lowering the quality threshold.
+
+The final goal remains approximately 6,000 production-quality vocabulary items, not approximately 6,000 database rows.

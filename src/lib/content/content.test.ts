@@ -29,4 +29,10 @@ describe("learning content pipeline", () => {
     expect(errors.some((error) => error.includes("broken prerequisite"))).toBe(true);
     expect(errors.some((error) => error.includes("answer must appear exactly once"))).toBe(true);
   });
+
+  it("rejects generic placement explanations that merely restate correctness", () => {
+    const item = { ...placementQuestions[0], explanation: `“${placementQuestions[0].answer}” is the only option that correctly completes the task.` };
+    const errors = validateLearningContent({ vocabulary: [], grammar: [], expressions: [], exercises: [], placement: [item], provenance: contentProvenanceBatches });
+    expect(errors.some((error) => error.includes("explanation is generic rather than instructional"))).toBe(true);
+  });
 });

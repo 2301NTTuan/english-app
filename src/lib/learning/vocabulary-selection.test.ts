@@ -3,7 +3,7 @@ import { createInitialState } from "@/lib/storage/app-repository";
 import type { VocabularyItem } from "@/types/domain";
 import { rankNewVocabulary } from "./vocabulary-selection";
 
-const item = (id: string, cefrLevel: VocabularyItem["cefrLevel"], frequencyRank: number, frequencyBand: VocabularyItem["frequencyBand"]): VocabularyItem => ({ id, word: id, cefrLevel, frequencyRank, frequencyBand, partOfSpeech: "noun", meanings: [{ definition: id }], examples: [`Use ${id} here.`], synonyms: [], antonyms: [], wordFamily: [], collocations: [], topics: [], tags: [] });
+const item = (id: string, cefrLevel: VocabularyItem["cefrLevel"], frequencyRank: number, frequencyBand: VocabularyItem["frequencyBand"]): VocabularyItem => ({ id, word: id, cefrLevel, frequencyRank, frequencyBand, status: "validated", provenanceId: "test", cefrBasis: "editorial-estimate", frequencyBasis: "source-backed-rank", partOfSpeech: "noun", meanings: [{ definition: id }], examples: [`Use ${id} here.`], synonyms: [], antonyms: [], wordFamily: [], collocations: [], topics: [], tags: [] });
 
 describe("rankNewVocabulary", () => {
   it("prefers level-appropriate common words over rarer material", () => {

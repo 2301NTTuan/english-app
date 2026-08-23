@@ -12,6 +12,24 @@ export interface ContentProvenanceBatch {
 
 export const contentProvenanceBatches: ContentProvenanceBatch[] = [
   {
+    id: "vocabulary-core-2026-08",
+    title: "Repository-authored vocabulary core",
+    sourceType: "repository-authored",
+    license: "Project-owned; no third-party definitions or examples incorporated",
+    attribution: "English Mastery content team",
+    status: "validated",
+    notes: "CEFR levels and coarse frequency bands are editorial estimates; exact corpus ranks are intentionally omitted.",
+  },
+  {
+    id: "vocabulary-foundations-001-2026-08",
+    title: "Foundational A1/A2 vocabulary batch 001",
+    sourceType: "repository-authored",
+    license: "Project-owned; no third-party definitions or examples incorporated",
+    attribution: "English Mastery content team",
+    status: "validated",
+    notes: "106 common foundational lexical units. CEFR and frequency bands are editorial estimates; optional relations intentionally omitted pending review.",
+  },
+  {
     id: "placement-core-2026-08",
     title: "Placement core and reading pilot",
     sourceType: "repository-authored",
