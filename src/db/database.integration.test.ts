@@ -205,6 +205,10 @@ suite("PostgreSQL migration and ownership", () => {
     const topic = await queryVocabularyPage({ topic: topicName });
     expect(topic.items.every((item) => item.topics.includes(topicName!))).toBe(true);
     expect(topic.filters.topic).toBe(topicName);
+    const frequency = await queryVocabularyPage({ frequencyBand: "very-common" });
+    expect(frequency.items.length).toBeGreaterThan(0);
+    expect(frequency.items.every((item) => item.frequencyBand === "very-common")).toBe(true);
+    expect(frequency.filters.frequencyBand).toBe("very-common");
     const metadata = await client.query("select count(*) filter (where frequency_rank is not null)::int exact_ranks, count(*) filter (where status = 'validated')::int validated, count(*) filter (where active)::int active, count(*) filter (where provenance_id = 'vocabulary-core-2026-08')::int core, count(*) filter (where provenance_id = 'vocabulary-foundations-001-2026-08')::int foundations, (select published_at from content_versions where version = 'bundled-v1') published_at from vocabulary_content");
     expect(metadata.rows[0]).toEqual({ exact_ranks: 0, validated: 298, active: 298, core: 192, foundations: 106, published_at: null });
   });

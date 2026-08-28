@@ -69,6 +69,6 @@ Current bundled lesson content: 298 enriched vocabulary entries, 138 grammar top
 
 - Secrets belong in the deployment environment, never in Git. `.env*` is ignored except `.env.example`.
 - `/api/health` returns only `ok` or `degraded`; a database failure produces HTTP 503 without leaking connection details.
-- Password reset and email-verification tokens are hashed, expiring, and single-use. Outbound email delivery is still pending; `PASSWORD_RESET_DELIVERY=development` returns a local reset URL only outside production.
+- Password reset and email-verification tokens are hashed, expiring, and single-use. Outbound delivery supports an environment-configured `resend` adapter; `development` returns local links only outside production, and `disabled` is the safe default. Production requires `APP_BASE_URL`, `EMAIL_FROM`, and provider credentials.
 - The in-process authentication limiter must be replaced with a shared store before horizontal scaling.
 - Review the placeholder Privacy and Terms pages with qualified counsel and add the actual operator details before launch.

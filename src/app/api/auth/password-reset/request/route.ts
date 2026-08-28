@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
-import { developmentResetUrl, issuePasswordReset } from "@/lib/auth/recovery";
+import { issuePasswordReset } from "@/lib/auth/recovery";
+import { sendPasswordResetEmail } from "@/lib/email/delivery";
 import { logEvent } from "@/lib/observability/logger";
 
 const requestSchema = z.object({ email: z.string().trim().email().max(254) });
@@ -16,8 +17,12 @@ export async function POST(request: Request) {
     const parsed = requestSchema.safeParse(await readJson(request, 4_096));
     if (!parsed.success) return jsonError("Enter a valid email address.", 400);
     const token = await issuePasswordReset(parsed.data.email);
-    const resetUrl = developmentResetUrl(request.url, token);
-    return NextResponse.json({ ok: true, message: genericMessage, ...(resetUrl ? { developmentResetUrl: resetUrl } : {}) });
+    let developmentResetUrl: string | undefined;
+    if (token) {
+      try { developmentResetUrl = (await sendPasswordResetEmail(parsed.data.email, token, request.url)).developmentUrl; }
+      catch { logEvent("error", "email.password_reset_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
+    }
+    return NextResponse.json({ ok: true, message: genericMessage, ...(developmentResetUrl ? { developmentResetUrl } : {}) });
   } catch (error) {
     const bodyError = bodyErrorResponse(error);
     if (bodyError) return bodyError;

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { Client } from "pg";
 
 const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const userA = { name: "Production Flow A", email: `flow-a-${nonce}@test.invalid`, password: "ProductionFlow1234" };
@@ -121,6 +122,25 @@ test.describe.serial("production acceptance", () => {
     expect(forged.body.state.activities).toEqual([]);
     expect(forged.body.state.placement).toBeUndefined();
 
+    const loginHeaders = { Origin: "http://127.0.0.1:3100", "Content-Type": "application/json" };
+    const wrongCredentials = await request.post("/api/auth/login", { headers: loginHeaders, data: { email: userA.email, password: "WrongPassword1234" } });
+    const unknownCredentials = await request.post("/api/auth/login", { headers: loginHeaders, data: { email: `unknown-${nonce}@test.invalid`, password: "WrongPassword1234" } });
+    expect({ status: wrongCredentials.status(), body: await wrongCredentials.json() }).toEqual({ status: 401, body: { error: "Invalid email or password." } });
+    expect({ status: unknownCredentials.status(), body: await unknownCredentials.json() }).toEqual({ status: 401, body: { error: "Invalid email or password." } });
+    const forgedSession = await request.get("/api/state", { headers: { Cookie: "english_mastery_session=forged-session-token" } });
+    expect(forgedSession.status()).toBe(401);
+
+    const userBIdentity = await pageB.evaluate(async () => (await fetch("/api/auth/me")).json());
+    const database = new Client({ connectionString: process.env.DATABASE_URL }); await database.connect();
+    try { await database.query("update auth_sessions set expires_at = now() - interval '1 minute' where user_id = $1", [userBIdentity.user.id]); } finally { await database.end(); }
+    expect(await pageB.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
+    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password").fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
+    const liveSession = (await contextB.cookies()).find((cookie) => cookie.name === "english_mastery_session"); expect(liveSession).toBeTruthy();
+    await pageB.evaluate(async () => { await fetch("/api/auth/logout", { method: "POST" }); });
+    await contextB.addCookies([liveSession!]);
+    expect(await pageB.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
+    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password").fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
+
     const maliciousOrigin = await request.put("/api/state", {
       data: {},
       headers: { Origin: "https://example.com" },
@@ -130,9 +150,10 @@ test.describe.serial("production acceptance", () => {
       const invalidType = await fetch("/api/state", { method: "PUT", headers: { "Content-Type": "text/plain" }, body: "{}" });
       const malformed = await fetch("/api/state", { method: "PUT", headers: { "Content-Type": "application/json" }, body: "{" });
       const invalidImport = await fetch("/api/state/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ state: { forged: true }, confirmLegacyImport: true }) });
-      return [invalidType.status, malformed.status, invalidImport.status];
+      const oversized = await fetch("/api/state", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ padding: "x".repeat(1_100_000) }) });
+      return [invalidType.status, malformed.status, invalidImport.status, oversized.status];
     });
-    expect(failures).toEqual([415, 400, 400]);
+    expect(failures).toEqual([415, 400, 400, 413]);
     await deleteAccount(pageB, userB.password);
     await contextB.close();
     await deleteAccount(page, userA.password);

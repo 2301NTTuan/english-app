@@ -5,7 +5,7 @@ import { getDb } from "@/db/client";
 import { vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
 import type { CEFRLevel } from "@/types/domain";
 
-export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string }
+export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string; frequencyBand?: "very-common" | "common" | "less-common" | "advanced" }
 
 export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const page = Math.max(1, Math.trunc(input.page ?? 1));
@@ -15,6 +15,7 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const conditions = [eq(vocabularyContent.active, true), preview ? inArray(vocabularyContent.status, ["validated", "reviewed", "published"]) : eq(vocabularyContent.status, "published")];
   if (input.level) conditions.push(eq(vocabularyContent.level, input.level));
   if (input.partOfSpeech) conditions.push(eq(vocabularyContent.partOfSpeech, input.partOfSpeech));
+  if (input.frequencyBand) conditions.push(eq(vocabularyContent.frequencyBand, input.frequencyBand));
   if (input.topic) conditions.push(sql`${input.topic} = any(${vocabularyContent.topics})`);
   if (search) conditions.push(or(ilike(vocabularyContent.word, `%${search}%`), ilike(vocabularyMeanings.englishDefinition, `%${search}%`), ilike(vocabularyMeanings.vietnameseMeaning, `%${search}%`))!);
   const where = and(...conditions);
@@ -30,5 +31,5 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
     .leftJoin(vocabularyMeanings, and(eq(vocabularyMeanings.vocabularyId, vocabularyContent.id), eq(vocabularyMeanings.position, 0)))
     .leftJoin(vocabularyExamples, and(eq(vocabularyExamples.vocabularyId, vocabularyContent.id), eq(vocabularyExamples.position, 0)))
     .where(where).orderBy(asc(vocabularyContent.frequencyRank), asc(vocabularyContent.word)).limit(pageSize).offset((page - 1) * pageSize);
-  return { items, page, pageSize, total, pageCount: Math.max(1, Math.ceil(total / pageSize)), filters: { level: input.level ?? null, search: search ?? null, topic: input.topic ?? null, partOfSpeech: input.partOfSpeech ?? null } };
+  return { items, page, pageSize, total, pageCount: Math.max(1, Math.ceil(total / pageSize)), filters: { level: input.level ?? null, search: search ?? null, topic: input.topic ?? null, partOfSpeech: input.partOfSpeech ?? null, frequencyBand: input.frequencyBand ?? null } };
 }

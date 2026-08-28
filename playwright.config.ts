@@ -7,7 +7,7 @@ if (!testDatabaseUrl) throw new Error("TEST_DATABASE_URL is required for Playwri
 const databaseName = new URL(testDatabaseUrl).pathname.slice(1);
 if (!databaseName.includes("test")) throw new Error(`Refusing to run Playwright against non-test database: ${databaseName}`);
 process.env.DATABASE_URL = testDatabaseUrl;
-process.env.PASSWORD_RESET_DELIVERY = "development";
+process.env.EMAIL_DELIVERY_PROVIDER = "disabled";
 process.env.PLACEMENT_CONTENT_CHANNEL = "validated-preview";
 process.env.CONTENT_RELEASE_CHANNEL = "validated-preview";
 

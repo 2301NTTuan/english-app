@@ -31,12 +31,12 @@ Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit to
 
 ## Scaling and performance
 
-The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. Browser lists already render bounded pages. Current bundled content remains in the client bundle, so the next performance milestone is server-side content pagination/search and route-specific loading. The in-memory rate limiter is single-process only.
+The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; it does not import its catalogue into the route bundle. Other study planners still use the 298-record authored fallback corpus, so completing route-specific retrieval before expanding content remains a performance milestone. The in-memory rate limiter is single-process only.
 
 ## Known limitations
 
 - Non-event snapshot synchronization still uses last-write-wins across simultaneous devices.
 - Middleware checks cookie presence for navigation protection; every API independently verifies the hashed session in PostgreSQL. A forged cookie may reach the shell but cannot read or write account data.
-- Password-reset and email-verification lifecycles exist, but outbound delivery adapters, MFA, administrator/content-editor roles, and session management UI remain pending.
+- Password-reset and email-verification lifecycles and an environment-configured outbound adapter exist; deployment still requires provider credentials, sender/domain verification, and support procedures. MFA, administrator/content-editor roles, and session management UI remain pending.
 - No telemetry backend, error tracker, queue, object storage, CDN design, or shared rate-limit store.
 - Playwright requires the standard Ubuntu Chromium system libraries (`sudo npx playwright install-deps chromium`) in a fresh WSL distribution.

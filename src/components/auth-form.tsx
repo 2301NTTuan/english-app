@@ -27,7 +27,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <button disabled={pending} className="btn-primary w-full justify-center disabled:opacity-60">{pending ? "Please wait…" : registering ? "Create account" : "Sign in"}</button>
     </form>
     <p className="muted mt-5 text-center text-sm">{registering ? "Already have an account?" : "New to English Mastery?"} <Link className="font-bold text-[#17795b]" href={registering ? "/login" : "/register"}>{registering ? "Sign in" : "Create one"}</Link></p>
-    <p className="muted mt-5 text-center text-xs"><Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link></p>
+    <p className="muted mt-5 text-center text-xs"><Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> · <Link href="/attribution">Attribution</Link></p>
   </div></div>;
 }
 

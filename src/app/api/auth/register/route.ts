@@ -7,6 +7,8 @@ import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { createSessionToken, hashSessionToken, SESSION_COOKIE, sessionCookieOptions, sessionExpiresAt } from "@/lib/auth/session";
 import { logEvent } from "@/lib/observability/logger";
+import { issueEmailVerification } from "@/lib/auth/recovery";
+import { sendVerificationEmail } from "@/lib/email/delivery";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
@@ -18,14 +20,20 @@ export async function POST(request: Request) {
     const email = normalizeEmail(parsed.data.email);
     const passwordHash = await hashPassword(parsed.data.password);
     const token = createSessionToken();
-    await getDb().transaction(async (tx) => {
+    const userId = await getDb().transaction(async (tx) => {
       const [user] = await tx.insert(users).values({ name: parsed.data.name, email, passwordHash }).returning({ id: users.id });
       await tx.insert(learningPreferences).values({ userId: user.id });
       await tx.insert(userStateSnapshots).values({ userId: user.id, schemaVersion: 1, state: createEmptyAccountState() });
       await tx.insert(authSessions).values({ tokenHash: hashSessionToken(token), userId: user.id, expiresAt: sessionExpiresAt() });
       await tx.insert(auditLogs).values({ userId: user.id, action: "account.registered", entityType: "user", entityId: user.id });
+      return user.id;
     });
-    const response = NextResponse.json({ ok: true }, { status: 201 });
+    let developmentVerificationUrl: string | undefined;
+    try {
+      const verificationToken = await issueEmailVerification(userId);
+      developmentVerificationUrl = (await sendVerificationEmail(email, verificationToken, request.url)).developmentUrl;
+    } catch { logEvent("error", "email.verification_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
+    const response = NextResponse.json({ ok: true, ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}) }, { status: 201 });
     response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
     return response;
   } catch (error) {

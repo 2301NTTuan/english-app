@@ -57,8 +57,3 @@ export async function consumeEmailVerification(token: string, now = new Date()):
     return true;
   });
 }
-
-export function developmentResetUrl(requestUrl: string, token: string | null): string | undefined {
-  if (!token || process.env.NODE_ENV === "production" || process.env.PASSWORD_RESET_DELIVERY !== "development") return undefined;
-  return new URL(`/reset-password?token=${encodeURIComponent(token)}`, requestUrl).toString();
-}

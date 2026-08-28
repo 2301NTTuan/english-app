@@ -8,6 +8,7 @@ const querySchema = z.object({
   page: z.coerce.number().int().positive().default(1), pageSize: z.coerce.number().int().positive().max(24).default(24),
   level: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]).optional(),
   search: z.string().trim().max(100).optional(), topic: z.string().trim().max(100).optional(), partOfSpeech: z.string().trim().max(80).optional(),
+  frequencyBand: z.enum(["very-common", "common", "less-common", "advanced"]).optional(),
 });
 
 export async function GET(request: Request) {

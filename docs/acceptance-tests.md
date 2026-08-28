@@ -5,9 +5,9 @@
 | Register | valid name/email/strong password | account, defaults, snapshot, session | database integration and Playwright |
 | Register | duplicate email | safe 409; no duplicate account | database integration |
 | Login | correct credentials | revocable HttpOnly session | Playwright |
-| Login | wrong or unknown credentials | same generic 401 | unit primitives; E2E pending |
+| Login | wrong or unknown credentials | same generic 401 | Playwright production flow |
 | Protected route | no cookie | redirect to `/login` with internal return path | runtime smoke |
-| State API | no/forged/expired session | 401; no data | database/E2E pending |
+| State API | no/forged/expired/revoked session | 401; no data | Playwright production flow |
 | Account isolation | two users and scoped query | only session owner’s row | database integration test (requires PostgreSQL) |
 | Daily planner | backlog exceeds target | reviews dominate; zero new material | unit tests |
 | Grammar path | unmet prerequisite | dependent topic locked | unit tests |
@@ -18,18 +18,22 @@
 | Import | malformed or over 1 MB | rejected without state change | schema unit and Playwright |
 | Delete account | password plus `DELETE` | account and owned rows removed | cascade integration and Playwright |
 | Health | database unavailable | HTTP 503 `{status:"degraded"}` only | runtime smoke |
+| Vocabulary catalogue | search/CEFR/POS/topic/frequency/page | authenticated bounded database response, max 24 rows | PostgreSQL integration and production build |
+| Password reset request | known or unknown email | same generic response; production omits token URL | integration, unit delivery adapter, and route implementation |
+| Email verification | valid/expired/reused token | one successful use; later/expired use rejected | PostgreSQL integration and verification UI/API |
+| Hostile/invalid API input | foreign origin, wrong media type, malformed or oversized JSON | 403/415/400/413 without mutation | Playwright production flow |
 
 Automate these with Playwright against an isolated migrated database before release:
 
 1. Registration validates input, creates exactly one account/default state, and sets an HttpOnly session. Duplicate registration is safe.
-2. Login rejects wrong and unknown credentials generically, throttles attempts, creates a revocable session, and logout invalidates it.
-3. Anonymous navigation redirects to login; expired or forged cookies cannot read or update `/api/state`.
+2. Login rejects wrong and unknown credentials generically, throttles attempts, creates a revocable session, and logout invalidates it. Generic rejection and revocation are automated; shared/distributed throttling remains a launch blocker.
+3. Anonymous navigation redirects to login; expired, revoked, or forged cookies cannot read `/api/state`.
 4. Two accounts save distinct state. Supplying another user ID has no effect. Deleting one account does not modify the other.
 5. Learning survives refresh and a second browser. Completion retries do not duplicate records once normalized writes are enabled.
 6. Legacy/file imports require confirmation, reject malformed/oversized payloads, and replace only the signed-in account.
 7. Export/import round-trips state. Reset requires confirmation. Deletion requires password and `DELETE`, clears the cookie, and cascades owned rows.
 8. Content seed is idempotent; validation passes; stable IDs and relationships survive a second seed.
-9. Health returns 200/`ok` with PostgreSQL and 503/`degraded` without it, with no diagnostics.
+9. Health returns 200/`ok` with PostgreSQL and 503/`degraded` against a deliberately unreachable endpoint, with no topology or stack diagnostics.
 10. Keyboard navigation reaches the skip link, labeled forms, errors, menu, core learning controls, and legal links; layouts remain usable under zoom.
 
-The most recent execution evidence and environment details are in `docs/test-report.md`.
+The 28 August 2026 Playwright run covers wrong/unknown credentials, forged/expired/revoked sessions, cross-account scope, hostile origin, wrong media type, malformed JSON, oversized JSON, and account deletion. Duplicate session/placement submissions are covered by PostgreSQL integration idempotency tests. The most recent execution evidence and environment details are in `docs/test-report.md`.

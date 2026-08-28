@@ -18,7 +18,7 @@ const navigation = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const { state, syncStatus } = useAppState();
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, []);
-  if (["/login", "/register", "/forgot-password", "/reset-password", "/privacy", "/terms"].includes(pathname)) return <main id="main-content">{children}</main>;
+  if (["/login", "/register", "/forgot-password", "/reset-password", "/verify-email", "/privacy", "/terms", "/attribution"].includes(pathname)) return <main id="main-content">{children}</main>;
   const levelVocabularyIds = new Set(vocabulary.filter((item) => item.cefrLevel === state.settings.currentLevel).map((item) => item.id));
   const levelGrammarIds = new Set(grammarTopics.filter((item) => item.level === state.settings.currentLevel).map((item) => item.id));
   const levelScores = [...state.vocabularyProgress.filter((item) => levelVocabularyIds.has(item.itemId)).map((item) => item.mastery.overall), ...state.grammarProgress.filter((item) => levelGrammarIds.has(item.topicId)).map((item) => item.mastery)];
