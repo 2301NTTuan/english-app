@@ -17,6 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed-content.ts",
     "db:test:reset": "tsx scripts/reset-test-database.ts",
+    "db:restore:drill": "tsx scripts/restore-drill.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
