@@ -11,10 +11,10 @@ ENRICHED COUNTS:
 A1: 750
 A2: 950
 B1: 1200
-B2: 327
+B2: 677
 C1: 10
 C2: 2
-Total: 3239
+Total: 3589
 
 CURRENT CEFR:
 B2
@@ -23,25 +23,25 @@ CURRENT BATCH:
 006
 
 LAST COMPLETED MASTER ENTRY:
-master-cast-verb / inventory position 3206
+master-free-verb / inventory position 3566
 
 NEXT MASTER ENTRY:
-master-casually-adverb / inventory position 3207
+master-friendly-adjective / inventory position 3567
 
 CURRENT BATCH RANGE:
 master-abandoned-adjective / 2902 through master-free-verb / 3566
 
 CURRENT BATCH COMPLETED:
-300/650
+650/650
 
 UNRESOLVED ENTRIES:
 None
 
 LAST CONTENT VALIDATION:
-PASS at batch 006 chunk B — validate:content 9/9; content:stats total 3239 with no validation errors
+PASS at batch 006 — validate:content 9/9; content:stats total 3589 with no validation, duplicate, missing-field, POS, example-target, or CEFR/frequency errors
 
 LAST CHECKPOINT COMMIT:
-Checkpoint vocabulary batch 006 at 300 of 650
+Enrich vocabulary batch 006 (B2)
 
 RESUME INSTRUCTION:
 Continue vocabulary enrichment from NEXT MASTER ENTRY.

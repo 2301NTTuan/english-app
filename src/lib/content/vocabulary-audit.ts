@@ -12,10 +12,11 @@ const countBy = <T>(values: T[], keys: string[], key: (value: T) => string) => O
 const deterministicItems = (items: VocabularyItem[], salt: string, requested: number) => [...items].sort((a, b) => deterministicKey(`${salt}:${a.id}`) - deterministicKey(`${salt}:${b.id}`) || a.id.localeCompare(b.id)).slice(0, requested);
 const exampleContainsTarget = (item: VocabularyItem) => {
   const lemma = normalize(item.lemma ?? item.word).replaceAll(" ", "");
+  const collapsedExamples = item.examples.map((example) => normalize(example).replaceAll(" ", ""));
   const forms = item.examples.flatMap((example) => normalize(example).split(" "));
   const stem = lemma.endsWith("y") ? lemma.slice(0, -1) : lemma.endsWith("e") ? lemma.slice(0, -1) : lemma;
   const irregular: Record<string, string[]> = { buy: ["bought"] };
-  return forms.some((form) => form === lemma || form.startsWith(stem) || (irregular[lemma] ?? []).includes(form));
+  return collapsedExamples.some((example) => example.includes(lemma)) || forms.some((form) => form === lemma || form.startsWith(stem) || (irregular[lemma] ?? []).includes(form));
 };
 
 export interface VocabularyDuplicateCandidate { firstId: string; secondId: string; reason: string; similarity: number }
