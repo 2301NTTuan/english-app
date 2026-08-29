@@ -1,6 +1,10 @@
 import type { CEFRLevel, VocabularyItem } from "@/types/domain";
 
 const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const validLevels = new Set(levels);
+const validPartsOfSpeech = new Set(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "determiner", "interjection", "modal", "auxiliary", "numeral", "particle", "phrase"]);
+const validStatuses = new Set(["draft", "validated", "reviewed", "published", "retired"]);
+const validFrequencyBands = new Set(["very-common", "common", "less-common", "advanced"]);
 const normalize = (value: string) => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const tokens = (value: string) => new Set(normalize(value).split(/\s+/).filter((token) => token.length > 2));
 const similarity = (left: string, right: string) => {
@@ -20,19 +24,33 @@ const exampleContainsTarget = (item: VocabularyItem) => {
 };
 
 export interface VocabularyDuplicateCandidate { firstId: string; secondId: string; reason: string; similarity: number }
+export interface VocabularyAuditOptions { knownProvenanceIds?: Set<string>; knownSourceIds?: Set<string> }
+
+function duplicateGroups(items: VocabularyItem[], key: (item: VocabularyItem) => string) {
+  const groups = new Map<string, VocabularyItem[]>();
+  for (const item of items) {
+    const value = key(item);
+    const group = groups.get(value) ?? [];
+    group.push(item);
+    groups.set(value, group);
+  }
+  return [...groups.entries()].filter(([value, group]) => value && group.length > 1);
+}
 
 export function findVocabularyDuplicateCandidates(items: VocabularyItem[]): VocabularyDuplicateCandidate[] {
   const candidates: VocabularyDuplicateCandidate[] = [];
-  for (let left = 0; left < items.length; left += 1) {
-    for (let right = left + 1; right < items.length; right += 1) {
-      const a = items[left]; const b = items[right];
-      const sameLexicalUnit = normalize(a.lemma ?? a.word) === normalize(b.lemma ?? b.word) && normalize(a.partOfSpeech) === normalize(b.partOfSpeech);
-      const sameDefinition = normalize(a.meanings[0]?.definition ?? "") === normalize(b.meanings[0]?.definition ?? "");
-      if (!sameLexicalUnit && !sameDefinition) continue;
-      const score = similarity(a.meanings[0]?.definition ?? "", b.meanings[0]?.definition ?? "");
-      if (sameDefinition || score >= 0.72) candidates.push({ firstId: a.id, secondId: b.id, reason: sameDefinition ? "different lexical units with an identical definition" : "same lemma/POS with near-identical definitions", similarity: Number(score.toFixed(2)) });
+  const addPairs = (groups: [string, VocabularyItem[]][], reason: string) => {
+    for (const [, group] of groups) {
+      for (let left = 0; left < group.length; left += 1) {
+        for (let right = left + 1; right < group.length; right += 1) {
+          const a = group[left]; const b = group[right];
+          candidates.push({ firstId: a.id, secondId: b.id, reason, similarity: Number(similarity(a.meanings[0]?.definition ?? "", b.meanings[0]?.definition ?? "").toFixed(2)) });
+        }
+      }
     }
-  }
+  };
+  addPairs(duplicateGroups(items, (item) => `${normalize(item.lemma ?? item.word)}:${normalize(item.partOfSpeech)}`), "same lemma/POS lexical unit");
+  addPairs(duplicateGroups(items, (item) => normalize(item.meanings[0]?.definition ?? "")).filter(([, group]) => new Set(group.map((item) => `${normalize(item.lemma ?? item.word)}:${normalize(item.partOfSpeech)}`)).size > 1), "different lexical units with an identical definition");
   return candidates;
 }
 
@@ -40,8 +58,10 @@ export function deterministicVocabularySample(items: VocabularyItem[], level: CE
   return deterministicItems(items.filter((item) => item.cefrLevel === level), level, requested);
 }
 
-export function auditVocabulary(items: VocabularyItem[]) {
+export function auditVocabulary(items: VocabularyItem[], options: VocabularyAuditOptions = {}) {
   const duplicateCandidates = findVocabularyDuplicateCandidates(items);
+  const duplicateIds = duplicateGroups(items, (item) => item.id).flatMap(([, group]) => group.map((item) => item.id));
+  const duplicateLexicalUnits = duplicateGroups(items, (item) => `${normalize(item.lemma ?? item.word)}:${normalize(item.partOfSpeech)}`).map(([lexicalUnit, group]) => ({ lexicalUnit, ids: group.map((item) => item.id) }));
   const duplicateExamples = [...new Map(items.flatMap((item) => item.examples.map((example) => [normalize(example), item.id] as const)).filter(([example], index, all) => all.findIndex(([candidate]) => candidate === example) !== index)).entries()].map(([example, id]) => ({ id, example }));
   const missingFields = items.flatMap((item) => [
     !item.lemma?.trim() && "lemma", !item.partOfSpeech.trim() && "partOfSpeech", !item.meanings[0]?.definition.trim() && "definition",
@@ -68,6 +88,37 @@ export function auditVocabulary(items: VocabularyItem[]) {
   }]));
   const lexicalTargets = new Set(items.map((item) => normalize(item.word)));
   const relationTargets = items.flatMap((item) => [...item.synonyms, ...item.antonyms].map((relation) => normalize(relation.word)));
+  const invalidPartsOfSpeech = items.filter((item) => !validPartsOfSpeech.has(normalize(item.partOfSpeech))).map((item) => item.id);
+  const invalidCefr = items.filter((item) => !validLevels.has(item.cefrLevel)).map((item) => item.id);
+  const invalidLifecycleStates = items.filter((item) => !validStatuses.has(item.status)).map((item) => item.id);
+  const invalidFrequencyMetadata = items.filter((item) =>
+    !item.frequencyBasis
+    || !item.frequencyBand
+    || !validFrequencyBands.has(item.frequencyBand)
+    || (item.frequencyBasis === "editorial-band" && (item.frequencyRank !== undefined || item.frequencySourceId !== undefined))
+    || (item.frequencyBasis === "source-backed-rank" && (!Number.isInteger(item.frequencyRank) || (item.frequencyRank ?? 0) < 1 || !item.frequencySourceId)),
+  ).map((item) => item.id);
+  const brokenProvenance = items.flatMap((item) => {
+    const issues: { id: string; reference: string; reason: string }[] = [];
+    if (options.knownProvenanceIds && !options.knownProvenanceIds.has(item.provenanceId)) issues.push({ id: item.id, reference: item.provenanceId, reason: "unknown primary provenance" });
+    const knownReferences = new Set([...(options.knownProvenanceIds ?? []), ...(options.knownSourceIds ?? [])]);
+    for (const reference of item.provenanceIds ?? []) if (knownReferences.size && !knownReferences.has(reference)) issues.push({ id: item.id, reference, reason: "unknown provenance reference" });
+    if (item.cefrBasis === "source-backed" && (!item.cefrSourceId || (options.knownSourceIds && !options.knownSourceIds.has(item.cefrSourceId)))) issues.push({ id: item.id, reference: item.cefrSourceId ?? "", reason: "missing or unknown CEFR source" });
+    if (item.frequencyBasis === "source-backed-rank" && (!item.frequencySourceId || (options.knownSourceIds && !options.knownSourceIds.has(item.frequencySourceId)))) issues.push({ id: item.id, reference: item.frequencySourceId ?? "", reason: "missing or unknown frequency source" });
+    return issues;
+  });
+  const placeholderPattern = /\b(?:todo|tbd|placeholder|lorem ipsum|undefined|null)\b|\{\{|\[object object\]/iu;
+  const malformedPattern = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFD]|\s{2,}|\s+[,.!?;:]|[!?.,]{3,}/u;
+  const textFields = items.flatMap((item) => ([
+    ["word", item.word], ["lemma", item.lemma ?? ""],
+    ...item.meanings.flatMap((meaning) => [["definition", meaning.definition], ["vietnamese", meaning.vietnamese ?? ""]]),
+    ...item.examples.map((example) => ["example", example]),
+  ] as [string, string][]).map(([field, value]) => ({ id: item.id, field, value })));
+  const placeholderText = textFields.filter(({ value }) => placeholderPattern.test(value)).map(({ id, field }) => ({ id, field }));
+  const malformedText = textFields.filter(({ value }) => value !== value.trim() || malformedPattern.test(value)).map(({ id, field }) => ({ id, field }));
+  const repeatedVietnameseCandidates = duplicateGroups(items, (item) => normalize(item.meanings[0]?.vietnamese ?? ""))
+    .filter(([, group]) => group.length >= 5)
+    .map(([vietnamese, group]) => ({ vietnamese, ids: group.map((item) => item.id) }));
   return {
     total: items.length,
     byLevel: countBy(items, levels, (item) => item.cefrLevel),
@@ -87,9 +138,19 @@ export function auditVocabulary(items: VocabularyItem[]) {
       externalLexicalStrings: relationTargets.filter((target) => !lexicalTargets.has(target)).length,
     },
     edgeAudit,
+    duplicateIds,
+    duplicateLexicalUnits,
     duplicateCandidates,
     duplicateExamples,
     missingFields,
+    invalidPartsOfSpeech,
+    invalidCefr,
+    invalidFrequencyMetadata,
+    invalidLifecycleStates,
+    brokenProvenance,
+    placeholderText,
+    malformedText,
+    repeatedVietnameseCandidates,
     exactFrequencyRanksClaimed: items.filter((item) => item.frequencyRank !== undefined).length,
     genericTopics: items.filter((item) => item.topics?.includes("general")).map((item) => item.id),
     posDefinitionMismatches: items.filter((item) => (item.partOfSpeech === "verb") !== normalize(item.meanings[0]?.definition ?? "").startsWith("to ")).map((item) => item.id),

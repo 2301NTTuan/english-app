@@ -28,6 +28,7 @@ import { enrichedVocabulary011a } from "@/data/vocabulary/enriched-011a";
 import { enrichedVocabulary011b } from "@/data/vocabulary/enriched-011b";
 import { enrichedVocabulary011c } from "@/data/vocabulary/enriched-011c";
 import { enrichedVocabulary011d } from "@/data/vocabulary/enriched-011d";
+import { applyVocabularyQaCorrection } from "@/data/vocabulary/qa-corrections";
 
 type Seed = [string, string, VocabularyItem["cefrLevel"], string, string, string, string[], string[]];
 const seeds: Seed[] = [
@@ -212,5 +213,6 @@ const coreVocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLev
 }));
 
 /** Stable, modular content catalogue. Add future CEFR batches under src/data/vocabulary/. */
-export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001, ...enrichedVocabulary001, ...enrichedVocabulary002, ...enrichedVocabulary003, ...enrichedVocabulary004, ...enrichedVocabulary005a, ...enrichedVocabulary005b, ...enrichedVocabulary005c, ...enrichedVocabulary005d, ...enrichedVocabulary006a, ...enrichedVocabulary006b, ...enrichedVocabulary006c, ...enrichedVocabulary006d, ...enrichedVocabulary007a, ...enrichedVocabulary007b, ...enrichedVocabulary007c, ...enrichedVocabulary007d, ...enrichedVocabulary008, ...enrichedVocabulary009a, ...enrichedVocabulary009b, ...enrichedVocabulary009c, ...enrichedVocabulary009d, ...enrichedVocabulary010a, ...enrichedVocabulary010b, ...enrichedVocabulary011a, ...enrichedVocabulary011b, ...enrichedVocabulary011c, ...enrichedVocabulary011d];
+const vocabularyCatalogue: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001, ...enrichedVocabulary001, ...enrichedVocabulary002, ...enrichedVocabulary003, ...enrichedVocabulary004, ...enrichedVocabulary005a, ...enrichedVocabulary005b, ...enrichedVocabulary005c, ...enrichedVocabulary005d, ...enrichedVocabulary006a, ...enrichedVocabulary006b, ...enrichedVocabulary006c, ...enrichedVocabulary006d, ...enrichedVocabulary007a, ...enrichedVocabulary007b, ...enrichedVocabulary007c, ...enrichedVocabulary007d, ...enrichedVocabulary008, ...enrichedVocabulary009a, ...enrichedVocabulary009b, ...enrichedVocabulary009c, ...enrichedVocabulary009d, ...enrichedVocabulary010a, ...enrichedVocabulary010b, ...enrichedVocabulary011a, ...enrichedVocabulary011b, ...enrichedVocabulary011c, ...enrichedVocabulary011d];
+export const vocabulary: VocabularyItem[] = vocabularyCatalogue.map(applyVocabularyQaCorrection);
 export const publishedVocabulary = vocabulary.filter((item) => item.status === "published");

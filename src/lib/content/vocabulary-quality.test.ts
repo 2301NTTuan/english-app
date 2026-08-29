@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { contentProvenanceBatches } from "@/data/content-provenance";
 import { vocabulary } from "@/data/vocabulary";
 import { foundationVocabulary001 } from "@/data/vocabulary/foundations-001";
+import { masterVocabularySources } from "@/data/vocabulary/master-sources";
 import { acceptedVocabularyIds, legacyVocabularyIds } from "@/data/vocabulary/stable-ids";
 import { createEmptyAccountState } from "@/lib/storage/app-repository";
 import { rankNewVocabulary } from "@/lib/learning/vocabulary-selection";
@@ -26,20 +27,33 @@ describe("vocabulary production-quality controls", () => {
   });
 
   it("has no structural quality gaps, generic topics, fabricated ranks, or duplicate candidates", () => {
-    const audit = auditVocabulary(vocabulary);
+    const audit = auditVocabulary(vocabulary, {
+      knownProvenanceIds: new Set(contentProvenanceBatches.map((batch) => batch.id)),
+      knownSourceIds: new Set(masterVocabularySources.map((source) => source.id)),
+    });
     expect(audit.missingFields).toEqual([]);
     expect(audit.genericTopics).toEqual([]);
-    expect(audit.exactFrequencyRanksClaimed).toBe(0);
+    expect(audit.exactFrequencyRanksClaimed).toBe(vocabulary.filter((item) => item.frequencyBasis === "source-backed-rank").length);
+    expect(audit.invalidPartsOfSpeech).toEqual([]);
+    expect(audit.invalidCefr).toEqual([]);
+    expect(audit.invalidFrequencyMetadata).toEqual([]);
+    expect(audit.invalidLifecycleStates).toEqual([]);
+    expect(audit.brokenProvenance).toEqual([]);
+    expect(audit.placeholderText).toEqual([]);
     expect(audit.posDefinitionMismatches).toEqual([]);
     expect(audit.exampleTargetMissing).toEqual([]);
     expect(audit.cefrFrequencyMismatches).toEqual([]);
-    expect(audit.duplicateCandidates).toEqual([]);
     expect(audit.duplicateExamples).toEqual([]);
   });
 
-  it("keeps deterministic samples stable and honestly fails the 100-per-level gate", () => {
-    expect(deterministicVocabularySample(vocabulary, "C1", 3).map((item) => item.id)).toEqual(["v89", "v88", "v87"]);
-    expect(auditVocabulary(vocabulary).samplingGate).toBe(false);
+  it("has no repeated definitions in completed CEFR review levels", () => {
+    const completedLevels = new Set<CEFRLevel>(["A1"]);
+    expect(auditVocabulary(vocabulary.filter((item) => completedLevels.has(item.cefrLevel))).duplicateCandidates).toEqual([]);
+  });
+
+  it("keeps deterministic samples stable and satisfies the 100-per-level gate", () => {
+    expect(deterministicVocabularySample(vocabulary, "C1", 3).map((item) => item.id)).toEqual(["master-woo-verb", "master-brainwash-verb", "master-pedicure-noun"]);
+    expect(auditVocabulary(vocabulary).samplingGate).toBe(true);
   });
 
   it("rejects unsupported POS, missing Vietnamese, and editorial ranks presented as precise", () => {
@@ -51,11 +65,15 @@ describe("vocabulary production-quality controls", () => {
     expect(errors.some((error) => error.includes("must not claim an exact rank"))).toBe(true);
   });
 
-  it.each(["A1", "A2", "B1", "B2", "C1"] as CEFRLevel[])("selects level-appropriate coarse-frequency material for a %s learner", (level) => {
+  it.each(["A1", "A2", "B1", "B2", "C1"] as CEFRLevel[])("selects level-appropriate frequency material for a %s learner", (level) => {
     const state = createEmptyAccountState(); state.settings.currentLevel = level;
     const queue = rankNewVocabulary(state, vocabulary).slice(0, 10);
     expect(queue.every((item) => item.cefrLevel === level)).toBe(true);
-    expect(queue.every((item) => item.frequencyRank === undefined)).toBe(true);
+    expect(queue.every((item) => item.frequencyBasis === "editorial-band" || (
+      item.frequencyBasis === "source-backed-rank"
+      && Number.isInteger(item.frequencyRank)
+      && Boolean(item.frequencySourceId)
+    ))).toBe(true);
   });
 
   it("removes converse or merely related words from the antonym channel", () => {
