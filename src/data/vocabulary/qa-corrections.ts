@@ -2112,6 +2112,136 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
   "master-bang-noun": { topic: "sounds" },
   "master-bang-verb": { example: "He banged his fist on the table." },
   "master-bar-verb": { topic: "society" },
+  "master-barrel-noun": {
+    definition: "a large round container with flat ends",
+    example: "The workers stored the wine in a wooden barrel.",
+  },
+  "master-base-verb": { topic: "places" },
+  "master-basis-noun": {
+    definition: "the main reason, principle, or support for something",
+    example: "Trust is the basis of their partnership.",
+  },
+  "master-battle-noun": {
+    definition: "a difficult struggle against a person, problem, or illness",
+    vietnamese: "cuộc chiến, sự đấu tranh",
+    topic: "society",
+  },
+  "master-beat-verb": {
+    definition: "to hit something repeatedly",
+  },
+  "master-behalf-noun": {
+    vietnamese: "thay mặt, nhân danh",
+    topic: "society",
+  },
+  "master-besides-preposition": {
+    definition: "in addition to someone or something",
+    vietnamese: "ngoài, bên cạnh",
+    example: "Besides homework, she has a part-time job.",
+  },
+  "master-bet-verb": { topic: "money" },
+  "master-bilingual-adjective": {
+    definition: "able to speak two languages",
+    vietnamese: "song ngữ, thông thạo hai ngôn ngữ",
+    example: "She is bilingual in English and Vietnamese.",
+    topic: "language",
+  },
+  "master-bill-verb": {
+    vietnamese: "tính tiền, gửi hóa đơn",
+    topic: "money",
+  },
+  "master-biography-noun": {
+    definition: "the written story of a person's life by someone else",
+    example: "She wrote a biography of the famous scientist.",
+    topic: "literature",
+  },
+  "master-biology-noun": { topic: "education" },
+  "master-bitter-adjective": {
+    definition: "having a sharp, unpleasant taste like black coffee",
+    example: "The medicine left a bitter taste in my mouth.",
+    topic: "food",
+  },
+  "master-blame-noun": {
+    definition: "responsibility for something bad that has happened",
+    vietnamese: "trách nhiệm, sự đổ lỗi",
+    topic: "society",
+  },
+  "master-bleed-verb": { example: "His cut finger continued to bleed." },
+  "master-blend-verb": {
+    definition: "to mix substances together until they combine",
+    example: "Blend the fruit, yogurt, and milk until smooth.",
+    topic: "food",
+  },
+  "master-block-verb": {
+    definition: "to prevent movement through a place or passage",
+    vietnamese: "chặn, ngăn cản",
+  },
+  "master-board-verb": {
+    definition: "to get onto a train, bus, ship, or aircraft",
+    vietnamese: "lên tàu, xe hoặc máy bay",
+    topic: "travel",
+  },
+  "master-bomb-noun": {
+    definition: "a weapon designed to explode",
+    example: "The police safely removed the unexploded bomb.",
+    topic: "safety",
+  },
+  "master-bomb-verb": {
+    topic: "safety",
+  },
+  "master-bond-noun": {
+    definition: "a close connection between people based on love or shared experience",
+    vietnamese: "mối liên kết, tình cảm gắn bó",
+    topic: "relationships",
+  },
+  "master-book-verb": {
+    vietnamese: "đặt trước",
+    topic: "travel",
+  },
+  "master-border-noun": {
+    definition: "the official line separating two countries or regions",
+    vietnamese: "biên giới, ranh giới",
+    topic: "places",
+  },
+  "master-bounce-verb": { topic: "movement" },
+  "master-breath-noun": { topic: "body" },
+  "master-brick-noun": {
+    definition: "a small rectangular block used for building walls",
+    example: "The mason placed each brick carefully in the wall.",
+  },
+  "master-builder-noun": {
+    topic: "people",
+  },
+  "master-bull-noun": {
+    definition: "an adult male cow",
+    vietnamese: "bò đực",
+  },
+  "master-bullet-noun": {
+    definition: "a small metal object fired from a gun",
+    example: "The officer found a bullet near the damaged wall.",
+    topic: "safety",
+  },
+  "master-bust-verb": {
+    definition: "to break or damage something",
+    vietnamese: "làm vỡ, phá hỏng",
+    example: "The fall busted the old suitcase.",
+  },
+  "master-but-preposition": {
+    definition: "with the exception of someone or something",
+    vietnamese: "ngoại trừ, trừ",
+  },
+  "master-calculation-noun": { topic: "thinking" },
+  "master-calm-adjective": {
+    vietnamese: "bình tĩnh, yên lặng",
+  },
+  "master-cancer-noun": {
+    definition: "a serious disease in which abnormal cells grow uncontrollably",
+    example: "Doctors detected the cancer at an early stage.",
+    topic: "health",
+  },
+  "master-capable-adjective": {
+    definition: "having the ability or qualities needed to do something",
+    vietnamese: "có khả năng, có năng lực",
+  },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {

@@ -8,30 +8,30 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 151-1200
+B1 / level entries 201-1200
 
 LAST CHECKED ENTRY:
-master-bar-verb / B1 position 150
+master-capable-adjective / B1 position 200
 
 NEXT ENTRY:
-master-barrel-noun / B1 position 151
+master-capacity-noun / B1 position 201
 
 CHECKED:
-1850/6000
+1900/6000
 
 ISSUES FOUND:
-critical: 150
-major: 613
-minor: 103
+critical: 157
+major: 637
+minor: 107
 
 ISSUES FIXED:
-866
+901
 
 LAST VALIDATION:
-B1 positions 1-150: 0 structural blockers, 0 repeated definitions, and 0 repeated Vietnamese groups
+B1 positions 151-200: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-QA B1 vocabulary positions 1-150 (this checkpoint)
+QA B1 vocabulary positions 151-200 (this checkpoint)
 
 NEXT ACTION:
-Continue B1 QA from master-barrel-noun.
+Continue B1 QA from master-capacity-noun.
