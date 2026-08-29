@@ -1,26 +1,35 @@
 import { randomBytes } from "node:crypto";
-import { unlink } from "node:fs/promises";
+import { readFile, unlink, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { Client } from "pg";
 import { loadTestEnvironment } from "./load-test-env";
 
 loadTestEnvironment();
-const sourceUrl = process.env.TEST_DATABASE_URL;
-if (!sourceUrl) throw new Error("TEST_DATABASE_URL is required for the restore drill.");
-const parsed = new URL(sourceUrl); const sourceDatabase = parsed.pathname.slice(1);
+const sourceUrl = process.env.TEST_DATABASE_URL ?? (() => { throw new Error("TEST_DATABASE_URL is required for the restore drill."); })();
+const sourceDatabase = new URL(sourceUrl).pathname.slice(1);
 if (!sourceDatabase.includes("test")) throw new Error(`Refusing restore drill for non-test database: ${sourceDatabase}`);
-const targetDatabase = `${sourceDatabase}_restore_drill_${randomBytes(4).toString("hex")}`;
-if (!/^[a-zA-Z0-9_]+$/.test(targetDatabase)) throw new Error("Generated restore database name is unsafe.");
-const administratorUrl = new URL(sourceUrl); administratorUrl.pathname = "/postgres";
-const targetUrl = new URL(sourceUrl); targetUrl.pathname = `/${targetDatabase}`;
-const dumpPath = `/tmp/${targetDatabase}.dump`;
-const countTables = ["users", "vocabulary_content", "vocabulary_meanings", "vocabulary_examples", "grammar_topics", "grammar_lessons", "placement_items", "placement_passages", "expressions", "study_sessions", "placement_attempts"];
+
+const targetSchema = `restore_drill_${randomBytes(4).toString("hex")}`;
+const dumpPath = `/tmp/english_mastery_${targetSchema}.sql`;
+const countTables = [
+  "users", "learning_preferences", "vocabulary_content", "vocabulary_meanings", "vocabulary_examples",
+  "grammar_topics", "grammar_lessons", "placement_items", "placement_passages", "expressions",
+  "review_states", "vocabulary_progress", "grammar_progress", "mistakes", "study_sessions",
+  "study_session_items", "placement_attempts", "placement_answers",
+];
 
 function run(command: string, args: string[], environment = process.env) {
   return new Promise<void>((resolve, reject) => {
     const child = spawn(command, args, { env: environment, stdio: "inherit" });
-    child.once("error", reject); child.once("exit", (code) => code === 0 ? resolve() : reject(new Error(`${command} exited with status ${code}`)));
+    child.once("error", reject);
+    child.once("exit", (code) => code === 0 ? resolve() : reject(new Error(`${command} exited with status ${code}`)));
   });
+}
+
+function schemaUrl(url: string, schema: string) {
+  const result = new URL(url);
+  result.searchParams.set("options", `-c search_path=${schema},pg_catalog`);
+  return result.toString();
 }
 
 async function snapshot(url: string) {
@@ -38,18 +47,30 @@ async function snapshot(url: string) {
 }
 
 async function main() {
-  const administrator = new Client({ connectionString: administratorUrl.toString() }); let created = false;
+  const administrator = new Client({ connectionString: sourceUrl });
+  let created = false;
   try {
     const before = await snapshot(sourceUrl);
-    await run("pg_dump", ["--format=custom", "--no-owner", `--file=${dumpPath}`, sourceUrl]);
-    await administrator.connect(); await administrator.query(`create database "${targetDatabase}"`); created = true;
-    await run("pg_restore", ["--no-owner", `--dbname=${targetUrl.toString()}`, dumpPath]);
-    const after = await snapshot(targetUrl.toString());
+    await run("pg_dump", ["--format=plain", "--no-owner", "--no-privileges", "--schema=public", `--file=${dumpPath}`, sourceUrl]);
+    await administrator.connect();
+
+    const dump = await readFile(dumpPath, "utf8");
+    const remapped = dump
+      .replaceAll("SCHEMA public", `SCHEMA "${targetSchema}"`)
+      .replaceAll("public.", `"${targetSchema}".`)
+      .replaceAll("search_path = public", `search_path = "${targetSchema}"`);
+    if (remapped === dump || remapped.includes("public.")) throw new Error("Restore dump schema remapping was incomplete.");
+    await writeFile(dumpPath, remapped, { encoding: "utf8", mode: 0o600 });
+    created = true;
+    await run("psql", ["--no-psqlrc", "--set=ON_ERROR_STOP=1", `--dbname=${sourceUrl}`, `--file=${dumpPath}`]);
+
+    const targetUrl = schemaUrl(sourceUrl, targetSchema);
+    const after = await snapshot(targetUrl);
     if (JSON.stringify(after) !== JSON.stringify(before)) throw new Error(`Restore verification mismatch: ${JSON.stringify({ before, after })}`);
-    await run("npx", ["vitest", "run", "--config", "vitest.integration.config.ts"], { ...process.env, DATABASE_URL: targetUrl.toString(), TEST_DATABASE_URL: targetUrl.toString() });
-    console.log(JSON.stringify({ status: "pass", sourceDatabase, targetDatabase, counts: after.counts, contentVersions: after.checksums.length }, null, 2));
+    await run("npx", ["vitest", "run", "--config", "vitest.integration.config.ts"], { ...process.env, DATABASE_URL: targetUrl, TEST_DATABASE_URL: targetUrl });
+    console.log(JSON.stringify({ status: "pass", strategy: "isolated-schema", sourceDatabase, targetSchema, counts: after.counts, contentVersions: after.checksums.length }, null, 2));
   } finally {
-    if (created) await administrator.query(`drop database if exists "${targetDatabase}" with (force)`);
+    if (created) await administrator.query(`drop schema if exists "${targetSchema}" cascade`);
     await administrator.end().catch(() => undefined);
     await unlink(dumpPath).catch(() => undefined);
   }

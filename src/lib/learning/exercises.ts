@@ -7,6 +7,18 @@ const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const rotate = <T,>(items: T[], offset: number) => items.map((_, index) => items[(index + offset) % items.length]);
 const sharedTopic = (a: VocabularyItem, b: VocabularyItem) => (a.topics ?? []).some((topic) => b.topics?.includes(topic));
+const normalizedClue = (value?: string) => value?.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim() ?? "";
+const definitionTokens = (value: string) => new Set(normalizedClue(value).split(" ").filter((token) => token.length > 2 && !["the", "and", "for", "with", "that", "this", "from", "into", "someone", "something"].includes(token)));
+const definitionOverlap = (first: string, second: string) => {
+  const a = definitionTokens(first); const b = definitionTokens(second);
+  if (!a.size || !b.size) return 0;
+  return [...a].filter((token) => b.has(token)).length / Math.min(a.size, b.size);
+};
+const confusableMeaning = (item: VocabularyItem, candidate: VocabularyItem) => {
+  const itemMeaning = item.meanings[0]; const candidateMeaning = candidate.meanings[0];
+  return Boolean(itemMeaning.vietnamese && normalizedClue(itemMeaning.vietnamese) === normalizedClue(candidateMeaning.vietnamese))
+    || definitionOverlap(itemMeaning.definition, candidateMeaning.definition) >= 0.5;
+};
 const contextClue = (item: VocabularyItem) => {
   const stem = item.word.replace(/e$/i, "").slice(0, Math.max(4, item.word.length - 1)).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return item.examples[0].replace(new RegExp(`\\b${stem}[a-z'-]*`, "i"), "___");
@@ -39,7 +51,8 @@ export function generateVocabularyExercise(item: VocabularyItem, source: PlanCat
   const base = { itemId: item.id, knowledgeType: "vocabulary" as const, source };
 
   if (preferred === "recall") {
-    const options = choices(item.word, distractors.map((candidate) => candidate.word), `${item.id}-recall`);
+    const recallDistractors = selectVocabularyDistractors(item, vocabulary.filter((candidate) => !confusableMeaning(item, candidate)), relatedWords);
+    const options = choices(item.word, recallDistractors.map((candidate) => candidate.word), `${item.id}-recall`);
     if (options) return { ...base, id: `${source}-${item.id}-recall`, type: "recall", targetDimension: "recall", difficulty: 2, prompt: `Which English word means “${showVietnamese && item.meanings[0].vietnamese ? item.meanings[0].vietnamese : item.meanings[0].definition}”?`, options, answer: item.word, explanation: `${item.word}: ${item.meanings[0].definition}` };
   }
 
@@ -54,9 +67,9 @@ export function generateVocabularyExercise(item: VocabularyItem, source: PlanCat
     if (options) return { ...base, id: `${source}-${item.id}-context`, type: "context", targetDimension: "context", difficulty: 3, prompt: `Which vocabulary item is demonstrated by this context? “${contextClue(item)}”`, options, answer: item.word, explanation: `${item.word} means ${item.meanings[0].definition}. Full example: ${item.examples[0]}` };
   }
 
-  const meaningDistractors = selectVocabularyDistractors(item, vocabulary, relatedWords).map((candidate) => candidate.meanings[0].definition);
+  const meaningDistractors = selectVocabularyDistractors(item, vocabulary.filter((candidate) => !confusableMeaning(item, candidate)), relatedWords).map((candidate) => candidate.meanings[0].definition);
   const options = choices(item.meanings[0].definition, meaningDistractors, `${item.id}-recognition`);
-  if (options) return { ...base, id: `${source}-${item.id}-recognition`, type: "recognition", targetDimension: "recognition", difficulty: 1, prompt: `What does “${item.word}” mean?`, options, answer: item.meanings[0].definition, explanation: item.examples[0] };
+  if (options) return { ...base, id: `${source}-${item.id}-recognition`, type: "recognition", targetDimension: "recognition", difficulty: 1, prompt: `What does the ${item.partOfSpeech} “${item.word}” mean?`, options, answer: item.meanings[0].definition, explanation: item.examples[0] };
 
   const fallback = curatedExercises.find((exercise) => exercise.knowledgeType === "vocabulary")!;
   return { ...fallback, id: `${source}-${item.id}-fallback`, itemId: item.id, source, targetDimension: preferred };

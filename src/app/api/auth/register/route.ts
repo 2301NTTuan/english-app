@@ -12,7 +12,7 @@ import { sendVerificationEmail } from "@/lib/email/delivery";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "register"), 5);
+  const limit = await consumeRateLimit(rateLimitKey(request, "register"), 5);
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const parsed = registrationSchema.safeParse(await readJson(request, 16_384));

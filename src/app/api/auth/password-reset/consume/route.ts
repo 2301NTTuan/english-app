@@ -10,7 +10,7 @@ const resetSchema = z.object({ token: z.string().min(32).max(256), password: pas
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "password-reset-consume"), 8);
+  const limit = await consumeRateLimit(rateLimitKey(request, "password-reset-consume"), 8);
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const parsed = resetSchema.safeParse(await readJson(request, 8_192));

@@ -11,7 +11,7 @@ const genericMessage = "If an account matches that email, password-reset instruc
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "password-reset-request"), 5);
+  const limit = await consumeRateLimit(rateLimitKey(request, "password-reset-request"), 5);
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const parsed = requestSchema.safeParse(await readJson(request, 4_096));

@@ -10,7 +10,7 @@ Mutating routes check same-origin requests and require JSON. Security headers di
 
 ## Threats and remaining controls
 
-- Credential stuffing: partial mitigation through bcrypt and rate limiting; add shared limiting, breached-password checks, email alerts, and optional MFA.
+- Credential stuffing: mitigated through bcrypt and atomic PostgreSQL-backed production throttling; add breached-password checks, email alerts, and optional MFA for higher-assurance deployments.
 - Session theft: cookie controls and stored hashes reduce impact; add session rotation, device/session management, and anomaly detection.
 - CSRF: same-origin checks and SameSite cookies; add explicit tokens if cross-origin clients or form endpoints are introduced.
 - XSS: React escaping and CSP baseline; remove `unsafe-inline` through CSP nonces before a high-assurance launch.
@@ -18,4 +18,4 @@ Mutating routes check same-origin requests and require JSON. Security headers di
 - Cross-account access: session-derived predicates plus integration and API-level browser coverage; user-supplied account IDs are ignored.
 - Dependency risk: lockfile and CI audit; triage advisories and configure automated dependency updates.
 
-The authentication limiter is in process only. A horizontally scaled deployment requires a shared atomic store and trusted-proxy configuration. Structured logs preserve request IDs and event names while filtering passwords, tokens, secrets, email/name fields, and answers. Password recovery and email verification require provider credentials, a verified sender/domain, delivery monitoring, and an operator support workflow before launch.
+The authentication limiter uses PostgreSQL atomically across horizontally scaled application instances; the memory backend is refused in production. Deployments must set `TRUST_PROXY=true` only when direct traffic is blocked and the trusted edge overwrites client-IP headers. Structured logs preserve request IDs and event names while filtering passwords, tokens, secrets, email/name fields, and answers. Password recovery and email verification require provider credentials, a verified sender/domain, delivery monitoring, and an operator support workflow before launch.

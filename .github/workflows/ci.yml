@@ -30,6 +30,7 @@ jobs:
       - run: npm run db:migrate
       - run: npm run db:seed
       - run: npm run validate:content
+      - run: npm run content:stats
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test

@@ -8,7 +8,7 @@ const schema = z.object({ token: z.string().min(32).max(256) });
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "email-verification-consume"), 8);
+  const limit = await consumeRateLimit(rateLimitKey(request, "email-verification-consume"), 8);
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const parsed = schema.safeParse(await readJson(request, 2_048));

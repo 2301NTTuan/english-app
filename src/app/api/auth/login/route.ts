@@ -13,7 +13,7 @@ const DUMMY_PASSWORD_HASH = "$2b$12$hHySbpbRtR9436UGn2PhyuDEV1kac/gRti0IdDqLnpPP
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "login"));
+  const limit = await consumeRateLimit(rateLimitKey(request, "login"));
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const parsed = credentialsSchema.safeParse(await readJson(request, 16_384));

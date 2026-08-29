@@ -38,7 +38,7 @@ function publicQuestion(question: PlacementQuestion) {
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "placement-question"), 120, 30 * 60_000);
+  const limit = await consumeRateLimit(rateLimitKey(request, "placement-question"), 120, 30 * 60_000);
   if (!limit.allowed) return jsonError("Too many placement requests. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const user = await currentUser();

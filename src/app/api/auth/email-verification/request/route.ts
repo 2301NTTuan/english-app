@@ -7,7 +7,7 @@ import { logEvent } from "@/lib/observability/logger";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
-  const limit = consumeRateLimit(rateLimitKey(request, "email-verification-request"), 4);
+  const limit = await consumeRateLimit(rateLimitKey(request, "email-verification-request"), 4);
   if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
   try {
     const user = await currentUser(); if (!user) return jsonError("Authentication required.", 401);

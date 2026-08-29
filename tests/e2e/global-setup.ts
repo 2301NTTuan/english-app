@@ -12,6 +12,7 @@ export default async function globalSetup() {
     if (database.rows[0]?.name !== expected) throw new Error("Connected test database does not match TEST_DATABASE_URL.");
     const content = await client.query<{ count: number }>("select count(*)::int count from vocabulary_content");
     if ((content.rows[0]?.count ?? 0) < 1) throw new Error("The E2E test database must be migrated and seeded before Playwright runs.");
+    await client.query("delete from auth_rate_limits");
   } finally {
     await client.end();
   }

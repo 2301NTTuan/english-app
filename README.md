@@ -33,7 +33,7 @@ npm run build
 npm run test:e2e
 ```
 
-Integration and E2E tests prefer local credentials from the ignored `.env.test.local` file and fall back to `.env.local`. They require a migrated, seeded, disposable database in `TEST_DATABASE_URL`; both suites refuse a database name without `test`. `npm run db:test:reset` deletes both application and Drizzle journal schemas and has the same safety refusal. Build before E2E and install Chromium once with `npx playwright install --with-deps chromium`. The application uses `DATABASE_URL` for migrations, seeding, and runtime access.
+Integration and E2E tests prefer local credentials from the ignored `.env.test.local` file and fall back to `.env.local`. They require a migrated, seeded, disposable database in `TEST_DATABASE_URL`; both suites refuse a database name without `test`. Use `npm run db:test:migrate` and `npm run db:test:seed` to target that URL explicitly. `npm run db:test:reset` deletes both application and Drizzle journal schemas and has the same safety refusal. Build before E2E and install Chromium once with `npx playwright install --with-deps chromium`. The application uses `DATABASE_URL` for production and development migrations, seeding, and runtime access.
 
 ## Architecture
 

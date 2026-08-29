@@ -21,7 +21,7 @@ The production foundation adds PostgreSQL and Drizzle without moving learning ru
 
 The normalized schema is the system of record for core learning events. Session completion atomically inserts one idempotent session and its answers, then upserts vocabulary/grammar mastery, review state, mistakes, preferences, an active learning path, audit evidence, and the hydration snapshot. Placement completion follows the same pattern for attempts and diagnostic answers. Unknown content references abort the whole transaction. Replaying an idempotency key returns success without changing review counts or path versions.
 
-The validated, versioned `AppState` snapshot remains a compatibility projection for fast hydration and explicit browser-data import. General debounced state saves also normalize current progress in one transaction, but simultaneous-device conflict resolution remains last-write-wins outside event idempotency boundaries.
+The validated, versioned `AppState` snapshot remains a compatibility fallback for explicit browser-data import and recovery. Hydration is projected from normalized preferences, progress, review, mistake, session, and placement rows. General debounced state saves can update preferences only; they cannot overwrite learning events. Per-account advisory locks serialize session and placement completion, and stale review versions return an explicit conflict.
 
 ## Technology decisions
 
@@ -31,12 +31,11 @@ Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit to
 
 ## Scaling and performance
 
-The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; it does not import its catalogue into the route bundle. Other study planners still use the 298-record authored fallback corpus, so completing route-specific retrieval before expanding content remains a performance milestone. The in-memory rate limiter is single-process only.
+The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; it does not import its catalogue into the route bundle. Other study planners still use the 298-record authored fallback corpus, so completing route-specific retrieval before expanding content remains a performance milestone. Authentication throttling uses an atomic PostgreSQL table in production and retains an in-memory backend only for local/test use.
 
 ## Known limitations
 
-- Non-event snapshot synchronization still uses last-write-wins across simultaneous devices.
 - Middleware checks cookie presence for navigation protection; every API independently verifies the hashed session in PostgreSQL. A forged cookie may reach the shell but cannot read or write account data.
 - Password-reset and email-verification lifecycles and an environment-configured outbound adapter exist; deployment still requires provider credentials, sender/domain verification, and support procedures. MFA, administrator/content-editor roles, and session management UI remain pending.
-- No telemetry backend, error tracker, queue, object storage, CDN design, or shared rate-limit store.
+- Structured request, slow-request, unhandled-error, database-health, and authentication-abuse logs are available; deployment still needs a telemetry/error backend and alert routing. No queue, object storage, or CDN design is currently required by implemented product flows.
 - Playwright requires the standard Ubuntu Chromium system libraries (`sudo npx playwright install-deps chromium`) in a fresh WSL distribution.

@@ -1,10 +1,42 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { createHash, randomBytes } from "node:crypto";
 import { Client } from "pg";
+import { exercises } from "../../src/data/exercises";
+import { grammarTopics } from "../../src/data/grammar";
+import { vocabulary } from "../../src/data/vocabulary";
+import { generateGrammarExercise, generateVocabularyExercise } from "../../src/lib/learning/exercises";
+import type { SessionExercise } from "../../src/types/domain";
 
 const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const userA = { name: "Production Flow A", email: `flow-a-${nonce}@test.invalid`, password: "ProductionFlow1234" };
 const userB = { name: "Production Flow B", email: `flow-b-${nonce}@test.invalid`, password: "ProductionFlow5678" };
+
+function sessionAnswerMap() {
+  const answers = new Map<string, string>();
+  const key = (prompt: string, options: string[]) => `${prompt}\u0000${[...options].sort().join("\u0000")}`;
+  const add = (exercise: Pick<SessionExercise, "prompt" | "options" | "answer">) => {
+    if (!exercise.options) throw new Error(`Generated session exercise has no options: ${exercise.prompt}`);
+    const exerciseKey = key(exercise.prompt, exercise.options);
+    const existing = answers.get(exerciseKey);
+    if (existing && existing !== exercise.answer) throw new Error(`Ambiguous generated session choices: ${exercise.prompt}`);
+    answers.set(exerciseKey, exercise.answer);
+  };
+  exercises.forEach(add);
+  for (const item of vocabulary) {
+    for (const dimension of ["recognition", "recall", "context", "spelling"] as const) {
+      add(generateVocabularyExercise(item, "newVocabulary", dimension, true));
+      add(generateVocabularyExercise(item, "newVocabulary", dimension, false));
+    }
+  }
+  for (const topic of grammarTopics) {
+    const exercise = generateGrammarExercise(topic.id, "newGrammar");
+    if (exercise) add(exercise);
+  }
+  return answers;
+}
+
+const authoredSessionAnswers = sessionAnswerMap();
 
 async function register(page: Page, user: typeof userA) {
   await page.goto("/register");
@@ -29,12 +61,28 @@ async function assertNoSeriousAccessibilityViolations(page: Page) {
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
 }
 
+async function installOneTimeToken(email: string, table: "email_verification_tokens" | "password_reset_tokens") {
+  const token = randomBytes(32).toString("hex");
+  const database = new Client({ connectionString: process.env.DATABASE_URL }); await database.connect();
+  try {
+    const user = await database.query<{ id: string }>("select id from users where email = $1", [email]);
+    const userId = user.rows[0]?.id; if (!userId) throw new Error("E2E account was not created.");
+    await database.query(`delete from ${table} where user_id = $1`, [userId]);
+    await database.query(`insert into ${table} (token_hash,user_id,expires_at) values ($1,$2,now() + interval '1 hour')`, [createHash("sha256").update(token).digest("hex"), userId]);
+  } finally { await database.end(); }
+  return token;
+}
+
 test.describe.serial("production acceptance", () => {
   test("persists the full placement, learning, mistake, review, and relogin flow", async ({ page }) => {
     const consoleErrors: string[] = []; const failedRequests: string[] = [];
     await register(page, userA);
     page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
     page.on("requestfailed", (request) => failedRequests.push(`${request.failure()?.errorText ?? "failed"} ${request.url()}`));
+    const verificationToken = await installOneTimeToken(userA.email, "email_verification_tokens");
+    await page.goto(`/verify-email?token=${verificationToken}`);
+    await expect(page.getByText("Your email is verified.")).toBeVisible();
+    await page.getByRole("link", { name: "Continue to placement" }).click();
     await assertNoSeriousAccessibilityViolations(page);
 
     const firstQuestionResponse = page.waitForResponse((response) => response.url().includes("/api/placement/question") && response.request().method() === "POST");
@@ -62,7 +110,13 @@ test.describe.serial("production acceptance", () => {
       const options = page.locator(".answer-option:enabled");
       await expect(options.first().or(completionHeading)).toBeVisible();
       if (await completionHeading.isVisible()) break;
-      await options.nth(answered % 4).click();
+      const prompt = await page.locator("#exercise-prompt").innerText();
+      const optionTexts = await options.locator("span.flex-1").allInnerTexts();
+      const authoredAnswer = authoredSessionAnswers.get(`${prompt}\u0000${[...optionTexts].sort().join("\u0000")}`);
+      expect(authoredAnswer, `Missing authored answer for session prompt: ${prompt}`).toBeTruthy();
+      const selectedIndex = answered === 0 ? optionTexts.indexOf(authoredAnswer!) : optionTexts.findIndex((option) => option !== authoredAnswer);
+      expect(selectedIndex).toBeGreaterThanOrEqual(0);
+      await options.nth(selectedIndex).click();
       await page.getByRole("button", { name: /Check answer/ }).click();
       const feedback = page.locator('[aria-labelledby="exercise-prompt"] [aria-live="polite"]');
       await expect(feedback).not.toBeEmpty();
@@ -156,6 +210,23 @@ test.describe.serial("production acceptance", () => {
     expect(failures).toEqual([415, 400, 400, 413]);
     await deleteAccount(pageB, userB.password);
     await contextB.close();
-    await deleteAccount(page, userA.password);
+
+    await page.goto("/forgot-password");
+    await page.getByLabel("Email").fill(userA.email);
+    await page.getByRole("button", { name: "Request reset" }).click();
+    await expect(page.getByRole("status")).toContainText("If an account matches that email");
+    const resetToken = await installOneTimeToken(userA.email, "password_reset_tokens");
+    const newPassword = "ProductionFlow9012";
+    await page.goto(`/reset-password?token=${resetToken}`);
+    await page.getByLabel("New password").fill(newPassword);
+    await page.getByLabel("Confirm password").fill(newPassword);
+    await page.getByRole("button", { name: "Update password" }).click();
+    await expect(page.getByText(/password has been updated/)).toBeVisible();
+    await page.getByRole("link", { name: /Sign in with new password/ }).click();
+    await page.getByLabel("Email").fill(userA.email);
+    await page.getByLabel("Password").fill(newPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await deleteAccount(page, newPassword);
   });
 });

@@ -135,7 +135,9 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
         grammarProgress = updateGrammarProgress(grammarProgress, item, masteryCorrect, effectiveRating, current.settings.desiredRetention);
       }
       const minutes = Math.max(1, Math.round((Date.now() - new Date(startedAt).getTime()) / 60_000));
-      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct, total: session.length, minutes, masteryDelta: correct > mistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
+      const completedCorrect = attemptsRef.current.filter((attempt) => attempt.correct).length;
+      const completedMistakes = attemptsRef.current.length - completedCorrect;
+      const activities = finished ? [{ id: `a-${Date.now()}`, date: new Date().toISOString(), label: "Adaptive daily session", correct: completedCorrect, total: session.length, minutes, masteryDelta: completedCorrect > completedMistakes ? 3 : 1, vocabularyReviewed: session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length, newVocabulary: session.filter((entry) => entry.source === "newVocabulary").length, grammarExercises: session.filter((entry) => entry.knowledgeType === "grammar").length, mistakesCorrected }, ...current.activities].slice(0, 30) : current.activities;
       const mistakeRecords = item.source === "mistakes" && masteryCorrect ? current.mistakes.map((mistake) => mistake.itemId === item.itemId ? { ...mistake, resolved: true } : mistake) : current.mistakes;
       return { ...current, vocabularyProgress, grammarProgress, mistakes: mistakeRecords, activities };
     });

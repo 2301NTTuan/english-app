@@ -14,7 +14,7 @@
 | Review | Again/Hard/Good/Easy | ordered, distinct scheduling behavior | unit tests |
 | Placement | strong/foundation/uneven/random evidence | bounded multidomain estimate and calibrated confidence | simulations and Playwright |
 | Placement delivery | active attempt | one server-selected item; no corpus or answer key | Playwright production flow |
-| Session answer | incorrect | mistake/relearning and mastery update | unit, integration, and Playwright |
+| Session answer | correct and incorrect | unambiguous feedback, mistake/relearning, FSRS and mastery update | unit, integration, and Playwright |
 | Import | malformed or over 1 MB | rejected without state change | schema unit and Playwright |
 | Delete account | password plus `DELETE` | account and owned rows removed | cascade integration and Playwright |
 | Health | database unavailable | HTTP 503 `{status:"degraded"}` only | runtime smoke |
@@ -26,14 +26,14 @@
 Automate these with Playwright against an isolated migrated database before release:
 
 1. Registration validates input, creates exactly one account/default state, and sets an HttpOnly session. Duplicate registration is safe.
-2. Login rejects wrong and unknown credentials generically, throttles attempts, creates a revocable session, and logout invalidates it. Generic rejection and revocation are automated; shared/distributed throttling remains a launch blocker.
+2. Login rejects wrong and unknown credentials generically, throttles attempts through an atomic PostgreSQL backend in production, creates a revocable session, and logout invalidates it. Generic rejection, shared throttling, and revocation are automated.
 3. Anonymous navigation redirects to login; expired, revoked, or forged cookies cannot read `/api/state`.
 4. Two accounts save distinct state. Supplying another user ID has no effect. Deleting one account does not modify the other.
-5. Learning survives refresh and a second browser. Completion retries do not duplicate records once normalized writes are enabled.
+5. Learning survives refresh and another device. Completion retries do not duplicate records, stale review versions return a conflict, and preference sync cannot overwrite normalized progress or events.
 6. Legacy/file imports require confirmation, reject malformed/oversized payloads, and replace only the signed-in account.
 7. Export/import round-trips state. Reset requires confirmation. Deletion requires password and `DELETE`, clears the cookie, and cascades owned rows.
 8. Content seed is idempotent; validation passes; stable IDs and relationships survive a second seed.
 9. Health returns 200/`ok` with PostgreSQL and 503/`degraded` against a deliberately unreachable endpoint, with no topology or stack diagnostics.
 10. Keyboard navigation reaches the skip link, labeled forms, errors, menu, core learning controls, and legal links; layouts remain usable under zoom.
 
-The 28 August 2026 Playwright run covers wrong/unknown credentials, forged/expired/revoked sessions, cross-account scope, hostile origin, wrong media type, malformed JSON, oversized JSON, and account deletion. Duplicate session/placement submissions are covered by PostgreSQL integration idempotency tests. The most recent execution evidence and environment details are in `docs/test-report.md`.
+The 29 August 2026 Playwright run covers registration, email verification, adaptive placement, correct and incorrect learning answers, mistake/FSRS persistence, logout/login persistence, wrong/unknown credentials, forged/expired/revoked sessions, cross-account scope, hostile origin, wrong media type, malformed JSON, oversized JSON, password reset, and account deletion. Duplicate and stale session submissions are covered by PostgreSQL integration tests. The most recent execution evidence and environment details are in `docs/test-report.md`.

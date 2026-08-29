@@ -24,6 +24,14 @@ export const emailVerificationTokens = pgTable("email_verification_tokens", {
   tokenHash: text("token_hash").primaryKey(), userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(), usedAt: timestamp("used_at", { withTimezone: true }), createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [index("email_verification_user_idx").on(table.userId), index("email_verification_expiry_idx").on(table.expiresAt)]);
 
+/** Shared, atomic request throttling state. Keys are one-way hashes, never raw IP addresses. */
+export const authRateLimits = pgTable("auth_rate_limits", {
+  keyHash: text("key_hash").primaryKey(),
+  count: integer("count").default(1).notNull(),
+  resetAt: timestamp("reset_at", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [index("auth_rate_limits_reset_idx").on(table.resetAt), check("auth_rate_limits_count_valid", sql`${table.count} > 0`)]);
+
 export const learningPreferences = pgTable("learning_preferences", {
   userId: uuid("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }), currentLevel: cefrLevel("current_level").default("B1").notNull(), dailyTarget: integer("daily_target").default(25).notNull(), maxNewWordsPerDay: integer("max_new_words_per_day").default(10).notNull(), maxNewGrammarPerDay: integer("max_new_grammar_per_day").default(1).notNull(), desiredRetention: real("desired_retention").default(0.9).notNull(), studyIntensity: text("study_intensity").default("balanced").notNull(), interfaceLanguage: text("interface_language").default("en").notNull(), showVietnamese: boolean("show_vietnamese").default(true).notNull(), onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }), ...timestamps,
 }, (table) => [check("preferences_targets_valid", sql`${table.dailyTarget} between 10 and 60 and ${table.maxNewWordsPerDay} between 0 and 20 and ${table.maxNewGrammarPerDay} between 0 and 3`), check("preferences_retention_valid", sql`${table.desiredRetention} between 0.8 and 0.97`), check("preferences_language_valid", sql`${table.interfaceLanguage} in ('en', 'vi')`)]);

@@ -13,13 +13,13 @@ npm run db:seed
 
 `db:seed` is deterministic and idempotent for stable content IDs. It records a SHA-256 checksum and content version, upserts content, and rebuilds owned child records in one transaction. Set `CONTENT_VERSION` for a release label.
 
-For disposable test databases only, `npm run db:test:reset` drops both `public` and Drizzle's migration-journal schema. It refuses production mode, missing `TEST_DATABASE_URL`, a database name without `test`, or a connection whose actual database does not match the URL. Never adapt this command for production.
+For disposable test databases only, `npm run db:test:migrate` applies migrations and `npm run db:test:seed` loads content into `TEST_DATABASE_URL` explicitly; `npm run db:test:reset` drops both `public` and Drizzle's migration-journal schema. All refuse production mode, a missing test URL, or a database name without `test`; reset additionally verifies the connected database name. Never adapt these commands for production.
 
 Production migrations must run once as a deployment step before application rollout. Back up first, review generated SQL, test forward migration and restore in staging, and never run seed scripts against production without an approved content release.
 
 ## Integrity and concurrency
 
-Foreign keys isolate dependent lifecycle behavior. Unique account emails, stable content IDs, per-user review/content records, mistake business keys, placement/session idempotency keys, and path item identity prevent common duplicates. Study and placement completion are server transactions. Review state includes a version and duplicate event submissions do not update it; non-event snapshot sync remains last-write-wins across simultaneous devices.
+Foreign keys isolate dependent lifecycle behavior. Unique account emails, stable content IDs, per-user review/content records, mistake business keys, placement/session idempotency keys, and path item identity prevent common duplicates. Study and placement completion are server transactions protected by per-account advisory locks. Normalized event rows are authoritative, stale review versions return a conflict instead of overwriting another device, and generic state sync can update preferences only. Snapshot documents remain a compatibility projection for legacy import and recovery, not an event write path.
 
 ## Backup and recovery runbook
 

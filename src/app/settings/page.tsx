@@ -6,7 +6,7 @@ import { Check, CloudUpload, Download, RotateCcw, Trash2, Upload } from "lucide-
 import { useAppState } from "@/components/app-provider";
 import { PageHeader } from "@/components/ui";
 import type { CEFRLevel, UserSettings } from "@/types/domain";
-import { createEmptyAccountState, hasLocalLearningState, localAppRepository, normalizeState } from "@/lib/storage/app-repository";
+import { hasLocalLearningState, localAppRepository, normalizeState } from "@/lib/storage/app-repository";
 import { appStateSchema, backupFileSchema, MAX_STATE_BYTES } from "@/lib/validation/app-state";
 import { importRemoteState } from "@/lib/storage/remote-app-repository";
 
@@ -23,7 +23,15 @@ export default function SettingsPage() {
 
   const showNotice = (next: Notice) => { setNotice(next); window.setTimeout(() => setNotice(null), 2400); };
   const save = () => { setState((current) => ({ ...current, settings })); setDraft(null); showNotice({ kind: "success", message: "Learning preferences saved." }); };
-  const reset = () => { if (!window.confirm("Delete your learning history and keep only default preferences?")) return; const initial = createEmptyAccountState(); setState(initial); setDraft(null); showNotice({ kind: "success", message: "Learning data reset." }); };
+  const reset = async () => {
+    if (!window.confirm("Delete your learning history and keep only default preferences?")) return;
+    try {
+      const response = await fetch("/api/state/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirmation: "RESET" }) });
+      if (!response.ok) throw new Error();
+      const payload = await response.json() as { state: unknown }; const parsed = appStateSchema.safeParse(payload.state); if (!parsed.success) throw new Error();
+      setState(parsed.data); setDraft(null); showNotice({ kind: "success", message: "Learning data reset." });
+    } catch { showNotice({ kind: "error", message: "Learning data could not be reset." }); }
+  };
   const exportData = () => {
     const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), state }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `english-mastery-${new Date().toISOString().slice(0, 10)}.json`; anchor.click(); URL.revokeObjectURL(url);
@@ -70,7 +78,7 @@ export default function SettingsPage() {
           <label className="flex items-center justify-between gap-4 rounded-xl border border-[#dce6e1] p-4"><span><b className="block text-sm">Show Vietnamese support</b><span className="muted text-xs">Meanings remain English-first.</span></span><input type="checkbox" checked={settings.showVietnamese} onChange={(event) => setDraft({ ...settings, showVietnamese: event.target.checked })} className="size-5 accent-[#17795b]"/></label>
           <label className="block"><div className="mb-2 text-sm font-bold">Interface language</div><select value={settings.interfaceLanguage} onChange={(event) => setDraft({ ...settings, interfaceLanguage: event.target.value as "en" | "vi" })} className="h-12 w-full rounded-xl border border-[#dce6e1] bg-white px-3"><option value="en">English</option><option value="vi">Vietnamese</option></select></label>
         </div>
-        <div className="mt-8 flex flex-wrap gap-2"><button onClick={save} className="btn-primary"><Check size={17}/>Save preferences</button><button onClick={reset} className="btn-secondary gap-2"><RotateCcw size={15}/>Reset learning data</button></div>
+        <div className="mt-8 flex flex-wrap gap-2"><button onClick={save} className="btn-primary"><Check size={17}/>Save preferences</button><button onClick={() => void reset()} className="btn-secondary gap-2"><RotateCcw size={15}/>Reset learning data</button></div>
       </section>
       <div className="space-y-5">
         <aside className="card p-5"><div className="eyebrow">How adaptation works</div><h2 className="mt-2 text-lg font-extrabold">Reviews protect memory</h2><ol className="muted mt-4 space-y-3 text-sm"><li><b className="text-[#15241f]">1.</b> Overdue and due reviews always stay in the plan.</li><li><b className="text-[#15241f]">2.</b> Weak dimensions and recurring mistakes come next.</li><li><b className="text-[#15241f]">3.</b> New words use remaining target capacity.</li><li><b className="text-[#15241f]">4.</b> A full backlog reduces new words to zero.</li></ol></aside>

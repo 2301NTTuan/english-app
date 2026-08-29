@@ -1,3 +1,6 @@
 import { defineConfig } from "drizzle-kit";
+import { loadEnvConfig } from "@next/env";
+
+loadEnvConfig(process.cwd(), true);
 
 export default defineConfig({ schema: "./src/db/schema.ts", out: "./drizzle", dialect: "postgresql", dbCredentials: { url: process.env.DATABASE_URL ?? "postgresql://english:english@localhost:5432/english_mastery" }, strict: true, verbose: true });

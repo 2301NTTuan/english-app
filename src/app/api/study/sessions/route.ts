@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth/server";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
-import { completeStudySession } from "@/lib/learning/persistence";
+import { completeStudySession, LearningWriteConflictError } from "@/lib/learning/persistence";
 import { studySessionWriteSchema } from "@/lib/validation/learning-write";
 import { logEvent } from "@/lib/observability/logger";
 
@@ -17,6 +17,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const bodyError = bodyErrorResponse(error);
     if (bodyError) return bodyError;
+    if (error instanceof LearningWriteConflictError) return jsonError("Learning progress changed on another device. Reload before retrying this session.", 409);
     logEvent("error", "learning.study_session_transaction_failed", { requestId: request.headers.get("x-request-id") });
     return jsonError("Study session could not be saved.", 503);
   }

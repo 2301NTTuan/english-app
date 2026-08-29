@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
@@ -23,15 +23,21 @@ suite("PostgreSQL migration and ownership", () => {
   let issueEmailVerification: typeof import("@/lib/auth/recovery")["issueEmailVerification"];
   let consumeEmailVerification: typeof import("@/lib/auth/recovery")["consumeEmailVerification"];
   let queryVocabularyPage: typeof import("@/lib/content/database")["queryVocabularyPage"];
+  let loadLearningState: typeof import("@/lib/learning/state-projection")["loadLearningState"];
+  let saveLearningPreferences: typeof import("@/lib/learning/persistence")["saveLearningPreferences"];
+  let resetLearningData: typeof import("@/lib/learning/persistence")["resetLearningData"];
+  let consumeRateLimit: typeof import("@/lib/auth/rate-limit")["consumeRateLimit"];
 
   beforeAll(async () => {
     const databaseName = new URL(databaseUrl!).pathname.slice(1);
     if (!databaseName.includes("test")) throw new Error(`Refusing to run integration tests against non-test database: ${databaseName}`);
     process.env.DATABASE_URL = databaseUrl;
     await client.connect();
-    ({ completeStudySession, completePlacement, importLegacyLearningState } = await import("@/lib/learning/persistence"));
+    ({ completeStudySession, completePlacement, importLegacyLearningState, saveLearningPreferences, resetLearningData } = await import("@/lib/learning/persistence"));
+    ({ loadLearningState } = await import("@/lib/learning/state-projection"));
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
     ({ queryVocabularyPage } = await import("@/lib/content/database"));
+    ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
   });
   afterAll(async () => {
     if (userIds.length) await client.query("delete from users where id = any($1::uuid[])", [userIds]);
@@ -62,8 +68,24 @@ suite("PostgreSQL migration and ownership", () => {
   };
 
   it("has the expected migrated tables", async () => {
-    const result = await client.query("select to_regclass('public.users') users, to_regclass('public.user_state_snapshots') snapshots, to_regclass('public.email_verification_tokens') verification_tokens");
-    expect(result.rows[0]).toEqual({ users: "users", snapshots: "user_state_snapshots", verification_tokens: "email_verification_tokens" });
+    const result = await client.query("select to_regclass('users') users, to_regclass('user_state_snapshots') snapshots, to_regclass('email_verification_tokens') verification_tokens, to_regclass('auth_rate_limits') rate_limits");
+    expect(result.rows[0]).toEqual({ users: "users", snapshots: "user_state_snapshots", verification_tokens: "email_verification_tokens", rate_limits: "auth_rate_limits" });
+  });
+
+  it("enforces one atomic rate limit across concurrent workers", async () => {
+    const originalBackend = process.env.RATE_LIMIT_BACKEND;
+    const key = `integration:${randomUUID()}`;
+    try {
+      process.env.RATE_LIMIT_BACKEND = "postgres";
+      const results = await Promise.all(Array.from({ length: 8 }, () => consumeRateLimit(key, 3, 60_000)));
+      expect(results.filter((result) => result.allowed)).toHaveLength(3);
+      expect(results.filter((result) => !result.allowed)).toHaveLength(5);
+      const stored = await client.query("select count from auth_rate_limits where key_hash = $1", [createHash("sha256").update(key).digest("hex")]);
+      expect(stored.rows[0]?.count).toBe(8);
+    } finally {
+      if (originalBackend === undefined) delete process.env.RATE_LIMIT_BACKEND; else process.env.RATE_LIMIT_BACKEND = originalBackend;
+      await client.query("delete from auth_rate_limits where key_hash = $1", [createHash("sha256").update(key).digest("hex")]);
+    }
   });
   it("keeps account data isolated and cascades dependent data", async () => {
     await client.query("begin");
@@ -106,7 +128,25 @@ suite("PostgreSQL migration and ownership", () => {
       (select review_count from review_states where user_id = $1 and knowledge_type = 'vocabulary') review_count,
       (select count(*)::int from mistakes where user_id = $1) mistakes,
       (select count(*)::int from learning_paths where user_id = $1 and active) active_paths`, [userId]);
-    expect(counts.rows[0]).toEqual({ sessions: 1, items: 1, vocabulary_progress: 1, grammar_progress: 1, reviews: 2, review_count: 2, mistakes: 1, active_paths: 1 });
+    expect(counts.rows[0]).toEqual({ sessions: 1, items: 1, vocabulary_progress: 1, grammar_progress: 0, reviews: 1, review_count: 2, mistakes: 1, active_paths: 1 });
+  });
+
+  it("keeps normalized learning events authoritative across stale-device saves and conflicts", async () => {
+    const userId = await createUser(); const state = learningState(); const startedAt = new Date(Date.now() - 60_000).toISOString();
+    const item = { knowledgeType: "vocabulary" as const, knowledgeContentId: state.vocabularyProgress[0].itemId, exerciseType: "recall", answer: "answer", correct: true, rating: "good" as const, position: 0 };
+    await completeStudySession(userId, { idempotencyKey: randomUUID(), startedAt, completedAt: new Date().toISOString(), state, items: [item] });
+    const stale = createEmptyAccountState(); stale.settings.dailyTarget = 40;
+    await saveLearningPreferences(userId, stale);
+    const projected = await loadLearningState(userId);
+    expect(projected.settings.dailyTarget).toBe(40);
+    expect(projected.vocabularyProgress).toHaveLength(1);
+    expect(projected.vocabularyProgress[0].review.reviewCount).toBe(2);
+    expect(projected.mistakes).toHaveLength(1);
+    await expect(completeStudySession(userId, { idempotencyKey: randomUUID(), startedAt, completedAt: new Date().toISOString(), state, items: [item] })).rejects.toThrow("another device");
+    const counts = await client.query("select (select count(*)::int from study_sessions where user_id=$1) sessions, (select review_count from review_states where user_id=$1) review_count", [userId]);
+    expect(counts.rows[0]).toEqual({ sessions: 1, review_count: 2 });
+    const reset = await resetLearningData(userId); expect(reset.vocabularyProgress).toEqual([]);
+    const afterReset = await loadLearningState(userId); expect(afterReset).toMatchObject({ vocabularyProgress: [], grammarProgress: [], mistakes: [], activities: [] });
   });
 
   it("rolls back the session when normalized content validation fails", async () => {
