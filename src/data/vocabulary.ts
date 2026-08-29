@@ -1,6 +1,7 @@
 import type { VocabularyItem } from "@/types/domain";
 import { extendedVocabulary } from "@/data/vocabulary/extended";
 import { foundationVocabulary001 } from "@/data/vocabulary/foundations-001";
+import { enrichedVocabulary001 } from "@/data/vocabulary/enriched-001";
 
 type Seed = [string, string, VocabularyItem["cefrLevel"], string, string, string, string[], string[]];
 const seeds: Seed[] = [
@@ -185,5 +186,5 @@ const coreVocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLev
 }));
 
 /** Stable, modular content catalogue. Add future CEFR batches under src/data/vocabulary/. */
-export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001];
+export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001, ...enrichedVocabulary001];
 export const publishedVocabulary = vocabulary.filter((item) => item.status === "published");

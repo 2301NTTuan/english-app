@@ -12,6 +12,7 @@ export interface LexicalRelation { word: string; strength: number; register?: st
 export interface VocabularyItem {
   id: string; word: string; lemma?: string; cefrLevel: CEFRLevel; partOfSpeech: string; ipa?: string;
   status: ContentStatus; provenanceId: string; cefrBasis: CefrBasis; frequencyBasis: FrequencyBasis;
+  cefrSourceId?: string; frequencySourceId?: string; provenanceIds?: string[];
   frequencyRank?: number; frequencyBand?: FrequencyBand;
   meanings: { definition: string; vietnamese?: string; usageNotes?: string }[]; examples: string[];
   synonyms: LexicalRelation[]; antonyms: LexicalRelation[];

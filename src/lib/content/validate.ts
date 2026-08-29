@@ -2,7 +2,7 @@ import type { ContentProvenanceBatch } from "@/data/content-provenance";
 import type { Exercise, ExpressionItem, GrammarTopic, PlacementQuestion, ReadingPassage, VocabularyItem } from "@/types/domain";
 
 const levels = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
-const partsOfSpeech = new Set(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "determiner", "interjection", "modal", "auxiliary", "phrase"]);
+const partsOfSpeech = new Set(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "determiner", "interjection", "modal", "auxiliary", "numeral", "particle", "phrase"]);
 const contentStatuses = new Set(["draft", "validated", "reviewed", "published", "retired"]);
 const normalized = (value: string) => value.trim().toLocaleLowerCase();
 const duplicates = (values: string[]) => values.filter((value, index) => values.indexOf(value) !== index);

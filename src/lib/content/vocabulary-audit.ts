@@ -93,7 +93,7 @@ export function auditVocabulary(items: VocabularyItem[]) {
     genericTopics: items.filter((item) => item.topics?.includes("general")).map((item) => item.id),
     posDefinitionMismatches: items.filter((item) => (item.partOfSpeech === "verb") !== normalize(item.meanings[0]?.definition ?? "").startsWith("to ")).map((item) => item.id),
     exampleTargetMissing: items.filter((item) => !exampleContainsTarget(item)).map((item) => item.id),
-    cefrFrequencyMismatches: items.filter((item) => (item.cefrLevel === "A1" && item.frequencyBand !== "very-common") || (["C1", "C2"].includes(item.cefrLevel) && item.frequencyBand !== "advanced")).map((item) => item.id),
+    cefrFrequencyMismatches: items.filter((item) => item.frequencyBasis === "editorial-band" && ((item.cefrLevel === "A1" && item.frequencyBand !== "very-common") || (["C1", "C2"].includes(item.cefrLevel) && item.frequencyBand !== "advanced"))).map((item) => item.id),
     samples,
     samplingGate: levels.every((level) => items.filter((item) => item.cefrLevel === level).length >= 100),
   };
