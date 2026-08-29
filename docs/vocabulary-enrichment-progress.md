@@ -12,36 +12,36 @@ A1: 750
 A2: 950
 B1: 1200
 B2: 1525
-C1: 10
+C1: 660
 C2: 2
-Total: 4437
+Total: 5087
 
 CURRENT CEFR:
-B2
+C1
 
 CURRENT BATCH:
-008
+009
 
 LAST COMPLETED MASTER ENTRY:
-master-yield-verb / inventory position 4426
+master-provisions-noun / inventory position 5082
 
 NEXT MASTER ENTRY:
-master-aboard-preposition / inventory position 4427
+master-provocative-adjective / inventory position 5083
 
 CURRENT BATCH RANGE:
-master-submit-verb / 4227 through master-yield-verb / 4426
+master-aboard-preposition / 4427 through master-provisions-noun / 5082
 
 CURRENT BATCH COMPLETED:
-198/198
+650/650
 
 UNRESOLVED ENTRIES:
 None
 
 LAST CONTENT VALIDATION:
-PASS at batch 008 — validate:content 9/9; content:stats total 4437 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
+PASS at batch 009 — validate:content 9/9; content:stats total 5087 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
 
 LAST CHECKPOINT COMMIT:
-Enrich vocabulary batch 008 (B2 completion)
+Enrich vocabulary batch 009 (C1)
 
 RESUME INSTRUCTION:
 Continue vocabulary enrichment from NEXT MASTER ENTRY.
