@@ -1868,6 +1868,250 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     topic: "time",
   },
   "master-zone-noun": { vietnamese: "khu vực, vùng" },
+  "v63": { example: "Regular sleep contributes to stronger memory." },
+  "v67": { topic: "change" },
+  "master-able-adjective": {
+    definition: "having the skill or means needed to do something",
+    vietnamese: "có khả năng, có năng lực",
+    example: "She is able to swim across the pool.",
+  },
+  "master-absence-noun": {
+    definition: "the state of not being present or available",
+    example: "His absence from class was unusual.",
+  },
+  "master-access-noun": {
+    definition: "the right or opportunity to enter or use something",
+    vietnamese: "quyền truy cập, lối vào",
+    example: "Students have free access to the library computers.",
+    topic: "technology",
+  },
+  "master-accompany-verb": { topic: "movement" },
+  "master-account-verb": {
+    vietnamese: "chiếm",
+    topic: "quantity",
+  },
+  "master-accountant-noun": {
+    definition: "a person whose job is to prepare and examine financial records",
+    example: "The accountant prepared the company's annual accounts.",
+    topic: "work",
+  },
+  "master-accuracy-noun": {
+    definition: "the quality of being correct and exact",
+  },
+  "master-accuse-verb": {
+    definition: "to say that someone has done something wrong or illegal",
+    example: "The police accused him of stealing the car.",
+  },
+  "master-achievement-noun": {
+    definition: "something important that is completed successfully through effort",
+    topic: "success",
+  },
+  "master-active-adjective": {
+    definition: "involved in activity or doing things regularly",
+    example: "She stays active by walking every morning.",
+    topic: "health",
+  },
+  "master-address-verb": {
+    definition: "to speak to someone using a particular name or title",
+    vietnamese: "xưng hô, gọi",
+    example: "Please address the judge as 'Your Honor.'",
+    topic: "communication",
+  },
+  "master-administration-noun": {
+    definition: "the work of managing an organization, business, or government",
+    topic: "work",
+  },
+  "master-adopt-verb": {
+    definition: "to choose and begin to use a method, idea, or plan",
+    vietnamese: "áp dụng, tiếp nhận",
+    topic: "decision-making",
+  },
+  "master-advance-verb": {
+    definition: "to move forward or make progress",
+    vietnamese: "tiến lên, thúc đẩy",
+    example: "The team advanced to the next stage of the project.",
+  },
+  "master-advertise-verb": {
+    vietnamese: "quảng cáo",
+  },
+  "master-afford-verb": { topic: "money" },
+  "master-afterward-adverb": { topic: "time" },
+  "master-agenda-noun": {
+    definition: "a list of subjects to discuss or tasks to complete",
+    vietnamese: "chương trình nghị sự, danh sách công việc",
+    example: "Budget planning is the first item on today's agenda.",
+  },
+  "master-agreement-noun": {
+    definition: "an arrangement or decision accepted by two or more people",
+    vietnamese: "sự đồng ý, thỏa thuận",
+    example: "The two companies reached an agreement on the price.",
+  },
+  "master-agriculture-noun": {
+    definition: "the work and science of growing crops and raising animals",
+    topic: "nature",
+  },
+  "master-aid-noun": {
+    definition: "help or supplies given to people in need",
+    example: "Emergency aid reached the village after the flood.",
+    topic: "society",
+  },
+  "master-aid-verb": {
+    definition: "to help someone or something succeed or improve",
+    example: "A local guide aided the rescue team.",
+  },
+  "master-alike-adjective": {
+    definition: "similar to each other in appearance or character",
+  },
+  "master-alike-adverb": {
+    definition: "in the same or a similar way",
+    topic: "comparison",
+  },
+  "master-alternative-noun": {
+    definition: "one of two or more choices or possibilities",
+    vietnamese: "lựa chọn thay thế",
+    topic: "decision-making",
+  },
+  "master-ambitious-adjective": {
+    definition: "determined to be successful or achieve difficult goals",
+    vietnamese: "có tham vọng, có hoài bão",
+    example: "She is ambitious and hopes to lead the department.",
+    topic: "success",
+  },
+  "master-amount-noun": {
+    vietnamese: "số lượng",
+    topic: "quantity",
+  },
+  "master-analysis-noun": {
+    definition: "a careful study of something to understand its parts or causes",
+    example: "The report includes an analysis of customer feedback.",
+  },
+  "master-anger-noun": {
+    definition: "a strong feeling of displeasure about someone or something",
+    example: "He struggled to control his anger during the argument.",
+  },
+  "master-annual-adjective": {
+    definition: "happening once every year",
+    vietnamese: "hằng năm, thường niên",
+    example: "The company published its annual report in June.",
+    topic: "time",
+  },
+  "master-annually-adverb": { topic: "time" },
+  "master-appetite-noun": {
+    definition: "a natural desire for food",
+    example: "My blocked nose is making me lose my appetite.",
+    topic: "health",
+  },
+  "master-appoint-verb": {
+    definition: "to officially choose someone for a job or position",
+    vietnamese: "bổ nhiệm",
+    topic: "work",
+  },
+  "master-appreciation-noun": {
+    definition: "the ability to recognize and understand the value of something",
+    vietnamese: "sự trân trọng, sự đánh giá cao",
+    example: "The course gave her a greater appreciation of local art.",
+    topic: "emotions",
+  },
+  "master-approve-verb": {
+    definition: "to officially accept or agree to something",
+    topic: "decision-making",
+  },
+  "master-approximately-adverb": {
+    definition: "close to a particular number or amount, but not exact",
+    topic: "quantity",
+  },
+  "master-arise-verb": { topic: "events" },
+  "master-arm-verb": { topic: "safety" },
+  "master-army-noun": { example: "The army protected the country's northern border." },
+  "master-arrange-verb": {
+    definition: "to organize or put things in a particular order",
+  },
+  "master-arrangement-noun": {
+    definition: "a plan or preparation made for a particular purpose",
+    vietnamese: "sự sắp xếp, kế hoạch",
+    example: "We made travel arrangements before booking the hotel.",
+    topic: "planning",
+  },
+  "master-arrest-noun": {
+    definition: "the act of taking someone into police custody",
+    topic: "safety",
+  },
+  "master-arrest-verb": { topic: "safety" },
+  "master-arrival-noun": {
+    vietnamese: "sự đến nơi",
+    topic: "travel",
+  },
+  "master-arrow-noun": {
+    definition: "a thin weapon with a pointed end that is shot from a bow",
+    vietnamese: "mũi tên",
+    example: "Her arrow landed near the center of the target.",
+    topic: "sports",
+  },
+  "master-artist-noun": {
+    definition: "a person who creates paintings, drawings, music, or other art",
+    vietnamese: "nghệ sĩ, họa sĩ",
+    topic: "arts",
+  },
+  "master-artistic-adjective": {
+    definition: "showing skill or imagination in creating art",
+    vietnamese: "có tính nghệ thuật",
+    example: "Her artistic talent was clear in every painting.",
+    topic: "arts",
+  },
+  "master-aside-adverb": {
+    example: "She stepped aside to let us pass.",
+    topic: "movement",
+  },
+  "master-aspect-noun": {
+    definition: "one part or feature of a situation, idea, or problem",
+    vietnamese: "khía cạnh",
+  },
+  "master-assignment-noun": {
+    vietnamese: "bài tập, nhiệm vụ được giao",
+    topic: "education",
+  },
+  "master-assistance-noun": { topic: "society" },
+  "master-associate-verb": {
+    definition: "to connect someone or something with another person or thing in your mind",
+  },
+  "master-athletic-adjective": {
+    definition: "relating to sports or physically strong and active",
+    vietnamese: "thuộc thể thao, khỏe mạnh",
+    example: "She joined the university's athletic program.",
+    topic: "sports",
+  },
+  "master-attach-verb": {
+    definition: "to fasten or join one thing to another",
+    example: "Attach the label firmly to the container.",
+  },
+  "master-attain-verb": {
+    definition: "to succeed in reaching a particular level, state, or goal",
+    example: "She attained the highest level in the course.",
+    topic: "success",
+  },
+  "master-attempt-verb": { topic: "actions" },
+  "master-attract-verb": {
+    definition: "to cause someone or something to come closer or pay attention",
+    vietnamese: "thu hút, hấp dẫn",
+  },
+  "master-authority-noun": { topic: "society" },
+  "master-award-verb": {
+    definition: "to officially give someone a prize, payment, or honor",
+    example: "The judges awarded her first prize.",
+    topic: "success",
+  },
+  "master-aware-adjective": { topic: "thinking" },
+  "master-awkward-adjective": {
+    definition: "causing difficulty, discomfort, or embarrassment",
+    vietnamese: "bất tiện, khó xử",
+  },
+  "master-back-verb": {
+    definition: "to support a person, plan, or idea",
+    vietnamese: "ủng hộ, hậu thuẫn",
+  },
+  "master-bang-noun": { topic: "sounds" },
+  "master-bang-verb": { example: "He banged his fist on the table." },
+  "master-bar-verb": { topic: "society" },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {

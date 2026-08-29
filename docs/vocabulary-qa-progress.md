@@ -8,30 +8,30 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 1-1200
+B1 / level entries 151-1200
 
 LAST CHECKED ENTRY:
-master-zone-noun / A2 position 950
+master-bar-verb / B1 position 150
 
 NEXT ENTRY:
-v2 / B1 position 1
+master-barrel-noun / B1 position 151
 
 CHECKED:
-1700/6000
+1850/6000
 
 ISSUES FOUND:
-critical: 144
-major: 561
-minor: 94
+critical: 150
+major: 613
+minor: 103
 
 ISSUES FIXED:
-799
+866
 
 LAST VALIDATION:
-A2 950/950: 0 structural blockers and 0 repeated definitions; quality tests 12/12; content validation 9/9; inventory quality gate true
+B1 positions 1-150: 0 structural blockers, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-QA A2 vocabulary corpus (this checkpoint)
+QA B1 vocabulary positions 1-150 (this checkpoint)
 
 NEXT ACTION:
-Continue B1 QA from v2.
+Continue B1 QA from master-barrel-noun.
