@@ -3427,6 +3427,193 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     definition: "having only a small distance from side to side",
     example: "The truck crossed a narrow bridge.",
   },
+  "master-nasty-adjective": {
+    definition: "very unpleasant, unkind, or difficult to deal with",
+    vietnamese: "khó chịu, tồi tệ",
+    example: "He was in a nasty mood after the argument.",
+  },
+  "master-naturally-adverb": { topic: "description" },
+  "master-near-adverb": {
+    example: "The deadline is drawing near.",
+    topic: "time",
+  },
+  "master-nearby-adjective": {
+    example: "We walked to a nearby village.",
+    topic: "places",
+  },
+  "master-nearby-adverb": { topic: "places" },
+  "master-negotiation-noun": {
+    definition: "a discussion intended to produce an agreement",
+    topic: "business",
+  },
+  "master-network-noun": { topic: "relationships" },
+  "master-nevertheless-adverb": {
+    definition: "despite what has just been said or mentioned",
+  },
+  "master-nonetheless-adverb": {
+    definition: "despite what has just been said or done",
+  },
+  "master-normally-adverb": { topic: "time" },
+  "master-northern-adjective": { topic: "places" },
+  "master-nuclear-adjective": {
+    definition: "relating to atomic energy or weapons that use it",
+    vietnamese: "thuộc hạt nhân",
+    example: "The country closed its oldest nuclear power station.",
+    topic: "science",
+  },
+  "master-nucleus-noun": {
+    vietnamese: "hạt nhân, trung tâm",
+    topic: "science",
+  },
+  "master-numerous-adjective": {
+    definition: "existing in large numbers",
+    example: "Numerous ants gathered near the food.",
+    topic: "quantity",
+  },
+  "master-nurse-verb": {
+    definition: "to care for a sick or injured person or animal",
+    vietnamese: "chăm sóc, điều dưỡng",
+    topic: "health",
+  },
+  "master-nutrient-noun": {
+    definition: "a substance in food that supports growth and health",
+    vietnamese: "chất dinh dưỡng",
+    topic: "health",
+  },
+  "master-object-noun": { topic: "objects" },
+  "master-objection-noun": { topic: "communication" },
+  "master-objective-noun": { topic: "success" },
+  "master-observation-noun": { topic: "senses" },
+  "master-obstacle-noun": { topic: "problem-solving" },
+  "master-obviously-adverb": { topic: "description" },
+  "master-occasion-verb": {
+    definition: "to cause an event or situation to happen",
+    topic: "events",
+  },
+  "master-off-preposition": {
+    definition: "away from or no longer supported by a surface",
+    vietnamese: "khỏi, rời khỏi",
+  },
+  "master-offensive-adjective": { topic: "communication" },
+  "master-officially-adverb": { topic: "society" },
+  "master-operation-noun": {
+    definition: "a medical procedure in which a surgeon treats the body",
+    vietnamese: "ca phẫu thuật, cuộc mổ",
+    topic: "health",
+  },
+  "master-opposite-adverb": {
+    definition: "in a position facing another person or thing",
+    example: "They sat opposite each other at the table.",
+    topic: "places",
+  },
+  "master-opposite-noun": { topic: "comparison" },
+  "master-opposition-noun": { topic: "society" },
+  "master-option-noun": { topic: "decision-making" },
+  "master-oral-noun": {
+    definition: "an examination in which answers are spoken rather than written",
+    example: "The language course ends with a short oral.",
+    topic: "education",
+  },
+  "master-organ-noun": { topic: "body" },
+  "master-organism-noun": { topic: "nature" },
+  "master-otherwise-adverb": {
+    vietnamese: "nếu không, bằng cách khác",
+  },
+  "master-outer-adjective": {
+    example: "The outer layer of the coat is waterproof.",
+  },
+  "master-overnight-adjective": {
+    example: "We booked an overnight train to Paris.",
+    topic: "time",
+  },
+  "master-overnight-adverb": { topic: "time" },
+  "master-owe-verb": { topic: "money" },
+  "master-oxygen-noun": {
+    definition: "a colorless gas that people and animals need to breathe",
+    example: "Patients with breathing difficulties may need extra oxygen.",
+    topic: "science",
+  },
+  "master-package-noun": { topic: "objects" },
+  "master-pain-noun": { topic: "health" },
+  "master-painful-adjective": {
+    definition: "causing physical or emotional pain",
+    example: "Walking was painful after she injured her ankle.",
+    topic: "health",
+  },
+  "master-pardon-verb": { topic: "society" },
+  "master-parental-adjective": {
+    definition: "relating to a parent or parents",
+    vietnamese: "thuộc cha mẹ",
+    topic: "family",
+  },
+  "master-partial-adjective": {
+    definition: "not complete or affecting only part of something",
+  },
+  "master-participant-noun": {
+    example: "Each participant received a certificate after the event.",
+  },
+  "master-particularly-adverb": { topic: "description" },
+  "master-passport-noun": {
+    definition: "an official document that allows a person to travel between countries",
+    example: "Show your passport at the border checkpoint.",
+    topic: "travel",
+  },
+  "master-past-adjective": {
+    example: "Past experience helped her solve the problem.",
+    topic: "time",
+  },
+  "master-pause-noun": {
+    definition: "a short period when an activity stops",
+    example: "There was a brief pause before the speaker continued.",
+  },
+  "master-pause-verb": {
+    definition: "to stop an activity for a short time",
+    example: "She paused the video to answer the phone.",
+    topic: "time",
+  },
+  "master-permanently-adverb": {
+    vietnamese: "vĩnh viễn, lâu dài",
+    topic: "time",
+  },
+  "master-permit-verb": {
+    definition: "to allow someone to do something",
+    vietnamese: "cho phép",
+    example: "The rules permit visitors to take photographs.",
+  },
+  "master-phenomenon-noun": { topic: "science" },
+  "master-physics-noun": { topic: "science" },
+  "master-pin-verb": {
+    definition: "to fasten something in place with a pin",
+  },
+  "master-pit-noun": {
+    vietnamese: "hố sâu",
+  },
+  "master-place-verb": {
+    example: "Please place the keys on the table.",
+  },
+  "master-plan-verb": {
+    vietnamese: "lập kế hoạch, dự định",
+    topic: "planning",
+  },
+  "master-plant-verb": {
+    vietnamese: "trồng, gieo",
+    topic: "nature",
+  },
+  "master-plastic-noun": {
+    definition: "a light artificial material that can be shaped into many forms",
+    vietnamese: "nhựa, chất dẻo",
+    example: "The bottle is made from recycled plastic.",
+  },
+  "master-platform-noun": {
+    example: "The speaker stepped onto the platform to address the crowd.",
+  },
+  "master-poison-noun": { topic: "safety" },
+  "master-policy-noun": { topic: "society" },
+  "master-politician-noun": {
+    definition: "a person who works in politics or holds elected office",
+    example: "The politician answered questions from local voters.",
+    topic: "society",
+  },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {

@@ -8,25 +8,25 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 701-1200
+B1 / level entries 801-1200
 
 LAST CHECKED ENTRY:
-master-narrow-adjective / B1 position 700
+master-politician-noun / B1 position 800
 
 NEXT ENTRY:
-master-nasty-adjective / B1 position 701
+master-politics-noun / B1 position 801
 
 CHECKED:
-2400/6000
+2500/6000
 
 CRITICAL FOUND:
-238
+253
 
 MAJOR FOUND:
-865
+907
 
 MINOR FOUND:
-157
+166
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B1 positions 601-700: 0 structural blockers and 0 semantic candidates; content validation 9/9; inventory 6000; quality gate true
+B1 positions 751-800: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-QA vocabulary B1 positions 401-700 (this checkpoint)
+QA vocabulary B1 positions 701-800 (this checkpoint)
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
