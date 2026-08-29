@@ -11,37 +11,37 @@ ENRICHED COUNTS:
 A1: 750
 A2: 950
 B1: 1200
-B2: 1327
+B2: 1525
 C1: 10
 C2: 2
-Total: 4239
+Total: 4437
 
 CURRENT CEFR:
 B2
 
 CURRENT BATCH:
-007
+008
 
 LAST COMPLETED MASTER ENTRY:
-master-stuff-verb / inventory position 4226
+master-yield-verb / inventory position 4426
 
 NEXT MASTER ENTRY:
-master-submit-verb / inventory position 4227
+master-aboard-preposition / inventory position 4427
 
 CURRENT BATCH RANGE:
-master-friendly-adjective / 3567 through master-stuff-verb / 4226
+master-submit-verb / 4227 through master-yield-verb / 4426
 
 CURRENT BATCH COMPLETED:
-650/650
+198/198
 
 UNRESOLVED ENTRIES:
 None
 
 LAST CONTENT VALIDATION:
-PASS at batch 007 — validate:content 9/9; content:stats total 4239 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
+PASS at batch 008 — validate:content 9/9; content:stats total 4437 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
 
 LAST CHECKPOINT COMMIT:
-Enrich vocabulary batch 007 (B2)
+Enrich vocabulary batch 008 (B2 completion)
 
 RESUME INSTRUCTION:
 Continue vocabulary enrichment from NEXT MASTER ENTRY.

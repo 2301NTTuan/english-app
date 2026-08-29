@@ -17,6 +17,7 @@ import { enrichedVocabulary007a } from "@/data/vocabulary/enriched-007a";
 import { enrichedVocabulary007b } from "@/data/vocabulary/enriched-007b";
 import { enrichedVocabulary007c } from "@/data/vocabulary/enriched-007c";
 import { enrichedVocabulary007d } from "@/data/vocabulary/enriched-007d";
+import { enrichedVocabulary008 } from "@/data/vocabulary/enriched-008";
 
 type Seed = [string, string, VocabularyItem["cefrLevel"], string, string, string, string[], string[]];
 const seeds: Seed[] = [
@@ -201,5 +202,5 @@ const coreVocabulary: VocabularyItem[] = seeds.map(([word, partOfSpeech, cefrLev
 }));
 
 /** Stable, modular content catalogue. Add future CEFR batches under src/data/vocabulary/. */
-export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001, ...enrichedVocabulary001, ...enrichedVocabulary002, ...enrichedVocabulary003, ...enrichedVocabulary004, ...enrichedVocabulary005a, ...enrichedVocabulary005b, ...enrichedVocabulary005c, ...enrichedVocabulary005d, ...enrichedVocabulary006a, ...enrichedVocabulary006b, ...enrichedVocabulary006c, ...enrichedVocabulary006d, ...enrichedVocabulary007a, ...enrichedVocabulary007b, ...enrichedVocabulary007c, ...enrichedVocabulary007d];
+export const vocabulary: VocabularyItem[] = [...coreVocabulary, ...extendedVocabulary, ...foundationVocabulary001, ...enrichedVocabulary001, ...enrichedVocabulary002, ...enrichedVocabulary003, ...enrichedVocabulary004, ...enrichedVocabulary005a, ...enrichedVocabulary005b, ...enrichedVocabulary005c, ...enrichedVocabulary005d, ...enrichedVocabulary006a, ...enrichedVocabulary006b, ...enrichedVocabulary006c, ...enrichedVocabulary006d, ...enrichedVocabulary007a, ...enrichedVocabulary007b, ...enrichedVocabulary007c, ...enrichedVocabulary007d, ...enrichedVocabulary008];
 export const publishedVocabulary = vocabulary.filter((item) => item.status === "published");
