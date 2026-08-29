@@ -2242,6 +2242,509 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     definition: "having the ability or qualities needed to do something",
     vietnamese: "có khả năng, có năng lực",
   },
+  "master-capacity-noun": { topic: "quantity" },
+  "master-capture-noun": {
+    definition: "the act of catching and holding a person or animal",
+    topic: "safety",
+  },
+  "master-capture-verb": {
+    example: "The officers captured the escaped prisoner.",
+    topic: "safety",
+  },
+  "master-care-verb": {
+    definition: "to feel concern or interest about someone or something",
+    vietnamese: "quan tâm, để ý",
+    example: "She cares deeply about the environment.",
+  },
+  "master-career-noun": {
+    definition: "a job or profession that you do for many years",
+    example: "She began her career as a science teacher.",
+    topic: "work",
+  },
+  "master-casual-adjective": {
+    definition: "relaxed and not formal",
+    vietnamese: "thoải mái, không trang trọng",
+  },
+  "master-category-noun": {
+    definition: "a group of people or things that share similar features",
+    example: "Books are divided into several subject categories.",
+    topic: "thinking",
+  },
+  "master-cattle-noun": {
+    definition: "cows and bulls kept on a farm",
+    vietnamese: "gia súc, bò",
+    example: "The cattle are grazing in the field.",
+  },
+  "master-caution-noun": { topic: "safety" },
+  "master-cautious-adjective": { topic: "safety" },
+  "master-celebrity-noun": {
+    vietnamese: "người nổi tiếng",
+    example: "The actor became an international celebrity.",
+  },
+  "master-cell-noun": {
+    definition: "a small room in a prison where a prisoner is kept",
+    vietnamese: "phòng giam",
+    topic: "places",
+  },
+  "master-channel-noun": {
+    definition: "a television or radio service that broadcasts programs",
+    vietnamese: "kênh truyền hình, kênh phát thanh",
+  },
+  "master-citizenship-noun": {
+    definition: "the legal status of being a citizen of a country",
+    example: "She applied for citizenship after living there for ten years.",
+    topic: "society",
+  },
+  "master-civil-adjective": {
+    definition: "relating to citizens and their rights rather than the military",
+    vietnamese: "dân sự, thuộc công dân",
+    topic: "society",
+  },
+  "master-claim-noun": {
+    vietnamese: "lời tuyên bố, lời khẳng định",
+  },
+  "master-classify-verb": {
+    definition: "to arrange people or things into groups by their features",
+    example: "Scientists classify animals according to shared characteristics.",
+  },
+  "master-clear-verb": {
+    definition: "to remove unwanted things from a place",
+    vietnamese: "dọn, dọn sạch",
+    example: "Please clear the table after dinner.",
+    topic: "daily-life",
+  },
+  "master-climate-noun": {
+    definition: "the usual weather conditions of a place over a long period",
+    example: "The region has a hot, dry climate.",
+    topic: "nature",
+  },
+  "master-clinic-noun": { topic: "health" },
+  "master-closely-adverb": {
+    definition: "in a way that has a strong or direct connection",
+    vietnamese: "chặt chẽ, mật thiết",
+    topic: "relationships",
+  },
+  "master-coast-verb": {
+    definition: "to move without using power, especially downhill",
+    vietnamese: "trôi theo quán tính",
+  },
+  "master-collapse-noun": { topic: "events" },
+  "master-collar-noun": { topic: "clothing" },
+  "master-combination-noun": { topic: "relationships" },
+  "master-comfort-noun": {
+    definition: "a state of physical ease and freedom from pain or worry",
+    vietnamese: "sự thoải mái, dễ chịu",
+    topic: "emotions",
+  },
+  "master-command-noun": {
+    definition: "the authority to give orders and control people",
+    vietnamese: "quyền chỉ huy",
+    topic: "society",
+  },
+  "master-commercial-adjective": {
+    vietnamese: "thuộc thương mại, buôn bán",
+    topic: "business",
+  },
+  "master-commonly-adverb": {
+    definition: "often or by many people",
+    example: "This plant is commonly found near rivers.",
+    topic: "description",
+  },
+  "master-comparison-noun": {
+    definition: "the act of examining how two or more things are similar or different",
+    example: "A comparison of the two plans revealed several differences.",
+    topic: "comparison",
+  },
+  "master-compete-verb": {
+    definition: "to try to win or be more successful than others",
+    example: "Athletes from twenty countries competed in the race.",
+  },
+  "master-competitive-adjective": { topic: "success" },
+  "master-complement-noun": {
+    definition: "something that improves another thing when added to it",
+    example: "The salad is a fresh complement to the main dish.",
+    topic: "relationships",
+  },
+  "master-complete-verb": { topic: "success" },
+  "master-completely-adverb": { topic: "description" },
+  "master-complicate-verb": {
+    definition: "to make something more difficult to understand or deal with",
+    example: "The new rules may complicate the application process.",
+  },
+  "master-concentration-noun": {
+    definition: "the amount of a substance present in a particular volume",
+    vietnamese: "nồng độ, sự tập trung",
+    topic: "quantity",
+  },
+  "master-concept-noun": {
+    definition: "an idea or principle used to understand something",
+    example: "Students discussed the concept of equal opportunity.",
+  },
+  "master-conclude-verb": {
+    definition: "to bring a speech, meeting, or event to an end",
+    topic: "communication",
+  },
+  "master-conclusion-noun": {
+    definition: "an opinion or decision reached after considering the evidence",
+    vietnamese: "kết luận",
+    topic: "thinking",
+  },
+  "master-conduct-noun": {
+    example: "The school expects high standards of conduct from students.",
+    topic: "society",
+  },
+  "master-confidence-noun": { topic: "emotions" },
+  "master-confirmation-noun": { topic: "communication" },
+  "master-conflict-noun": {
+    definition: "a serious disagreement or struggle between people or groups",
+    example: "Both sides agreed to seek a peaceful end to the conflict.",
+    topic: "society",
+  },
+  "master-connect-verb": {
+    definition: "to join or link two or more things",
+    vietnamese: "kết nối, nối liền",
+    example: "The technician connected the device to the battery.",
+    topic: "relationships",
+  },
+  "master-conservation-noun": {
+    definition: "the protection of natural resources from damage or waste",
+    example: "Water conservation is essential during a drought.",
+    topic: "nature",
+  },
+  "master-conservative-adjective": {
+    definition: "preferring traditional ideas and being cautious about change",
+    vietnamese: "bảo thủ, truyền thống",
+    topic: "society",
+  },
+  "master-considerable-adjective": {
+    definition: "large enough in amount or degree to be important",
+    example: "The repairs will require considerable time and money.",
+    topic: "quantity",
+  },
+  "master-constantly-adverb": {
+    definition: "all the time or very often",
+    example: "The weather here is constantly changing.",
+    topic: "time",
+  },
+  "master-constitution-noun": { topic: "society" },
+  "master-construct-verb": {
+    vietnamese: "xây dựng, chế tạo",
+    topic: "actions",
+  },
+  "master-construction-noun": { topic: "work" },
+  "master-consumer-noun": { topic: "business" },
+  "master-consumption-noun": {
+    definition: "the use of goods, energy, or other resources",
+    example: "The new equipment reduced electricity consumption.",
+    topic: "business",
+  },
+  "master-content-noun": {
+    definition: "the information, ideas, or material contained in something",
+    example: "The website provides useful educational content.",
+    topic: "communication",
+  },
+  "master-continually-adverb": {
+    definition: "repeatedly over a period of time",
+    example: "The software is continually updated with new features.",
+    topic: "time",
+  },
+  "master-continuously-adverb": {
+    example: "The machine ran continuously for twelve hours.",
+    topic: "time",
+  },
+  "master-contribution-noun": { topic: "society" },
+  "master-control-verb": {
+    definition: "to direct, limit, or manage how something works",
+    topic: "actions",
+  },
+  "master-copyright-noun": {
+    definition: "the legal right to control how an original work is used",
+    example: "The author owns the copyright to the book.",
+    topic: "society",
+  },
+  "master-correction-noun": { topic: "education" },
+  "master-cotton-noun": { example: "This shirt is made from soft cotton." },
+  "master-council-noun": {
+    definition: "a group of people elected or appointed to make decisions",
+    example: "The local council approved the new housing plan.",
+  },
+  "master-count-noun": {
+    vietnamese: "số lượng, tổng số",
+  },
+  "master-county-noun": {
+    definition: "an area with its own local government that includes several towns",
+  },
+  "master-crash-verb": {
+    definition: "to hit something violently while moving",
+    vietnamese: "đâm, va mạnh",
+    topic: "events",
+  },
+  "master-criminal-noun": {
+    definition: "a person who has committed or been convicted of a crime",
+    example: "The police arrested the criminal near the station.",
+    topic: "society",
+  },
+  "master-crisis-noun": {
+    definition: "a time of great danger, difficulty, or uncertainty",
+    example: "The government introduced emergency measures during the crisis.",
+  },
+  "master-critical-adjective": {
+    definition: "expressing careful judgment or disapproval",
+    example: "The newspaper published a critical review of the policy.",
+  },
+  "master-crop-noun": {
+    definition: "a plant grown by farmers for food or other uses",
+    vietnamese: "cây trồng, vụ mùa",
+  },
+  "master-crush-noun": { topic: "relationships" },
+  "master-cultural-adjective": {
+    definition: "relating to the customs, arts, and beliefs of a society",
+    vietnamese: "thuộc văn hóa",
+  },
+  "master-cure-noun": { topic: "health" },
+  "master-currency-noun": {
+    example: "You can exchange foreign currency at the bank.",
+  },
+  "master-current-adjective": {
+    example: "The current situation requires immediate action.",
+    topic: "time",
+  },
+  "master-currently-adverb": {
+    definition: "at the present time",
+    example: "They are currently trying to call home.",
+    topic: "time",
+  },
+  "master-curriculum-noun": {
+    definition: "the subjects and courses taught by a school or college",
+    topic: "education",
+  },
+  "master-cut-noun": {
+    definition: "an injury or opening in the skin caused by something sharp",
+    vietnamese: "vết cắt",
+    topic: "health",
+  },
+  "master-cycle-verb": {
+    definition: "to travel by bicycle",
+    vietnamese: "đi xe đạp",
+    example: "I cycle to work whenever the weather is dry.",
+  },
+  "master-date-verb": {
+    vietnamese: "hẹn hò",
+    topic: "relationships",
+  },
+  "master-deal-verb": { topic: "problem-solving" },
+  "master-debt-noun": {
+    definition: "money that a person or organization owes",
+    example: "She paid off her bank debt within two years.",
+  },
+  "master-decision-noun": {
+    definition: "a choice made after considering different possibilities",
+    vietnamese: "quyết định, sự lựa chọn",
+    example: "After careful thought, she made a decision to accept the job.",
+    topic: "decision-making",
+  },
+  "master-decline-noun": { topic: "quantity" },
+  "master-decrease-noun": { topic: "quantity" },
+  "master-deed-noun": { topic: "actions" },
+  "master-defend-verb": {
+    definition: "to protect someone or something from attack or criticism",
+    example: "The soldiers defended the town against the attack.",
+    topic: "safety",
+  },
+  "master-define-verb": {
+    definition: "to explain the exact meaning of a word or idea",
+    example: "The dictionary defines each technical term clearly.",
+  },
+  "master-definite-adjective": {
+    definition: "clear, certain, and unlikely to change",
+    vietnamese: "chắc chắn, rõ ràng",
+    example: "We need a definite answer by Friday.",
+  },
+  "master-definitely-adverb": {
+    definition: "without any doubt",
+    vietnamese: "chắc chắn, nhất định",
+    topic: "certainty",
+  },
+  "master-definition-noun": {
+    definition: "an explanation of the meaning of a word or phrase",
+    example: "Please look up the definition in a dictionary.",
+  },
+  "master-deliver-verb": {
+    vietnamese: "giao, chuyển đến",
+  },
+  "master-delivery-noun": {
+    definition: "the act of taking goods or mail to a person or place",
+    vietnamese: "sự giao hàng, sự chuyển phát",
+    topic: "business",
+  },
+  "master-demand-noun": { topic: "business" },
+  "master-democracy-noun": {
+    definition: "a system of government in which people choose their leaders by voting",
+  },
+  "master-demonstration-noun": {
+    definition: "an act of showing how something works or proving that it is true",
+    example: "The chef gave a demonstration of the new cooking technique.",
+  },
+  "master-departure-noun": {
+    definition: "the act of leaving a place",
+    example: "Our departure was delayed by heavy snow.",
+    topic: "travel",
+  },
+  "master-depression-noun": {
+    definition: "a medical condition that causes persistent sadness and loss of interest",
+    vietnamese: "bệnh trầm cảm",
+    example: "She sought professional help for her depression.",
+    topic: "health",
+  },
+  "master-deprive-verb": {
+    definition: "to prevent someone from having something necessary or desired",
+    example: "The punishment deprived prisoners of phone access.",
+  },
+  "master-designer-noun": {
+    definition: "a person who plans how products, clothes, or other things will look and work",
+  },
+  "master-desire-noun": {
+    definition: "a strong feeling of wanting something",
+    vietnamese: "mong muốn, khát khao",
+    example: "She expressed a strong desire to continue her studies.",
+  },
+  "master-desperate-adjective": { topic: "emotions" },
+  "master-destination-noun": {
+    definition: "the place to which someone or something is traveling",
+    vietnamese: "điểm đến",
+    topic: "travel",
+  },
+  "master-development-noun": { topic: "change" },
+  "master-diagram-noun": { vietnamese: "sơ đồ, biểu đồ" },
+  "master-diameter-noun": { topic: "quantity" },
+  "master-differ-verb": {
+    vietnamese: "khác, không giống",
+    topic: "comparison",
+  },
+  "master-dioxide-noun": {
+    vietnamese: "đioxit",
+    example: "Carbon dioxide is released when fuels burn.",
+  },
+  "master-direct-verb": {
+    definition: "to point or guide someone or something toward a place",
+    vietnamese: "hướng, chỉ dẫn",
+  },
+  "master-disability-noun": {
+    definition: "a physical or mental condition that limits some activities",
+    vietnamese: "khuyết tật, tình trạng khuyết tật",
+    example: "The school provides support for students with disabilities.",
+    topic: "health",
+  },
+  "master-disable-verb": {
+    definition: "to make a device or system unable to work",
+    vietnamese: "vô hiệu hóa, tắt",
+    topic: "technology",
+  },
+  "master-disagreement-noun": {
+    definition: "a situation in which people have different opinions",
+    vietnamese: "sự bất đồng, sự không đồng ý",
+    topic: "communication",
+  },
+  "master-disaster-noun": {
+    definition: "an event that causes great damage, loss, or suffering",
+    topic: "safety",
+  },
+  "master-discount-noun": {
+    definition: "a reduction in the usual price of something",
+    vietnamese: "khoản giảm giá",
+    example: "Students receive a ten percent discount on tickets.",
+    topic: "money",
+  },
+  "master-discrimination-noun": {
+    definition: "unfair treatment of people because of characteristics such as race or sex",
+    vietnamese: "sự phân biệt đối xử",
+    example: "The law protects workers from discrimination.",
+    topic: "society",
+  },
+  "master-disease-noun": { topic: "health" },
+  "master-display-verb": {
+    definition: "to show something where people can see it",
+    topic: "communication",
+  },
+  "master-distance-noun": { topic: "quantity" },
+  "master-distinction-noun": {
+    definition: "an important difference between two similar things",
+    example: "The report makes a clear distinction between cost and value.",
+    topic: "comparison",
+  },
+  "master-distribute-verb": { topic: "actions" },
+  "master-distribution-noun": {
+    definition: "the process of supplying goods to different people or places",
+    topic: "business",
+  },
+  "master-district-noun": {
+    vietnamese: "quận, khu vực",
+  },
+  "master-divide-noun": {
+    definition: "a strong difference or separation between groups of people",
+    vietnamese: "sự chia rẽ, khoảng cách",
+    example: "There is a growing divide between rich and poor families.",
+    topic: "society",
+  },
+  "master-dot-noun": {
+    vietnamese: "dấu chấm, chấm nhỏ",
+  },
+  "master-downward-adjective": {
+    example: "The graph shows a downward trend in prices.",
+  },
+  "master-dump-noun": { topic: "places" },
+  "master-dump-verb": { topic: "nature" },
+  "master-duty-noun": { topic: "work" },
+  "master-eager-adjective": { topic: "emotions" },
+  "master-economic-adjective": {
+    vietnamese: "thuộc kinh tế",
+    topic: "business",
+  },
+  "master-economy-noun": {
+    definition: "the system by which a country produces, trades, and uses goods and services",
+    vietnamese: "nền kinh tế",
+    topic: "business",
+  },
+  "master-edge-noun": {
+    definition: "the outer boundary or side of a surface",
+    vietnamese: "cạnh, rìa",
+    example: "She placed the cup near the edge of the table.",
+    topic: "description",
+  },
+  "master-edition-noun": {
+    definition: "a particular version of a book, newspaper, or program",
+    vietnamese: "ấn bản, phiên bản",
+    example: "The second edition includes three new chapters.",
+    topic: "literature",
+  },
+  "master-educate-verb": { topic: "education" },
+  "master-either-determiner": {
+    vietnamese: "một trong hai, bất kỳ bên nào",
+  },
+  "master-election-noun": { topic: "society" },
+  "master-electrical-adjective": {
+    example: "An electrical engineer inspected the damaged circuit.",
+    topic: "technology",
+  },
+  "master-electricity-noun": { topic: "technology" },
+  "master-electron-noun": {
+    definition: "a tiny particle with a negative electrical charge",
+    example: "Each electron carries a negative charge.",
+    topic: "science",
+  },
+  "master-electronic-adjective": {
+    definition: "using or relating to electronic equipment and technology",
+    example: "What does that electronic device do?",
+    topic: "technology",
+  },
+  "master-emotional-adjective": { topic: "emotions" },
+  "master-emphasis-noun": { topic: "communication" },
+  "master-employment-noun": {
+    definition: "paid work or the state of having a job",
+    vietnamese: "việc làm, sự tuyển dụng",
+    example: "The new factory created employment for local workers.",
+    topic: "work",
+  },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {

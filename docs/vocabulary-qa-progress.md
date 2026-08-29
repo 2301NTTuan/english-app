@@ -1,5 +1,5 @@
 ACTIVE GOAL:
-Production QA of all 6,000 enriched vocabulary entries.
+Complete production QA of all 6,000 enriched vocabulary entries.
 
 STATUS:
 IN_PROGRESS
@@ -8,30 +8,40 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 201-1200
+B1 / level entries 401-1200
 
 LAST CHECKED ENTRY:
-master-capable-adjective / B1 position 200
+master-employment-noun / B1 position 400
 
 NEXT ENTRY:
-master-capacity-noun / B1 position 201
+master-enable-verb / B1 position 401
 
 CHECKED:
-1900/6000
+2100/6000
 
-ISSUES FOUND:
-critical: 157
-major: 637
-minor: 107
+CRITICAL FOUND:
+192
 
-ISSUES FIXED:
-901
+MAJOR FOUND:
+725
+
+MINOR FOUND:
+127
+
+CRITICAL UNRESOLVED:
+0
+
+MAJOR UNRESOLVED:
+0
+
+MINOR UNRESOLVED:
+0
 
 LAST VALIDATION:
-B1 positions 151-200: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B1 positions 351-400: 0 structural blockers and 0 semantic candidates; content validation 9/9; inventory 6000; quality gate true
 
 LAST CHECKPOINT COMMIT:
-QA B1 vocabulary positions 151-200 (this checkpoint)
+QA vocabulary B1 positions 201-400 (this checkpoint)
 
 NEXT ACTION:
-Continue B1 QA from master-capacity-noun.
+Continue from NEXT ENTRY only.
