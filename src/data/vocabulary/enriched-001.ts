@@ -877,12 +877,12 @@ export const enrichedVocabulary001: VocabularyItem[] = [
     ],
     "meanings": [
       {
-        "definition": "with a forward motion",
-        "vietnamese": "theo chiều dài, suốt theo"
+        "definition": "forward or onward in a line",
+        "vietnamese": "dọc theo, tiến về phía trước"
       }
     ],
     "examples": [
-      "We drove along admiring the view."
+      "Come along with us."
     ],
     "synonyms": [],
     "antonyms": [],
