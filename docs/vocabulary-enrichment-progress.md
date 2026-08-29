@@ -12,36 +12,36 @@ A1: 750
 A2: 950
 B1: 1200
 B2: 1525
-C1: 660
+C1: 975
 C2: 2
-Total: 5087
+Total: 5402
 
 CURRENT CEFR:
 C1
 
 CURRENT BATCH:
-009
+010
 
 LAST COMPLETED MASTER ENTRY:
-master-provisions-noun / inventory position 5082
+master-zany-adjective / inventory position 5401
 
 NEXT MASTER ENTRY:
-master-provocative-adjective / inventory position 5083
+master-abject-adjective / inventory position 5402
 
 CURRENT BATCH RANGE:
-master-aboard-preposition / 4427 through master-provisions-noun / 5082
+master-provocative-adjective / 5083 through master-zany-adjective / 5401
 
 CURRENT BATCH COMPLETED:
-650/650
+315/315
 
 UNRESOLVED ENTRIES:
 None
 
 LAST CONTENT VALIDATION:
-PASS at batch 009 — validate:content 9/9; content:stats total 5087 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
+PASS at batch 010 — validate:content 9/9; content:stats total 5402 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
 
 LAST CHECKPOINT COMMIT:
-Enrich vocabulary batch 009 (C1)
+Enrich vocabulary batch 010 (C1 completion)
 
 RESUME INSTRUCTION:
 Continue vocabulary enrichment from NEXT MASTER ENTRY.
