@@ -13,35 +13,35 @@ A2: 950
 B1: 1200
 B2: 1525
 C1: 975
-C2: 2
-Total: 5402
+C2: 152
+Total: 5552
 
 CURRENT CEFR:
-C1
+C2
 
 CURRENT BATCH:
-010
+011
 
 LAST COMPLETED MASTER ENTRY:
-master-zany-adjective / inventory position 5401
+master-dissemble-verb / inventory position 5551
 
 NEXT MASTER ENTRY:
-master-abject-adjective / inventory position 5402
+master-disseminate-verb / inventory position 5552
 
 CURRENT BATCH RANGE:
-master-provocative-adjective / 5083 through master-zany-adjective / 5401
+master-abject-adjective / 5402 through master-zoology-noun / 6001
 
 CURRENT BATCH COMPLETED:
-315/315
+150/598
 
 UNRESOLVED ENTRIES:
 None
 
 LAST CONTENT VALIDATION:
-PASS at batch 010 — validate:content 9/9; content:stats total 5402 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
+PASS at batch 011 checkpoint 150/598 — validate:content 9/9; content:stats total 5552 with no validation, missing-field, POS, example-target, or CEFR/frequency errors
 
 LAST CHECKPOINT COMMIT:
-Enrich vocabulary batch 010 (C1 completion)
+Checkpoint vocabulary batch 011 at 150 of 598
 
 RESUME INSTRUCTION:
 Continue vocabulary enrichment from NEXT MASTER ENTRY.

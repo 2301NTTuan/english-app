@@ -237,6 +237,15 @@ export const contentProvenanceBatches: ContentProvenanceBatch[] = [
     notes: "165 resumable learner-facing records completing C1, preserving master inventory metadata and provenance.",
   },
   {
+    id: "vocabulary-enriched-011a-2026-08",
+    title: "Master vocabulary enrichment batch 011, chunk A (C2)",
+    sourceType: "licensed-import",
+    license: "CC BY-SA 4.0 (Simple English and Vietnamese Wiktionary adaptations); CC BY 4.0 plus Princeton WordNet license (Open English WordNet)",
+    attribution: "Wiktionary contributors; Open English WordNet Team and Princeton University WordNet; adapted and normalized by the English Mastery content team",
+    status: "validated",
+    notes: "150 resumable learner-facing C2 records for batch 011, preserving master inventory metadata and provenance.",
+  },
+  {
     id: "placement-core-2026-08",
     title: "Placement core and reading pilot",
     sourceType: "repository-authored",
