@@ -47,7 +47,7 @@ describe("vocabulary production-quality controls", () => {
   });
 
   it("has no repeated definitions in completed CEFR review levels", () => {
-    const completedLevels = new Set<CEFRLevel>(["A1"]);
+    const completedLevels = new Set<CEFRLevel>(["A1", "A2"]);
     expect(auditVocabulary(vocabulary.filter((item) => completedLevels.has(item.cefrLevel))).duplicateCandidates).toEqual([]);
   });
 
