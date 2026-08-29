@@ -57,6 +57,15 @@ export const contentProvenanceBatches: ContentProvenanceBatch[] = [
     notes: "200 learner-facing A2 records completing the level. Stable IDs, CEFR evidence, and frequency evidence are preserved from master-inventory.tsv; one definition, Vietnamese meaning, example, and topic are retained per lexical unit.",
   },
   {
+    id: "vocabulary-enriched-004-2026-08",
+    title: "Master vocabulary enrichment batch 004 (B1)",
+    sourceType: "licensed-import",
+    license: "CC BY-SA 4.0 (Simple English and Vietnamese Wiktionary adaptations); CC BY 4.0 plus Princeton WordNet license (Open English WordNet)",
+    attribution: "Wiktionary contributors; Open English WordNet Team and Princeton University WordNet; adapted and normalized by the English Mastery content team",
+    status: "validated",
+    notes: "650 learner-facing B1 records. Stable IDs, CEFR evidence, and frequency evidence are preserved from master-inventory.tsv; one definition, Vietnamese meaning, example, and topic are retained per lexical unit.",
+  },
+  {
     id: "placement-core-2026-08",
     title: "Placement core and reading pilot",
     sourceType: "repository-authored",
