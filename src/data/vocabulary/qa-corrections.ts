@@ -2745,6 +2745,688 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     example: "The new factory created employment for local workers.",
     topic: "work",
   },
+  "master-directly-adverb": { topic: "description" },
+  "master-enable-verb": {
+    definition: "to make it possible for someone or something to do something",
+    example: "The new software enables users to share files securely.",
+  },
+  "master-encounter-noun": { topic: "events" },
+  "master-endless-adjective": {
+    definition: "continuing for a very long time or seeming never to end",
+    example: "The meeting became an endless debate about minor details.",
+  },
+  "master-endure-verb": { topic: "emotions" },
+  "master-engage-verb": {
+    definition: "to take part in a particular activity",
+    vietnamese: "tham gia",
+    example: "Students engage in several outdoor activities each week.",
+    topic: "activities",
+  },
+  "master-engine-noun": {
+    definition: "the part of a machine that produces power",
+    vietnamese: "động cơ",
+    example: "The mechanic repaired the car's engine.",
+  },
+  "master-ensure-verb": { topic: "certainty" },
+  "master-enthusiastic-adjective": { topic: "emotions" },
+  "master-entirely-adverb": {
+    definition: "completely and in every way",
+    topic: "description",
+  },
+  "master-entry-noun": { topic: "places" },
+  "master-environmental-adjective": {
+    definition: "relating to the natural world and its protection",
+    topic: "nature",
+  },
+  "master-equal-adjective": {
+    example: "The two groups contain an equal number of students.",
+    topic: "comparison",
+  },
+  "master-equality-noun": {
+    definition: "the state of having the same rights and opportunities",
+    vietnamese: "sự bình đẳng",
+    topic: "society",
+  },
+  "master-equally-adverb": { topic: "comparison" },
+  "master-equipment-noun": {
+    definition: "the tools or machines needed for a job or activity",
+    vietnamese: "thiết bị, dụng cụ",
+    example: "The team checked its safety equipment before climbing.",
+  },
+  "master-escape-verb": {
+    definition: "to get away from a dangerous or unpleasant situation",
+    example: "We reached a shelter to escape the storm.",
+    topic: "safety",
+  },
+  "master-estimate-verb": {
+    definition: "to roughly calculate an amount, cost, or time",
+    vietnamese: "ước tính, ước lượng",
+    example: "Can you estimate how long the journey will take?",
+    topic: "quantity",
+  },
+  "master-eventually-adverb": { topic: "time" },
+  "master-examination-noun": {
+    definition: "a formal test of knowledge or ability",
+    vietnamese: "kỳ thi, bài kiểm tra",
+    example: "Did you pass the English examination last week?",
+    topic: "education",
+  },
+  "master-exclusive-adjective": {
+    definition: "limited to one person or group and not shared with others",
+    vietnamese: "độc quyền, dành riêng",
+  },
+  "master-existence-noun": {
+    definition: "the state of being real or present",
+    example: "Scientists found evidence of the lake's earlier existence.",
+  },
+  "master-exit-noun": {
+    vietnamese: "lối ra",
+    example: "The emergency exit is at the end of the corridor.",
+    topic: "places",
+  },
+  "master-exit-verb": {
+    example: "Please exit the building through the rear door.",
+  },
+  "master-expense-noun": {
+    vietnamese: "chi phí, khoản chi",
+  },
+  "master-experience-verb": { topic: "experience" },
+  "master-experiment-noun": { topic: "science" },
+  "master-exploration-noun": { topic: "science" },
+  "master-explosion-noun": {
+    definition: "a sudden violent burst that releases energy and causes damage",
+    vietnamese: "vụ nổ",
+    topic: "safety",
+  },
+  "master-expose-verb": {
+    definition: "to leave someone unprotected from something harmful",
+    vietnamese: "để tiếp xúc, phơi nhiễm",
+    topic: "health",
+  },
+  "master-extend-verb": {
+    definition: "to make something last longer or reach farther",
+    vietnamese: "kéo dài, mở rộng",
+    topic: "time",
+  },
+  "master-extent-noun": {
+    definition: "the degree or amount to which something is true or happens",
+    vietnamese: "mức độ, phạm vi",
+    topic: "quantity",
+  },
+  "master-extra-noun": { topic: "shopping" },
+  "master-extreme-adjective": {
+    definition: "very great or far beyond what is usual",
+    vietnamese: "cực độ, nghiêm trọng",
+  },
+  "master-facility-noun": { topic: "places" },
+  "master-failure-noun": {
+    definition: "a lack of success or an unsuccessful person or thing",
+    vietnamese: "sự thất bại, thất bại",
+    topic: "success",
+  },
+  "master-fascinate-verb": { topic: "emotions" },
+  "master-fax-noun": {
+    definition: "a document sent electronically through a fax machine",
+    vietnamese: "bản fax, điện fax",
+    example: "Did you receive the fax I sent this morning?",
+    topic: "communication",
+  },
+  "master-feed-verb": { example: "I feed my dog twice a day." },
+  "master-fellow-noun": {
+    vietnamese: "người đàn ông, anh chàng",
+  },
+  "master-fight-verb": {
+    example: "The children often fight over the same toy.",
+    topic: "society",
+  },
+  "master-film-verb": {
+    vietnamese: "quay phim, ghi hình",
+    topic: "communication",
+  },
+  "master-finance-verb": { topic: "money" },
+  "master-financial-adjective": { topic: "money" },
+  "master-fine-noun": {
+    vietnamese: "tiền phạt",
+  },
+  "master-firm-noun": { topic: "business" },
+  "master-fish-verb": { topic: "actions" },
+  "master-fit-verb": {
+    definition: "to be the right size or shape for someone or something",
+    topic: "clothing",
+  },
+  "master-flow-noun": { topic: "movement" },
+  "master-form-verb": {
+    definition: "to create or develop a particular shape or structure",
+    example: "The students formed a circle around the teacher.",
+  },
+  "master-formally-adverb": {
+    definition: "in an official or appropriately serious way",
+    example: "The ambassador was formally introduced to the guests.",
+    topic: "description",
+  },
+  "master-formula-noun": { topic: "problem-solving" },
+  "master-forth-adverb": { topic: "movement" },
+  "master-freely-adverb": { topic: "description" },
+  "master-frequently-adverb": {
+    vietnamese: "thường xuyên",
+    topic: "time",
+  },
+  "master-frustration-noun": {
+    definition: "the feeling of being annoyed because you cannot achieve something",
+    vietnamese: "sự thất vọng, sự bực bội",
+  },
+  "master-fuel-noun": {
+    definition: "a substance used to produce heat or power",
+    example: "The truck uses diesel as fuel.",
+  },
+  "master-function-noun": { topic: "description" },
+  "master-fund-noun": {
+    vietnamese: "quỹ, nguồn tiền",
+  },
+  "master-fund-verb": {
+    definition: "to provide money for a project or activity",
+    vietnamese: "tài trợ, cấp vốn",
+    topic: "money",
+  },
+  "master-furnish-verb": {
+    definition: "to provide a room or building with furniture",
+    vietnamese: "trang bị nội thất",
+    topic: "home",
+  },
+  "master-further-adverb": { topic: "description" },
+  "master-future-adjective": { topic: "time" },
+  "master-gain-noun": {
+    definition: "an increase or a benefit obtained from something",
+    vietnamese: "sự gia tăng, lợi ích",
+    example: "The company reported a significant gain in sales.",
+    topic: "quantity",
+  },
+  "master-gain-verb": {
+    definition: "to obtain something useful or valuable",
+    example: "She gained valuable experience during the internship.",
+  },
+  "master-gap-noun": {
+    vietnamese: "khoảng cách, sự chênh lệch",
+    topic: "society",
+  },
+  "master-gay-adjective": {
+    definition: "sexually or romantically attracted to people of the same sex",
+    vietnamese: "đồng tính",
+    example: "He is an openly gay actor.",
+    topic: "relationships",
+  },
+  "master-gene-noun": {
+    definition: "a section of DNA that controls an inherited characteristic",
+    example: "Scientists identified a gene linked to the disease.",
+    topic: "science",
+  },
+  "master-general-adjective": {
+    example: "The report begins with a general overview of the problem.",
+  },
+  "master-generally-adverb": { topic: "description" },
+  "master-generate-verb": { topic: "technology" },
+  "master-generous-adjective": { topic: "emotions" },
+  "master-gentleman-noun": {
+    definition: "a polite and well-mannered man",
+    vietnamese: "quý ông, người đàn ông lịch thiệp",
+    example: "He behaved like a gentleman throughout the evening.",
+  },
+  "master-geographical-adjective": {
+    definition: "relating to the physical features and locations of places",
+    example: "The mountains form a clear geographical boundary.",
+    topic: "nature",
+  },
+  "master-geography-noun": {
+    definition: "the study of places, people, and the physical features of the Earth",
+    topic: "education",
+  },
+  "master-global-adjective": { example: "Climate change is a global problem." },
+  "master-go-noun": {
+    definition: "a turn or opportunity to do something",
+    vietnamese: "lượt",
+    example: "It is my go, so please pass me the dice.",
+    topic: "activities",
+  },
+  "master-governor-noun": { vietnamese: "thống đốc" },
+  "master-graduate-noun": {
+    definition: "a person who has completed a course at a school or university",
+    vietnamese: "người tốt nghiệp, cử nhân",
+    topic: "education",
+  },
+  "master-grant-noun": {
+    definition: "money given by an organization for a particular purpose",
+    vietnamese: "khoản trợ cấp, khoản tài trợ",
+  },
+  "master-grant-verb": {
+    definition: "to officially give someone permission, a right, or a request",
+    example: "The council granted permission for the new building.",
+    topic: "society",
+  },
+  "master-graph-noun": { topic: "quantity" },
+  "master-graphics-noun": { vietnamese: "đồ họa, hình ảnh đồ họa" },
+  "master-grave-noun": { topic: "places" },
+  "master-greenhouse-noun": {
+    definition: "a glass building that traps heat for growing plants",
+    example: "Tomatoes grow well inside the warm greenhouse.",
+    topic: "nature",
+  },
+  "master-group-verb": {
+    example: "The teacher grouped students by reading level.",
+    topic: "actions",
+  },
+  "master-growth-noun": { topic: "change" },
+  "master-guess-noun": {
+    example: "My guess is that the repairs will cost about eighty dollars.",
+    topic: "thinking",
+  },
+  "master-guidance-noun": {
+    definition: "advice or help that shows someone what to do",
+    example: "The new employees received guidance from an experienced manager.",
+  },
+  "master-guilty-adjective": {
+    definition: "responsible for committing a crime or doing something wrong",
+    example: "The court found him guilty of theft.",
+    topic: "society",
+  },
+  "master-habitat-noun": {
+    example: "Wetlands provide a natural habitat for many birds.",
+    topic: "nature",
+  },
+  "master-half-adverb": { topic: "quantity" },
+  "master-handle-verb": {
+    definition: "to hold, touch, or move something with your hands",
+    example: "Please handle the glass equipment carefully.",
+  },
+  "master-hang-verb": { example: "Please hang the picture on the living-room wall." },
+  "master-hazard-noun": {
+    definition: "something that may cause danger or harm",
+    vietnamese: "mối nguy hiểm, nguy cơ",
+    example: "Ice on the road is a serious driving hazard.",
+    topic: "safety",
+  },
+  "master-headline-noun": {
+    definition: "the title of a newspaper article, usually printed in large letters",
+    vietnamese: "tiêu đề báo, dòng tít",
+  },
+  "master-height-noun": {
+    example: "The wall reaches a height of three meters.",
+    topic: "quantity",
+  },
+  "master-highlight-verb": { topic: "communication" },
+  "master-highly-adverb": { topic: "description" },
+  "master-hip-noun": {
+    definition: "the joint or outer area where the leg meets the body",
+    vietnamese: "hông, khớp hông",
+  },
+  "master-hire-verb": {
+    definition: "to employ someone and pay them to work",
+    topic: "work",
+  },
+  "master-hit-noun": {
+    definition: "an act of striking someone or something",
+    topic: "actions",
+  },
+  "master-honest-adjective": {
+    vietnamese: "trung thực, thật thà",
+    example: "Please give me an honest answer.",
+  },
+  "master-horizon-noun": {
+    definition: "the line where the land or sea appears to meet the sky",
+    example: "The sun disappeared below the horizon.",
+    topic: "nature",
+  },
+  "master-household-noun": {
+    example: "Four people live in our household.",
+    topic: "family",
+  },
+  "master-human-noun": {
+    definition: "a person; a member of the human species",
+    example: "Humans have a major effect on the natural world.",
+    topic: "people",
+  },
+  "master-hunt-noun": {
+    vietnamese: "cuộc tìm kiếm, cuộc săn tìm",
+    example: "The police began a nationwide hunt for the suspect.",
+    topic: "safety",
+  },
+  "master-hunt-verb": { topic: "animals" },
+  "master-hurt-adjective": { topic: "emotions" },
+  "master-identity-noun": {
+    definition: "the qualities, beliefs, and details that make a person who they are",
+    vietnamese: "danh tính, bản sắc",
+    topic: "society",
+  },
+  "master-ignore-verb": {
+    definition: "to deliberately pay no attention to someone or something",
+  },
+  "master-illness-noun": { topic: "health" },
+  "master-immediate-adjective": { topic: "time" },
+  "master-immediately-adverb": { topic: "time" },
+  "master-improvement-noun": {
+    definition: "a change that makes something better",
+    example: "The latest update is a major improvement over the old version.",
+    topic: "change",
+  },
+  "master-incident-noun": {
+    definition: "an event, especially one that is unusual or unpleasant",
+    example: "The police recorded the incident in their report.",
+  },
+  "master-increase-noun": { topic: "quantity" },
+  "master-increasingly-adverb": {
+    definition: "more and more over time",
+    vietnamese: "ngày càng",
+    topic: "change",
+  },
+  "master-incredible-adjective": {
+    example: "The athlete completed the race at incredible speed.",
+  },
+  "master-incredibly-adverb": {
+    definition: "in an extreme or hard-to-believe way",
+    topic: "description",
+  },
+  "master-indirectly-adverb": { topic: "description" },
+  "master-industry-noun": {
+    definition: "businesses that produce a particular type of goods or services",
+    topic: "business",
+  },
+  "master-inevitable-adjective": {
+    vietnamese: "không thể tránh khỏi, chắc chắn xảy ra",
+    example: "Some delays were inevitable during the repairs.",
+    topic: "certainty",
+  },
+  "master-inform-verb": { topic: "communication" },
+  "master-ingredient-noun": {
+    definition: "one of the foods or substances used to make a dish",
+    vietnamese: "nguyên liệu, thành phần",
+    example: "The main ingredients in the pie are apples and peaches.",
+  },
+  "master-initially-adverb": {
+    definition: "at the beginning",
+    example: "Initially, the new system seemed difficult to use.",
+    topic: "time",
+  },
+  "master-inject-verb": {
+    definition: "to put medicine into the body using a needle",
+    example: "The nurse injected the medicine into his arm.",
+  },
+  "master-injury-noun": {
+    definition: "physical harm or damage to a person's or animal's body",
+    vietnamese: "chấn thương, thương tích",
+    topic: "health",
+  },
+  "master-insist-verb": {
+    definition: "to demand something firmly and refuse to accept disagreement",
+    example: "She insisted on paying for the meal.",
+  },
+  "master-inspire-verb": {
+    definition: "to make someone feel eager or able to do something creative or worthwhile",
+    vietnamese: "truyền cảm hứng, khơi gợi",
+    topic: "emotions",
+  },
+  "master-institute-noun": { topic: "education" },
+  "master-instructor-noun": {
+    definition: "a person whose job is to teach a skill or subject",
+    example: "The driving instructor taught her how to park safely.",
+    topic: "education",
+  },
+  "master-intend-verb": { example: "Do you intend to stay online much longer?" },
+  "master-interact-verb": { topic: "relationships" },
+  "master-interaction-noun": {
+    definition: "communication or activity between people or things that affect each other",
+    example: "The course encourages interaction between students and teachers.",
+    topic: "relationships",
+  },
+  "master-intermediate-adjective": { topic: "education" },
+  "master-interview-verb": {
+    definition: "to ask someone questions formally for a job, report, or study",
+    vietnamese: "phỏng vấn",
+    example: "The manager interviewed three job applicants.",
+  },
+  "master-invasion-noun": {
+    definition: "the act of entering a country by force with an army",
+    example: "Thousands of residents fled during the invasion.",
+    topic: "safety",
+  },
+  "master-invest-verb": {
+    definition: "to put money, time, or effort into something for a future benefit",
+    example: "The company plans to invest in renewable energy.",
+    topic: "money",
+  },
+  "master-investigation-noun": {
+    vietnamese: "sự điều tra, nghiên cứu",
+    topic: "thinking",
+  },
+  "master-isolation-noun": { topic: "emotions" },
+  "master-jazz-noun": {
+    definition: "a style of music with strong rhythms and improvisation",
+    vietnamese: "nhạc jazz",
+    example: "The club hosts live jazz every Friday night.",
+    topic: "arts",
+  },
+  "master-joint-adjective": {
+    example: "The two organizations issued a joint statement.",
+    topic: "relationships",
+  },
+  "master-joke-verb": { topic: "communication" },
+  "master-journalist-noun": { vietnamese: "nhà báo, phóng viên" },
+  "master-justice-noun": {
+    definition: "fair treatment according to the law and accepted principles",
+    example: "The victims continued their campaign for justice.",
+    topic: "society",
+  },
+  "master-kid-verb": {
+    definition: "to say something that is not true as a joke",
+    vietnamese: "nói đùa, trêu",
+  },
+  "master-lab-noun": {
+    vietnamese: "phòng thí nghiệm",
+    topic: "science",
+  },
+  "master-landlord-noun": {
+    example: "The landlord repaired the heating in our apartment.",
+  },
+  "master-largely-adverb": { topic: "description" },
+  "master-last-adverb": {
+    definition: "at the most recent time",
+    topic: "time",
+  },
+  "master-last-verb": { topic: "time" },
+  "master-lately-adverb": { topic: "time" },
+  "master-laugh-noun": { topic: "sounds" },
+  "master-laughter-noun": {
+    example: "Laughter filled the classroom after the teacher's joke.",
+    topic: "sounds",
+  },
+  "master-launch-verb": { topic: "business" },
+  "master-lay-verb": {
+    definition: "to put something down flat or in a particular position",
+    example: "Lay the book on the table, please.",
+  },
+  "master-layer-noun": {
+    definition: "a level or thickness of material covering a surface",
+    vietnamese: "lớp, tầng",
+  },
+  "master-lead-verb": {
+    definition: "to guide a person or group toward a place or goal",
+    vietnamese: "dẫn dắt, chỉ đường",
+    topic: "movement",
+  },
+  "master-lean-adjective": {
+    vietnamese: "thon gọn, ít mỡ",
+    example: "Regular exercise helped him stay lean and healthy.",
+    topic: "body",
+  },
+  "master-least-adverb": { topic: "quantity" },
+  "master-leave-noun": {
+    vietnamese: "kỳ nghỉ phép, thời gian nghỉ",
+    example: "She took ten days of leave to visit her mother.",
+    topic: "work",
+  },
+  "master-legal-adjective": {
+    example: "It is legal to park here after six o'clock.",
+    topic: "society",
+  },
+  "master-legally-adverb": {
+    example: "The document must be signed before it is legally valid.",
+    topic: "society",
+  },
+  "master-length-noun": { topic: "quantity" },
+  "master-lie-noun": { vietnamese: "lời nói dối" },
+  "master-lift-noun": {
+    vietnamese: "chuyến đi nhờ xe",
+    topic: "travel",
+  },
+  "master-lift-verb": {
+    definition: "to raise someone or something to a higher position",
+    topic: "actions",
+  },
+  "master-light-verb": {
+    definition: "to start a fire or make something begin to burn",
+    example: "We used dry wood to light the fire.",
+  },
+  "master-limit-noun": {
+    example: "There is a strict limit on the number of visitors.",
+    topic: "quantity",
+  },
+  "master-link-verb": {
+    definition: "to connect two or more people, places, or things",
+    vietnamese: "kết nối, liên kết",
+    topic: "relationships",
+  },
+  "master-literature-noun": { topic: "literature" },
+  "master-little-determiner": {
+    definition: "a small amount of something",
+  },
+  "master-liver-noun": {
+    vietnamese: "gan",
+    topic: "body",
+  },
+  "master-locate-verb": { topic: "places" },
+  "master-location-noun": {
+    example: "The store moved to a more convenient location.",
+    topic: "places",
+  },
+  "master-lock-verb": {
+    definition: "to fasten something with a key or locking device",
+    topic: "safety",
+  },
+  "master-loss-noun": {
+    definition: "the state of no longer having something or being unable to find it",
+    topic: "ownership",
+  },
+  "master-loyal-adjective": { topic: "relationships" },
+  "master-loyalty-noun": {
+    definition: "the quality of continuing to support a person, group, or cause",
+    example: "Her loyalty to the team continued through difficult seasons.",
+    topic: "relationships",
+  },
+  "master-mail-verb": {
+    vietnamese: "gửi qua bưu điện",
+    topic: "communication",
+  },
+  "master-majority-noun": { topic: "quantity" },
+  "master-management-noun": {
+    definition: "the work of controlling and organizing a business or activity",
+    example: "This building uses a computerized energy management system.",
+    topic: "business",
+  },
+  "master-marble-noun": {
+    definition: "a hard polished stone used for floors, walls, and sculptures",
+    example: "The entrance hall has a polished marble floor.",
+  },
+  "master-market-verb": {
+    definition: "to advertise and promote a product for sale",
+    vietnamese: "tiếp thị, quảng bá",
+    topic: "business",
+  },
+  "master-marriage-noun": { topic: "relationships" },
+  "master-match-verb": {
+    definition: "to be similar to or suitable for something",
+    vietnamese: "phù hợp, tương xứng",
+    topic: "comparison",
+  },
+  "master-mathematics-noun": { topic: "education" },
+  "master-maximum-adjective": {
+    example: "The machine can operate at maximum pressure.",
+    topic: "quantity",
+  },
+  "master-meaningful-adjective": {
+    definition: "having an important purpose or value",
+  },
+  "master-meanwhile-adverb": { topic: "time" },
+  "master-measure-noun": { topic: "problem-solving" },
+  "master-measure-verb": { topic: "quantity" },
+  "master-mechanical-adjective": { topic: "technology" },
+  "master-medium-adjective": {
+    example: "Would you like a small, medium, or large drink?",
+    topic: "quantity",
+  },
+  "master-medium-noun": {
+    definition: "a substance through which energy or signals can travel",
+    vietnamese: "môi trường, chất trung gian",
+    topic: "science",
+  },
+  "master-mental-adjective": {
+    definition: "relating to the mind or processes of thinking and feeling",
+    vietnamese: "thuộc tinh thần, tâm lý",
+    topic: "health",
+  },
+  "master-merchant-noun": { topic: "business" },
+  "master-merely-adverb": { topic: "description" },
+  "master-minimum-adjective": {
+    example: "Workers must receive the minimum wage.",
+    topic: "quantity",
+  },
+  "master-minority-noun": {
+    definition: "the smaller part of a group, usually less than half",
+    vietnamese: "thiểu số, phần ít",
+  },
+  "master-mislead-verb": {
+    definition: "to cause someone to believe something that is not true",
+    vietnamese: "làm hiểu lầm, đánh lừa",
+    example: "The advertisement may mislead customers about the true cost.",
+    topic: "communication",
+  },
+  "master-model-adjective": {
+    example: "She was praised as a model citizen.",
+  },
+  "master-model-verb": {
+    definition: "to demonstrate behavior that others can copy",
+    vietnamese: "làm gương, làm mẫu",
+    example: "Parents should model the behavior they expect from their children.",
+    topic: "education",
+  },
+  "master-molecule-noun": { topic: "science" },
+  "master-monitor-noun": { topic: "technology" },
+  "master-monitor-verb": {
+    definition: "to watch or check something regularly for changes or problems",
+    vietnamese: "theo dõi, giám sát",
+    example: "Nurses monitor the patient's condition throughout the night.",
+    topic: "safety",
+  },
+  "master-moral-noun": {
+    definition: "a principle about what is right and wrong",
+    vietnamese: "nguyên tắc đạo đức, bài học",
+    example: "The story teaches a clear moral about honesty.",
+    topic: "society",
+  },
+  "master-more-adverb": {
+    definition: "in a greater degree or amount than before",
+    example: "This chapter is more interesting than the last one.",
+    topic: "comparison",
+  },
+  "master-moreover-adverb": {
+    definition: "used to add another related and important point",
+  },
+  "master-motive-noun": { topic: "thinking" },
+  "master-movement-noun": { topic: "movement" },
+  "master-murder-verb": { topic: "safety" },
+  "master-myth-noun": { topic: "literature" },
+  "master-naked-adjective": { topic: "clothing" },
+  "master-narrow-adjective": {
+    definition: "having only a small distance from side to side",
+    example: "The truck crossed a narrow bridge.",
+  },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {

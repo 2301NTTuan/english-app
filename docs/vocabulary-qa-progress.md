@@ -8,25 +8,25 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 401-1200
+B1 / level entries 701-1200
 
 LAST CHECKED ENTRY:
-master-employment-noun / B1 position 400
+master-narrow-adjective / B1 position 700
 
 NEXT ENTRY:
-master-enable-verb / B1 position 401
+master-nasty-adjective / B1 position 701
 
 CHECKED:
-2100/6000
+2400/6000
 
 CRITICAL FOUND:
-192
+238
 
 MAJOR FOUND:
-725
+865
 
 MINOR FOUND:
-127
+157
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B1 positions 351-400: 0 structural blockers and 0 semantic candidates; content validation 9/9; inventory 6000; quality gate true
+B1 positions 601-700: 0 structural blockers and 0 semantic candidates; content validation 9/9; inventory 6000; quality gate true
 
 LAST CHECKPOINT COMMIT:
-QA vocabulary B1 positions 201-400 (this checkpoint)
+QA vocabulary B1 positions 401-700 (this checkpoint)
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
