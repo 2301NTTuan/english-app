@@ -1,6 +1,6 @@
 # Validation report
 
-Latest vocabulary reconciliation verification date: 30 August 2026. Build and browser E2E results below remain from 29 August 2026; they were not rerun because this reconciliation did not change application runtime code.
+Latest repository verification date: 30 August 2026. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) for commit `be3d4b1` (`Fix full-corpus E2E validation`) passed the complete configured workflow, including the production build and Playwright browser E2E.
 
 ## Automated results
 

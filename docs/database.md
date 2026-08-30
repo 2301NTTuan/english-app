@@ -2,7 +2,7 @@
 
 ## Schema and migrations
 
-PostgreSQL 17+ is the local and deployment target. Drizzle schema is in `src/db/schema.ts`; three generated immutable SQL migrations are in `drizzle/`. The migrations create five enums and 31 tables, database checks, the email-verification token lifecycle, and the unique mistake business key used by transactional upserts.
+PostgreSQL 17+ is the local and deployment target. Drizzle schema is in `src/db/schema.ts`; six generated immutable SQL migrations are in `drizzle/`. The migrations create five enums and 31 tables, database checks, the email-verification token lifecycle, and the unique mistake business key used by transactional upserts.
 
 ```bash
 docker compose up -d postgres
@@ -33,6 +33,8 @@ pg_restore --no-owner --dbname=english_mastery_restore_test english-mastery.dump
 
 Verify restore by checking core table counts, sampling content checksums, validating foreign keys, and running integration tests against the restored database. A production operator must choose and document RPO/RTO, retention, encryption keys, access controls, geographic policy, and a quarterly restore drill. Account deletion cascades primary records; backup expiration follows the configured retention window.
 
-For a repeatable local drill against the configured disposable test database, run `npm run db:restore:drill`. The script refuses a source database whose name does not contain `test`, creates a uniquely named disposable restore target, compares core row counts and all content-version checksums, runs the PostgreSQL integration suite against the restored database, and removes both target and `/tmp` dump afterward. This validates the repository-level logical restore procedure only; it does not prove a cloud provider snapshot, retention policy, encryption, or production RPO/RTO.
+For a repeatable local drill against the configured disposable test database, run `npm run db:restore:drill`. The script refuses a source database whose name does not contain `test`, remaps a plain logical dump into a uniquely named isolated schema, compares core row counts and all content-version checksums, runs the PostgreSQL integration suite against the restored schema, and removes both the schema and `/tmp` dump afterward. This validates the repository-level logical restore procedure only; it does not prove a cloud provider snapshot, retention policy, encryption, or production RPO/RTO.
 
-Latest local drill attempt: **FAIL, 28 August 2026**. `pg_dump` completed against the disposable test database, but the configured least-privilege test role could not create the uniquely named restore database (`SQLSTATE 42501: permission denied to create database`). Restoration, checksum comparison, and integration tests against the restored copy therefore did not run. The temporary `/tmp` dump was removed by the script. Re-run with a staging maintenance role that has permission to create and drop disposable databases; do not grant `CREATEDB` to the application runtime role merely to make this drill pass.
+Previous attempt: **FAIL, 28 August 2026**. `pg_dump` completed against the disposable test database, but the configured least-privilege test role could not create the uniquely named restore database (`SQLSTATE 42501: permission denied to create database`). Restoration, checksum comparison, and integration tests against that copy therefore did not run. The temporary `/tmp` dump was removed by the script.
+
+Latest verified drill: **PASS, 29 August 2026**. `npm run db:restore:drill` restored the logical dump into an isolated schema without granting `CREATEDB`; core row counts and content-version checksums matched, all 12 PostgreSQL integration tests passed against the restored schema, and the temporary schema and dump were removed.
