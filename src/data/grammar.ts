@@ -1,4 +1,5 @@
 import type { GrammarTopic } from "@/types/domain";
+import { a1Lessons } from "./grammar/a1";
 
 const topic = (id: string, title: string, level: GrammarTopic["level"], description: string, prerequisites: string[], structures: string[], example: string, mistake: [string, string, string], subtopics: string[]): GrammarTopic => ({
   id, title, level, category: "Core grammar", description, prerequisites,
@@ -54,7 +55,8 @@ const additionalDetailedTopics: GrammarTopic[] = [
   topic("advanced-cohesive-devices", "Advanced cohesive devices", "C2", "Build subtle logical and referential links across extended formal discourse.", ["discourse-markers", "information-structure"], ["lexical chains", "reference", "substitution and ellipsis"], "This interpretation is plausible; the former, however, better explains the final result.", ["This interpretation plausible, former explains.", "This interpretation is plausible; the former, however, better explains the result.", "Reference expressions need an identifiable antecedent."], ["reference", "lexical cohesion", "logical relations"]),
 ];
 
-const detailedTopics: GrammarTopic[] = [...coreDetailedTopics, ...additionalDetailedTopics];
+const legacyDetailedTopics: GrammarTopic[] = [...coreDetailedTopics, ...additionalDetailedTopics];
+const detailedTopics: GrammarTopic[] = [...a1Lessons, ...legacyDetailedTopics.filter((item) => !a1Lessons.some((lesson) => lesson.id === item.id))];
 
 export const curriculumOutline: Record<GrammarTopic["level"], string[]> = {
   A1: ["Verb to be", "Subject pronouns", "Object pronouns", "Possessive adjectives", "Possessive pronouns", "Articles: a / an / the", "Plural nouns", "Demonstratives", "There is / There are", "Have / Have got", "Present Simple", "Present Continuous", "Present Simple vs Present Continuous", "Can / Can't", "Imperatives", "Possessive 's", "Some / Any", "Much / Many", "Countable / Uncountable nouns", "Prepositions of place", "Prepositions of time", "Wh- questions", "Adverbs of frequency", "Basic conjunctions"],
