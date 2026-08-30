@@ -5,28 +5,28 @@ STATUS:
 IN_PROGRESS
 
 CURRENT CEFR:
-B1
+B2
 
 CURRENT RANGE:
-B1 / level entries 1101-1200
+B2 / level entries 1-250
 
 LAST CHECKED ENTRY:
-master-tick-noun / B1 position 1100
+master-yet-conjunction / B1 position 1200
 
 NEXT ENTRY:
-master-tick-verb / B1 position 1101
+v1 / B2 position 1
 
 CHECKED:
-2800/6000
+2900/6000
 
 CRITICAL FOUND:
-304
+318
 
 MAJOR FOUND:
-1052
+1101
 
 MINOR FOUND:
-198
+209
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B1 positions 1051-1100: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B1 positions 1-1200: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-504a6fd QA vocabulary B1 positions 701-800
+9e950d8 QA vocabulary B1 positions 801-1100
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.

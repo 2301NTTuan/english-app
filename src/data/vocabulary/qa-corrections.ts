@@ -9,11 +9,14 @@ interface VocabularyQaCorrection {
 
 /** Confirmed learner-facing corrections found during the 6,000-entry production QA pass. */
 export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
+  "v14": { definition: "completely necessary or extremely important" },
+  "v16": { definition: "happening often or at short intervals" },
   "v36": { topic: "safety" },
   "v37": { topic: "decision-making" },
   "v44": { topic: "description" },
   "v52": { topic: "memory" },
   "v59": { topic: "description" },
+  "v72": { definition: "to happen or take place" },
   "a1-city": { topic: "places" },
   "master-about-adverb": {
     definition: "approximately; a little more or less than a number or amount",
@@ -2089,7 +2092,10 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     example: "She attained the highest level in the course.",
     topic: "success",
   },
-  "master-attempt-verb": { topic: "actions" },
+  "master-attempt-verb": {
+    example: "She will attempt to finish the climb before sunset.",
+    topic: "actions",
+  },
   "master-attract-verb": {
     definition: "to cause someone or something to come closer or pay attention",
     vietnamese: "thu hút, hấp dẫn",
@@ -4312,6 +4318,200 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
   "master-tick-noun": {
     vietnamese: "dấu tích, dấu kiểm",
   },
+  "master-tick-verb": {
+    example: "The old clock continued to tick through the night.",
+    topic: "sounds",
+  },
+  "master-tide-noun": { topic: "nature" },
+  "master-tie-verb": {
+    vietnamese: "buộc, thắt",
+  },
+  "master-tighten-verb": {
+    vietnamese: "siết chặt, làm căng",
+    example: "Can you tighten the lid so the jar does not leak?",
+  },
+  "master-tire-verb": {
+    vietnamese: "trở nên mệt, làm mệt",
+  },
+  "master-tobacco-noun": { topic: "health" },
+  "master-total-adjective": {
+    example: "The project was a total failure.",
+  },
+  "master-total-noun": {
+    definition: "the complete amount obtained by adding everything together",
+    example: "The total came to fifty dollars.",
+    topic: "quantity",
+  },
+  "master-totally-adverb": { topic: "description" },
+  "master-touch-verb": { topic: "senses" },
+  "master-tour-verb": {
+    vietnamese: "đi tham quan",
+    example: "We toured the old castle with a local guide.",
+    topic: "travel",
+  },
+  "master-trace-noun": {
+    vietnamese: "dấu vết, một lượng rất nhỏ",
+  },
+  "master-traditionally-adverb": { topic: "culture" },
+  "master-transfer-verb": {
+    example: "Please transfer the files to the new computer.",
+    topic: "change",
+  },
+  "master-transformation-noun": {
+    example: "The building underwent a complete transformation after the renovation.",
+    topic: "change",
+  },
+  "master-transport-noun": { topic: "travel" },
+  "master-treat-noun": {
+    vietnamese: "điều thú vị hiếm có, món quà đặc biệt",
+    topic: "activities",
+  },
+  "master-treatment-noun": { topic: "health" },
+  "master-tremendous-adjective": {
+    vietnamese: "to lớn, rất lớn, tuyệt vời",
+  },
+  "master-trend-noun": {
+    vietnamese: "xu hướng",
+    topic: "change",
+  },
+  "master-trim-noun": {
+    definition: "a neat and tidy condition or appearance",
+    example: "The garden is in good trim.",
+    topic: "description",
+  },
+  "master-triumph-noun": { topic: "success" },
+  "master-tropical-adjective": { topic: "places" },
+  "master-tumble-verb": {
+    example: "The stack of boxes began to tumble.",
+  },
+  "master-type-verb": { topic: "technology" },
+  "master-typical-adjective": {
+    vietnamese: "điển hình, tiêu biểu",
+  },
+  "master-typically-adverb": { topic: "description" },
+  "master-unable-adjective": {
+    definition: "not having the ability or opportunity to do something",
+    vietnamese: "không thể, không có khả năng",
+  },
+  "master-unclear-adjective": {
+    vietnamese: "không rõ ràng, khó hiểu",
+  },
+  "master-unemployed-adjective": {
+    vietnamese: "thất nghiệp, không có việc làm",
+    topic: "work",
+  },
+  "master-unemployment-noun": { topic: "work" },
+  "master-unexpected-adjective": { topic: "events" },
+  "master-union-noun": { topic: "society" },
+  "master-unlikely-adjective": { topic: "possibility" },
+  "master-unusually-adverb": {
+    definition: "in a way that is not usual or expected",
+    vietnamese: "khác thường, một cách bất thường",
+    topic: "description",
+  },
+  "master-upward-adjective": {
+    definition: "moving or directed toward a higher position",
+    example: "The graph shows an upward trend.",
+  },
+  "master-urge-noun": { topic: "emotions" },
+  "master-urgent-adjective": { topic: "safety" },
+  "master-usage-noun": {
+    definition: "the way in which a word, phrase, or object is used",
+    vietnamese: "cách dùng, việc sử dụng",
+    topic: "language",
+  },
+  "master-variety-noun": {
+    vietnamese: "sự đa dạng, nhiều loại khác nhau",
+    topic: "quantity",
+  },
+  "master-various-adjective": {
+    definition: "including several different types or kinds",
+  },
+  "master-vehicle-noun": { topic: "travel" },
+  "master-vein-noun": {
+    example: "The nurse found a vein in his arm.",
+  },
+  "master-victim-noun": {
+    definition: "a person harmed by a crime, accident, or other event",
+    vietnamese: "nạn nhân",
+    topic: "safety",
+  },
+  "master-victory-noun": {
+    example: "The team celebrated a clear victory.",
+    topic: "success",
+  },
+  "master-view-verb": {
+    definition: "to regard or consider someone or something in a particular way",
+    vietnamese: "xem, coi, nhìn nhận",
+  },
+  "master-violence-noun": { topic: "safety" },
+  "master-virtual-adjective": {
+    definition: "created or experienced through computer technology rather than physically",
+    vietnamese: "ảo, trực tuyến",
+    topic: "technology",
+  },
+  "master-vision-noun": {
+    vietnamese: "thị lực, khả năng nhìn",
+    topic: "senses",
+  },
+  "master-volume-noun": {
+    vietnamese: "âm lượng",
+    topic: "sounds",
+  },
+  "master-volunteer-verb": { topic: "society" },
+  "master-vowel-noun": { topic: "language" },
+  "master-wake-verb": {
+    example: "Could you please wake Donald up?",
+  },
+  "master-warn-verb": { topic: "safety" },
+  "master-warranty-noun": {
+    definition: "a written promise to repair or replace a product within a certain time",
+    vietnamese: "sự bảo hành, giấy bảo hành",
+    example: "The laptop comes with a two-year warranty.",
+    topic: "business",
+  },
+  "master-waste-adjective": {
+    definition: "no longer wanted or suitable for ordinary use",
+    vietnamese: "thải, bỏ đi",
+    example: "The factory treats its waste water before release.",
+    topic: "materials",
+  },
+  "master-waste-verb": { topic: "quantity" },
+  "master-wave-verb": {
+    vietnamese: "vẫy, vẫy tay",
+    topic: "communication",
+  },
+  "master-weapon-noun": {
+    example: "The guard locked the weapon in a secure cabinet.",
+    topic: "safety",
+  },
+  "master-welcome-adjective": {
+    vietnamese: "được hoan nghênh, dễ chịu",
+    example: "The cool rain brought welcome relief after the heat.",
+  },
+  "master-whoever-pronoun": {
+    definition: "any person who does a particular thing or is in a particular situation",
+    example: "Whoever arrives first should open the windows.",
+  },
+  "master-whole-noun": {
+    definition: "all of something considered as one complete thing",
+    example: "The whole of the building was renovated.",
+    topic: "quantity",
+  },
+  "master-willingness-noun": { topic: "emotions" },
+  "master-wire-noun": { topic: "technology" },
+  "master-witness-verb": {
+    definition: "to see an event happen, especially an important or unusual one",
+    example: "Several people witnessed the accident.",
+  },
+  "master-workplace-noun": { topic: "work" },
+  "master-workshop-noun": { topic: "work" },
+  "master-worth-adjective": { topic: "money" },
+  "master-worthwhile-adjective": { topic: "success" },
+  "master-worthy-adjective": {
+    example: "The committee supported this worthy cause.",
+  },
+  "master-wound-noun": { topic: "health" },
 };
 
 export function applyVocabularyQaCorrection(item: VocabularyItem): VocabularyItem {
