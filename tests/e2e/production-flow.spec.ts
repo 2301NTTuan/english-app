@@ -2,17 +2,14 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { createHash, randomBytes } from "node:crypto";
 import { Client } from "pg";
-import { exercises } from "../../src/data/exercises";
-import { grammarTopics } from "../../src/data/grammar";
-import { vocabulary } from "../../src/data/vocabulary";
-import { generateGrammarExercise, generateVocabularyExercise } from "../../src/lib/learning/exercises";
-import type { SessionExercise } from "../../src/types/domain";
+import { buildStudySession } from "../../src/lib/learning/session";
+import type { AppState, SessionExercise } from "../../src/types/domain";
 
 const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const userA = { name: "Production Flow A", email: `flow-a-${nonce}@test.invalid`, password: "ProductionFlow1234" };
 const userB = { name: "Production Flow B", email: `flow-b-${nonce}@test.invalid`, password: "ProductionFlow5678" };
 
-function sessionAnswerMap() {
+function sessionAnswerMap(session: SessionExercise[]) {
   const answers = new Map<string, string>();
   const key = (prompt: string, options: string[]) => `${prompt}\u0000${[...options].sort().join("\u0000")}`;
   const add = (exercise: Pick<SessionExercise, "prompt" | "options" | "answer">) => {
@@ -22,21 +19,9 @@ function sessionAnswerMap() {
     if (existing && existing !== exercise.answer) throw new Error(`Ambiguous generated session choices: ${exercise.prompt}`);
     answers.set(exerciseKey, exercise.answer);
   };
-  exercises.forEach(add);
-  for (const item of vocabulary) {
-    for (const dimension of ["recognition", "recall", "context", "spelling"] as const) {
-      add(generateVocabularyExercise(item, "newVocabulary", dimension, true));
-      add(generateVocabularyExercise(item, "newVocabulary", dimension, false));
-    }
-  }
-  for (const topic of grammarTopics) {
-    const exercise = generateGrammarExercise(topic.id, "newGrammar");
-    if (exercise) add(exercise);
-  }
+  session.forEach(add);
   return answers;
 }
-
-const authoredSessionAnswers = sessionAnswerMap();
 
 async function register(page: Page, user: typeof userA) {
   await page.goto("/register");
@@ -101,6 +86,13 @@ test.describe.serial("production acceptance", () => {
     await expect(placementResult).toBeVisible();
     await page.getByRole("link", { name: /View learning path/ }).click();
     await expect(page.getByRole("heading", { name: /learning path/ })).toBeVisible();
+
+    const stateResponse = await page.evaluate(async () => {
+      const response = await fetch("/api/state");
+      return { status: response.status, body: await response.json() };
+    }) as { status: number; body: { state: AppState } };
+    expect(stateResponse.status).toBe(200);
+    const authoredSessionAnswers = sessionAnswerMap(buildStudySession(stateResponse.body.state));
 
     await page.goto("/");
     await page.getByRole("link", { name: /Start Today's Session/ }).click();

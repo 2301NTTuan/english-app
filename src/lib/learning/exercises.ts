@@ -47,7 +47,8 @@ export function generateVocabularyExercise(item: VocabularyItem, source: PlanCat
   const curated = curatedExercises.find((exercise) => exercise.itemId === item.id && (preferred === "recall" ? exercise.type === "recall" : preferred === "context" ? exercise.type === "fill-blank" : exercise.type === "recognition"));
   if (curated) return { ...curated, id: `${source}-${curated.id}`, source, targetDimension: preferred, difficulty: curated.difficulty ?? (preferred === "recognition" ? 1 : 2) };
   const relatedWords = [...item.synonyms, ...item.antonyms].map((relation) => relation.word);
-  const distractors = selectVocabularyDistractors(item, vocabulary, relatedWords);
+  const rankedDistractors = selectVocabularyDistractors(item, vocabulary, relatedWords, preferred === "context" ? 12 : 3);
+  const distractors = preferred === "context" ? rankedDistractors.filter((candidate) => !confusableMeaning(item, candidate)).slice(0, 3) : rankedDistractors;
   const base = { itemId: item.id, knowledgeType: "vocabulary" as const, source };
 
   if (preferred === "recall") {

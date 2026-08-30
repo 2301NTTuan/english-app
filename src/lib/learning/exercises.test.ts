@@ -19,9 +19,11 @@ describe("exercise generation", () => {
     const job = vocabulary.find((item) => item.id === "a1-job")!;
     const happen = vocabulary.find((item) => item.id === "foundation-a2-happen")!;
     const temporary = vocabulary.find((item) => item.id === "v25")!;
+    const decline = vocabulary.find((item) => item.id === "master-decline-noun")!;
     expect(generateVocabularyExercise(job, "newVocabulary", "recall").options).not.toContain("work");
     expect(generateVocabularyExercise(happen, "newVocabulary", "recall").options).not.toContain("occur");
     expect(generateVocabularyExercise(temporary, "newVocabulary", "recognition").options).not.toContain("lasting only a short time");
+    expect(generateVocabularyExercise(decline, "newVocabulary", "context").options).not.toContain("decrease");
   });
 
   it("excludes related words from synonym distractors", () => {
