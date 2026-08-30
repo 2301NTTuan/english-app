@@ -1740,6 +1740,388 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
   "master-ignorance-noun": {
     vietnamese: "sự thiếu hiểu biết",
   },
+  "master-immigrant-noun": {
+    vietnamese: "người nhập cư",
+    example: "Many immigrants settled in the city after the war.",
+    topic: "society",
+  },
+  "master-imperative-noun": {
+    example: "In the sentence 'Come here,' the verb is in the imperative.",
+    topic: "language",
+  },
+  "master-implement-noun": {
+    vietnamese: "dụng cụ, công cụ",
+  },
+  "master-implement-verb": { topic: "actions" },
+  "master-implication-noun": {
+    definition: "a possible effect or consequence of an action or decision",
+    vietnamese: "hệ quả, hàm ý",
+  },
+  "master-import-verb": { topic: "business" },
+  "master-impulse-noun": {
+    definition: "a sudden strong desire to do something",
+    vietnamese: "sự thôi thúc, ý muốn bộc phát",
+  },
+  "master-incentive-noun": {
+    vietnamese: "động lực, sự khuyến khích",
+    topic: "work",
+  },
+  "master-incur-verb": {
+    definition: "to become subject to something unpleasant, such as a cost or penalty",
+    example: "Late payments may incur additional charges.",
+    topic: "money",
+  },
+  "master-independently-adverb": { topic: "actions" },
+  "master-index-noun": { topic: "language" },
+  "master-infant-noun": {
+    vietnamese: "trẻ sơ sinh, em bé",
+    topic: "family",
+  },
+  "master-infectious-adjective": {
+    definition: "able to spread from one person, animal, or plant to another",
+    vietnamese: "dễ lây, truyền nhiễm",
+    topic: "health",
+  },
+  "master-inference-noun": {
+    definition: "a conclusion reached from evidence and reasoning rather than direct observation",
+  },
+  "master-inflate-verb": {
+    definition: "to fill something with air or gas so that it becomes larger",
+  },
+  "master-inflation-noun": {
+    vietnamese: "lạm phát",
+    topic: "money",
+  },
+  "master-influential-adjective": {
+    definition: "having the power to affect people's ideas, actions, or decisions",
+    example: "She became an influential figure in modern architecture.",
+    topic: "society",
+  },
+  "master-informal-adjective": {
+    example: "We held an informal discussion before the official meeting.",
+  },
+  "master-inhabit-verb": { topic: "places" },
+  "master-initial-adjective": {
+    definition: "happening or existing at the beginning",
+    topic: "time",
+  },
+  "master-initiative-noun": {
+    definition: "the ability to decide and act without waiting for someone else",
+    vietnamese: "tính chủ động, sáng kiến",
+    example: "She showed initiative by organizing the project herself.",
+    topic: "skills",
+  },
+  "master-injection-noun": { topic: "health" },
+  "master-innovation-noun": {
+    vietnamese: "sự đổi mới, sáng kiến",
+    topic: "technology",
+  },
+  "master-innovative-adjective": {
+    example: "The company is known for its innovative product designs.",
+    topic: "technology",
+  },
+  "master-input-noun": {
+    definition: "information, ideas, or advice contributed to a project or decision",
+    vietnamese: "ý kiến đóng góp, thông tin đầu vào",
+  },
+  "master-inspector-noun": {
+    definition: "a person whose job is to check that rules or standards are followed",
+    topic: "work",
+  },
+  "master-instantly-adverb": { topic: "time" },
+  "master-instinct-noun": {
+    example: "Birds have a strong instinct to protect their young.",
+    topic: "nature",
+  },
+  "master-institution-noun": {
+    vietnamese: "thể chế, thiết chế xã hội",
+    topic: "society",
+  },
+  "master-insufficient-adjective": {
+    example: "The available evidence was insufficient to prove the claim.",
+  },
+  "master-insult-verb": {
+    example: "He apologized after insulting his colleague during the meeting.",
+  },
+  "master-integrate-verb": {
+    definition: "to combine separate parts so that they form a complete whole",
+    example: "The course integrates practical training with classroom study.",
+  },
+  "master-intellectual-adjective": { topic: "thinking" },
+  "master-intellectual-noun": {
+    example: "She was a respected intellectual who wrote about social change.",
+  },
+  "master-intent-adjective": { topic: "decision-making" },
+  "master-interactive-adjective": {
+    definition: "allowing people and a system to communicate with and respond to each other",
+    vietnamese: "có tính tương tác",
+    example: "The museum has an interactive display for children.",
+    topic: "technology",
+  },
+  "master-interfere-verb": {
+    definition: "to become involved in a situation and prevent it from developing normally",
+    topic: "relationships",
+  },
+  "master-interior-noun": {
+    example: "The interior of the building was recently renovated.",
+  },
+  "master-interpreter-noun": { topic: "work" },
+  "master-intimate-adjective": {
+    example: "They shared an intimate conversation over dinner.",
+    topic: "relationships",
+  },
+  "master-invariably-adverb": { topic: "time" },
+  "master-investigate-verb": {
+    definition: "to examine a situation carefully in order to discover the facts",
+    topic: "thinking",
+  },
+  "master-investigator-noun": {
+    definition: "a person whose job is to discover facts about a crime or problem",
+    example: "The investigator interviewed everyone who witnessed the accident.",
+    topic: "work",
+  },
+  "master-investment-noun": { topic: "money" },
+  "master-investor-noun": {
+    example: "Several investors provided money for the new company.",
+    topic: "money",
+  },
+  "master-invisible-adjective": {
+    definition: "unable to be seen",
+    vietnamese: "vô hình, không nhìn thấy được",
+    example: "The gas is invisible but has a strong smell.",
+    topic: "senses",
+  },
+  "master-invoke-verb": {
+    definition: "to mention a law, rule, or authority in order to support an action",
+    vietnamese: "viện dẫn, áp dụng",
+    topic: "society",
+  },
+  "master-jam-verb": {
+    definition: "to become stuck or make something become stuck",
+    vietnamese: "làm kẹt, bị kẹt",
+    example: "A sheet of paper jammed inside the printer.",
+  },
+  "master-jaw-noun": {
+    definition: "either of the two bony parts of the mouth that hold the teeth",
+    example: "He injured his jaw during the match.",
+  },
+  "master-joint-noun": {
+    vietnamese: "khớp, chỗ nối",
+    example: "She injured a joint in her knee while running.",
+    topic: "body",
+  },
+  "master-journalism-noun": {
+    example: "She studied journalism before becoming a news reporter.",
+    topic: "communication",
+  },
+  "master-jump-noun": {
+    vietnamese: "sự tăng vọt, mức tăng đột ngột",
+    example: "The company reported a sharp jump in online sales.",
+    topic: "change",
+  },
+  "master-keen-adjective": { topic: "emotions" },
+  "master-label-noun": { topic: "objects" },
+  "master-lack-verb": {
+    definition: "to not have something or not have enough of it",
+  },
+  "master-lap-noun": {
+    definition: "the area formed by your upper legs when you are sitting down",
+    vietnamese: "lòng",
+    example: "The tired child fell asleep on his mother's lap.",
+  },
+  "master-laptop-noun": { topic: "technology" },
+  "master-laser-noun": {
+    definition: "a device that produces a narrow, powerful beam of light",
+    vietnamese: "tia laser, thiết bị laser",
+    example: "The surgeon used a laser during the operation.",
+    topic: "technology",
+  },
+  "master-latter-adjective": {
+    definition: "nearer the end of a period, or the second of two things mentioned",
+    vietnamese: "sau, cuối, thứ hai trong hai điều",
+    topic: "time",
+  },
+  "master-lawn-noun": {
+    vietnamese: "bãi cỏ, thảm cỏ",
+    topic: "home",
+  },
+  "master-lawsuit-noun": {
+    example: "The customer filed a lawsuit against the company.",
+    topic: "society",
+  },
+  "master-leaflet-noun": {
+    definition: "a small sheet or folded piece of paper that gives information",
+    vietnamese: "tờ rơi, tờ thông tin",
+    topic: "communication",
+  },
+  "master-leak-noun": { topic: "objects" },
+  "master-leak-verb": { topic: "change" },
+  "master-leap-noun": { topic: "movement" },
+  "master-lease-noun": {
+    example: "We signed a two-year lease on the apartment.",
+    topic: "business",
+  },
+  "master-lecturer-noun": {
+    vietnamese: "giảng viên",
+    topic: "education",
+  },
+  "master-legend-noun": {
+    example: "According to legend, a dragon once lived beneath the mountain.",
+    topic: "culture",
+  },
+  "master-legendary-adjective": { topic: "culture" },
+  "master-legislation-noun": {
+    vietnamese: "pháp luật, đạo luật",
+    topic: "society",
+  },
+  "master-legislative-adjective": {
+    example: "The committee has legislative authority over tax policy.",
+    topic: "society",
+  },
+  "master-legislature-noun": {
+    example: "The state legislature approved the new education law.",
+  },
+  "master-legitimate-adjective": {
+    definition: "allowed by law or based on a reasonable and acceptable claim",
+    example: "The court recognized the group as a legitimate organization.",
+    topic: "society",
+  },
+  "master-level-verb": {
+    definition: "to direct criticism, blame, or an accusation at someone",
+    vietnamese: "chĩa vào, nhắm vào",
+    example: "Several officials leveled criticism at the proposed policy.",
+    topic: "communication",
+  },
+  "master-liberal-adjective": { topic: "society" },
+  "master-lifetime-noun": {
+    example: "The artist produced hundreds of paintings during her lifetime.",
+  },
+  "master-limb-noun": {
+    vietnamese: "chi, tay hoặc chân",
+    example: "The accident damaged a nerve in his left limb.",
+  },
+  "master-line-verb": {
+    definition: "to arrange or position something in a straight line",
+    vietnamese: "xếp thẳng, căn thẳng hàng",
+  },
+  "master-listener-noun": {
+    example: "A good listener pays attention without interrupting.",
+    topic: "communication",
+  },
+  "master-litter-noun": {
+    example: "Volunteers collected litter from the beach.",
+    topic: "environment",
+  },
+  "master-load-verb": {
+    definition: "to put goods or materials onto a vehicle or into a container",
+  },
+  "master-loan-noun": {
+    vietnamese: "khoản vay, tiền vay",
+  },
+  "master-lobby-noun": {
+    vietnamese: "sảnh, tiền sảnh",
+    topic: "places",
+  },
+  "master-lucrative-adjective": { topic: "money" },
+  "master-major-noun": {
+    vietnamese: "chuyên ngành chính",
+    topic: "education",
+  },
+  "master-make-noun": {
+    definition: "the brand or manufacturer of a product",
+    vietnamese: "nhãn hiệu, hãng sản xuất",
+    example: "What make of car is that?",
+    topic: "business",
+  },
+  "master-manipulate-verb": {
+    definition: "to control or handle something skillfully, sometimes unfairly",
+    vietnamese: "điều khiển, thao tác, thao túng",
+    topic: "actions",
+  },
+  "master-manual-adjective": {
+    vietnamese: "thủ công, bằng tay",
+    topic: "work",
+  },
+  "master-manual-noun": {
+    vietnamese: "sách hướng dẫn, sổ tay",
+    example: "I need to fix the printer, but I cannot find the manual.",
+    topic: "technology",
+  },
+  "master-manufacture-noun": { topic: "work" },
+  "master-manufacturer-noun": {
+    example: "The manufacturer recalled the product after a safety test.",
+    topic: "business",
+  },
+  "master-margin-noun": {
+    example: "She wrote a short note in the margin.",
+    topic: "language",
+  },
+  "master-mask-noun": {
+    vietnamese: "mặt nạ, khẩu trang",
+    topic: "health",
+  },
+  "master-mass-noun": { topic: "science" },
+  "master-master-noun": {
+    definition: "a person with exceptional skill in a particular activity",
+    vietnamese: "bậc thầy, người tinh thông",
+    example: "She is a master of the violin.",
+    topic: "skills",
+  },
+  "master-mate-noun": {
+    example: "My roommate helped me carry the boxes.",
+    topic: "relationships",
+  },
+  "master-mathematical-adjective": { topic: "science" },
+  "master-mean-noun": {
+    vietnamese: "số trung bình, trung bình cộng",
+    topic: "science",
+  },
+  "master-medication-noun": { topic: "health" },
+  "master-memorial-noun": { topic: "history" },
+  "master-mentor-noun": { topic: "education" },
+  "master-merchandise-noun": { topic: "business" },
+  "master-merger-noun": {
+    definition: "the process of combining two or more organizations into one",
+    topic: "business",
+  },
+  "master-mess-verb": {
+    definition: "to make something untidy or spoil a situation",
+    vietnamese: "làm lộn xộn, làm hỏng",
+    example: "Please do not mess up the documents on my desk.",
+    topic: "actions",
+  },
+  "master-messenger-noun": { topic: "communication" },
+  "master-metaphor-noun": { topic: "language" },
+  "master-metric-adjective": {
+    definition: "relating to the system of measurement based on meters and kilograms",
+    vietnamese: "thuộc hệ mét",
+    example: "Most countries use the metric system.",
+    topic: "science",
+  },
+  "master-microphone-noun": { topic: "technology" },
+  "master-migration-noun": { topic: "nature" },
+  "master-mine-noun": {
+    example: "The region once had a large coal mine.",
+    topic: "materials",
+  },
+  "master-minister-noun": { topic: "society" },
+  "master-missile-noun": {
+    vietnamese: "tên lửa, đạn tên lửa",
+    topic: "safety",
+  },
+  "master-mix-noun": { topic: "materials" },
+  "master-mixture-noun": {
+    example: "The bowl contained a mixture of rice and vegetables.",
+  },
+  "master-mobility-noun": {
+    example: "Regular exercise improved her mobility after the operation.",
+    topic: "movement",
+  },
+  "master-mock-adjective": {
+    definition: "not real, but made to look or act like the real thing",
+    vietnamese: "giả, mô phỏng",
+    example: "Students took part in a mock election at school.",
+  },
   "master-activity-noun": {
     definition: "something people do for work, learning, exercise, or enjoyment",
     vietnamese: "hoạt động",

@@ -8,25 +8,25 @@ CURRENT CEFR:
 B2
 
 CURRENT RANGE:
-B2 / level entries 701-900
+B2 / level entries 901-1100
 
 LAST CHECKED ENTRY:
-master-illustrate-verb / B2 position 750
+master-mock-adjective / B2 position 900
 
 NEXT ENTRY:
-master-illustration-noun / B2 position 751
+master-modest-adjective / B2 position 901
 
 CHECKED:
-3650/6000
+3800/6000
 
 CRITICAL FOUND:
-420
+439
 
 MAJOR FOUND:
-1443
+1506
 
 MINOR FOUND:
-316
+350
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B2 positions 701-750: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B2 positions 876-900: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-0e4449f QA vocabulary B2 positions 301-500
+043c565 QA vocabulary B2 positions 501-750
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
