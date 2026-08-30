@@ -9,14 +9,15 @@ describe("master vocabulary inventory", () => {
 
   it("contains exactly 6,000 normalized lexical units in the accepted target range", () => {
     expect(records).toHaveLength(6_000);
+    expect(vocabulary).toHaveLength(6_000);
     expect(audit.byLevel).toEqual({ A1: 750, A2: 950, B1: 1_200, B2: 1_525, C1: 975, C2: 600 });
     expect(audit.qualityGate).toBe(true);
   });
 
-  it("preserves every enriched vocabulary ID and its identity metadata", () => {
+  it("maps every master entry to one enriched record while preserving identity metadata", () => {
     expect(audit.missingExistingIds).toEqual([]);
     expect(audit.existingMetadataMismatches).toEqual([]);
-    expect(vocabulary.every((item) => records.some((record) => record.id === item.id))).toBe(true);
+    expect(new Set(vocabulary.map((item) => item.id))).toEqual(new Set(records.map((record) => record.id)));
   });
 
   it("contains no duplicate IDs or duplicate lemma/POS lexical units", () => {

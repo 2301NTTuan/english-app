@@ -18,7 +18,7 @@
 | Import | malformed or over 1 MB | rejected without state change | schema unit and Playwright |
 | Delete account | password plus `DELETE` | account and owned rows removed | cascade integration and Playwright |
 | Health | database unavailable | HTTP 503 `{status:"degraded"}` only | runtime smoke |
-| Vocabulary catalogue | search/CEFR/POS/topic/frequency/page | authenticated bounded database response, max 24 rows | PostgreSQL integration and production build |
+| Vocabulary catalogue | search/CEFR/POS/topic/frequency/page | authenticated bounded database response over 6,000 seeded rows, max 24 rows; terminal corpus ID remains reachable | PostgreSQL integration and production build |
 | Password reset request | known or unknown email | same generic response; production omits token URL | integration, unit delivery adapter, and route implementation |
 | Email verification | valid/expired/reused token | one successful use; later/expired use rejected | PostgreSQL integration and verification UI/API |
 | Hostile/invalid API input | foreign origin, wrong media type, malformed or oversized JSON | 403/415/400/413 without mutation | Playwright production flow |

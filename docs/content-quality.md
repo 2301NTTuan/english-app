@@ -2,11 +2,11 @@
 
 ## Current baseline
 
-Run `npm run content:stats` for the exact machine-derived counts and release gates. The repository distinguishes the metadata-only vocabulary master inventory from enriched vocabulary lessons, distinguishes the full grammar catalogue from detailed lessons, and reports placement coverage by CEFR level, domain, and status.
+Run `npm run content:stats` for the exact machine-derived counts and release gates. The repository keeps the 6,000-unit vocabulary master inventory separate from its one-to-one 6,000-record enriched learner catalogue, distinguishes the full grammar catalogue from detailed lessons, and reports placement coverage by CEFR level, domain, and status.
 
-The long-term architecture targets roughly 6,000 vocabulary senses, 110–130 detailed grammar lessons, 300 idioms, 300 phrasal verbs, 1,000 collocations, and 750 calibrated placement items. These are capacity targets, not claims about the current bank. Quality gates take priority over bulk generation.
+The core 6,000-record vocabulary enrichment and machine-QA targets are complete. Independent educator/Vietnamese review, publication approval, optional richer senses and lexical relations, and learner-feedback refinement remain. Other content capacity targets are not claims about the current bank; quality gates take priority over bulk generation.
 
-The master inventory is documented in `docs/master-vocabulary-inventory.md`; the 298 enriched records and their representative audit remain documented in `docs/vocabulary-quality-audit.md`. Master rows contain only inclusion metadata. Their CEFR and frequency bases explicitly distinguish source-backed values from editorial estimates, while the enriched records retain their existing editorial bases until each is reviewed during enrichment.
+The master inventory is documented in `docs/master-vocabulary-inventory.md`; the original 298-record audit remains as a historical record in `docs/vocabulary-quality-audit.md`; and the completed corpus is summarized in `docs/vocabulary-final-qa.md`. Master rows contain inclusion metadata, while every master ID now maps to an enriched record with original definition, Vietnamese meaning, and example. CEFR and frequency bases continue to distinguish source-backed values from editorial estimates.
 
 The grammar statistics distinguish 35 records previously labelled detailed from lessons that meet the stricter production rubric. Under the automated structural rubric (multiple specific examples and mistakes, substantial phenomenon-specific explanation, and no shared generic explanation tail), zero current lessons qualify. This is an honest production gate failure, not a reason to manufacture templated lesson text.
 
@@ -25,7 +25,7 @@ Automated validation never promotes a record to `reviewed` or `published`. The c
 
 `npm run validate:content` rejects duplicate IDs and duplicate semantic records, malformed meanings/examples/relations, invalid relation strengths and frequency ranks, broken or cyclic grammar prerequisites, ambiguous answers, repeated choices, weak placement metadata, invalid difficulty/discrimination, missing provenance, and broken reading-passage references. Placement items require four unique choices, one exact answer, an item-specific instructional explanation, domain/topic/subtopic tags, continuous parameters, status, and provenance. Generic explanations that merely say the selected option is correct are rejected.
 
-Enriched-vocabulary validation requires a supported POS, Vietnamese meaning, specific topic, lifecycle status, known provenance, honest CEFR/frequency basis, and consistency between an exact rank and its declared source basis. Master-inventory validation separately enforces source references, exact source-rank integrity, level distribution, stable preservation of all 298 enriched IDs, duplicate lemma/POS rejection, spelling-variant collision checks, and suspicious-assignment reporting. Automated checks do not claim to prove semantic correctness.
+Enriched-vocabulary validation requires a supported POS, Vietnamese meaning, specific topic, lifecycle status, known provenance, honest CEFR/frequency basis, and consistency between an exact rank and its declared source basis. Master-inventory validation separately enforces source references, exact source-rank integrity, level distribution, one-to-one preservation of all 6,000 enriched IDs, duplicate lemma/POS rejection, spelling-variant collision checks, and suspicious-assignment reporting. Automated checks do not claim to prove semantic correctness.
 
 Stable IDs are immutable. A legitimate new sense of an existing word receives its own ID and definition; an exact word/part-of-speech/definition duplicate is rejected. Retired IDs are never recycled.
 
@@ -35,7 +35,7 @@ The current pilot passages, prompts, distractors, explanations, and enriched lex
 
 Sources evaluated but not used in the master inventory are documented in `docs/content-sources.md`. In particular, no proprietary dictionary definitions or examples, non-commercial CEFRLex data, Wiktionary text, Tatoeba sentences, or `wordfreq` data were imported.
 
-The master inventory is a candidate-selection asset, not a production lesson bank. Every row still needs sense selection and human editorial review before definitions, translations, examples, or relations are added. Source-backed CEFR labels identify their originating vocabulary profile; they are not universal official CEFR rulings or psychometrically calibrated learner parameters.
+The master inventory remains the selection, identity, and provenance source for the enriched catalogue. Every row now has learner-facing content, but all 6,000 records still need independent human editorial review before production publication. Source-backed CEFR labels identify their originating vocabulary profile; they are not universal official CEFR rulings or psychometrically calibrated learner parameters.
 
 ## Human review checklist
 

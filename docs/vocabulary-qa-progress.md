@@ -14,7 +14,7 @@ LAST CHECKED ENTRY:
 master-zoology-noun / C2 position 600
 
 NEXT ENTRY:
-none
+NONE
 
 CHECKED:
 6000/6000

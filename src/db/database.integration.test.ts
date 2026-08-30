@@ -234,12 +234,14 @@ suite("PostgreSQL migration and ownership", () => {
   it("paginates database vocabulary with preserved CEFR, search, and topic filters", async () => {
     const first = await queryVocabularyPage({ page: 1, pageSize: 24 });
     expect(first.items).toHaveLength(24);
-    expect(first.total).toBe(298);
+    expect(first.total).toBe(6_000);
     const level = await queryVocabularyPage({ level: "B2" });
     expect(level.items.length).toBeLessThanOrEqual(24);
     expect(level.items.every((item) => item.level === "B2")).toBe(true);
     const search = await queryVocabularyPage({ search: "acquire" });
     expect(search.items.some((item) => item.word.toLowerCase() === "acquire")).toBe(true);
+    const expandedSearch = await queryVocabularyPage({ search: "zoology" });
+    expect(expandedSearch.items.some((item) => item.id === "master-zoology-noun")).toBe(true);
     const topicName = first.items.find((item) => item.topics.length)?.topics[0];
     expect(topicName).toBeTruthy();
     const topic = await queryVocabularyPage({ topic: topicName });
@@ -250,6 +252,6 @@ suite("PostgreSQL migration and ownership", () => {
     expect(frequency.items.every((item) => item.frequencyBand === "very-common")).toBe(true);
     expect(frequency.filters.frequencyBand).toBe("very-common");
     const metadata = await client.query("select count(*) filter (where frequency_rank is not null)::int exact_ranks, count(*) filter (where status = 'validated')::int validated, count(*) filter (where active)::int active, count(*) filter (where provenance_id = 'vocabulary-core-2026-08')::int core, count(*) filter (where provenance_id = 'vocabulary-foundations-001-2026-08')::int foundations, (select published_at from content_versions where version = 'bundled-v1') published_at from vocabulary_content");
-    expect(metadata.rows[0]).toEqual({ exact_ranks: 0, validated: 298, active: 298, core: 192, foundations: 106, published_at: null });
+    expect(metadata.rows[0]).toEqual({ exact_ranks: 4_130, validated: 6_000, active: 6_000, core: 192, foundations: 106, published_at: null });
   });
 });

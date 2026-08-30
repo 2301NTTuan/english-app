@@ -33,6 +33,6 @@ No definitions, examples, Vietnamese translations, synonyms, antonyms, collocati
 
 ## Repository-authored content
 
-The 298 enriched vocabulary records, grammar explanations, examples, mistakes, expressions, placement passages, and placement items remain repository-authored. Their machine-readable batches live in `src/data/content-provenance.ts`. The master inventory maps those 298 vocabulary IDs without deleting or regenerating them.
+All 6,000 enriched vocabulary records, grammar explanations, examples, mistakes, expressions, placement passages, and placement items remain repository-authored. Their machine-readable batches live in `src/data/content-provenance.ts`. The expansion preserved the original 298 vocabulary IDs and maps every master inventory ID to one enriched record without regenerating stable identities.
 
-Before any master row becomes an enriched lesson record, it still requires sense selection, English/Vietnamese editorial work, duplicate/sense review, and publication approval under `docs/content-quality.md`.
+Core enrichment and machine QA are complete. Independent English/Vietnamese educator review, sense/CEFR/editorial review, and publication approval remain required under `docs/content-quality.md`.

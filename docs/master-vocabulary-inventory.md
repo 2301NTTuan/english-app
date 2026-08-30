@@ -2,6 +2,9 @@
 
 Audit date: 23 August 2026.
 
+> **HISTORICAL INVENTORY AUDIT**
+> This document records the master inventory when it was still a metadata-only selection asset. It subsequently became the source of truth for the completed 6,000-entry enriched corpus and machine-QA pass. See [the final vocabulary QA summary](vocabulary-final-qa.md).
+
 ## Result
 
 The metadata-only master inventory contains 6,000 normalized lemma/POS lexical units:
@@ -54,4 +57,4 @@ npm run validate:content
 npm run content:stats
 ```
 
-The inventory quality gate passes for proceeding to small, separately reviewed enrichment batches. It is not itself a 6,000-entry production lesson corpus.
+The inventory quality gate passed and the inventory subsequently became the source of truth for enriching all 6,000 entries. The enriched corpus remains `validated`, not independently educator-reviewed or production-published.

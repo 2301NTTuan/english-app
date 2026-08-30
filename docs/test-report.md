@@ -1,6 +1,6 @@
 # Validation report
 
-Latest local verification date: 29 August 2026.
+Latest vocabulary reconciliation verification date: 30 August 2026. Build and browser E2E results below remain from 29 August 2026; they were not rerun because this reconciliation did not change application runtime code.
 
 ## Automated results
 
@@ -9,8 +9,8 @@ Latest local verification date: 29 August 2026.
 | Content validation | PASS | 9/9 tests across the enriched content and master inventory suites |
 | ESLint | PASS | zero errors/warnings |
 | TypeScript | PASS | `tsc --noEmit` |
-| Unit tests | PASS | 92/92 tests across 25 files |
-| PostgreSQL integration | PASS | 12/12 tests against the freshly migrated and twice-seeded disposable test database |
+| Unit tests | PASS | 94/94 tests across 25 files, including full-corpus identity and terminal-entry study-session selection |
+| PostgreSQL integration | PASS | 12/12 tests against the freshly seeded disposable test database; 6,000 active vocabulary rows and search beyond the original 298 records verified |
 | Browser E2E | PASS | 2/2 Chromium tests against the production server and disposable test database |
 | Production build | PASS | Next.js 16.3.2 Webpack build; all application and API routes compiled and prerendered as expected |
 | Runtime smoke | PASS | login/attribution 200, anonymous root 307, anonymous vocabulary API 401, health 200/ok with DB and 503/degraded against a deliberately unreachable DB, security headers present |
@@ -33,7 +33,7 @@ The configured disposable PostgreSQL database is reachable and all integration t
 - Password recovery/email verification token lifecycle and provider adapter: pass. Deployment credentials, verified sender/domain, delivery monitoring, and operator support workflows remain launch blockers; no paid provider was configured.
 - Normalized transactional learning-session and placement persistence: pass; per-account advisory locks and review-version checks reject stale event writes, while generic state sync is restricted to preferences.
 - Content provenance: pass for repository-authored placement/enriched vocabulary batches and the licensed master vocabulary inventory; educator review and production publication: fail.
-- Bounded server-side vocabulary browse/search/filter retrieval: pass for the 298 enriched records; the 6,000-unit inventory is still metadata-only and is not presented as learner-ready content.
+- Bounded server-side vocabulary browse/search/filter retrieval: pass over all 6,000 seeded enriched records in local/test and `validated-preview`; search reaches `master-zoology-noun`, outside the original 298-record set. Default production filtering still exposes only `published` records, currently zero, so validated content is not silently promoted.
 - User-visible audited-source attribution: pass. Privacy/Terms operator identity and jurisdiction configuration: fail.
 - Structured request/error/health/auth-abuse logging and request correlation: pass. External monitoring backend, alert routing, and backup retention remain deployment configuration. Restore drill: pass using an isolated disposable schema without granting `CREATEDB`; row counts, content checksum, users, progress, reviews, and 12 integration tests matched the source backup.
 
@@ -41,9 +41,13 @@ Result: **not production-ready**. The repository is a coherent production founda
 
 ## Content Quality Audit
 
-- Machine validated: the 6,000-unit metadata-only master inventory, all 298 enriched vocabulary records, all 108 placement items, six reading passages, stable IDs, provenance links, duplicate candidates, metadata consistency, relation structure, grammar prerequisites, and deterministic learning/placement simulations.
-- Manually inspected in this run: the full 106-record foundational vocabulary batch, corrected vocabulary seed rules and relation removals, deterministic level/edge samples, and the 36 core placement explanations rewritten to teach the specific answer.
+- Machine validated: the 6,000-unit master inventory, all 6,000 enriched vocabulary records, all 108 placement items, six reading passages, stable IDs, provenance links, duplicate candidates, metadata consistency, relation structure, grammar prerequisites, and deterministic learning/placement simulations.
+- Machine-assisted vocabulary QA processed all 6,000 records and resolved 927 critical, 2,713 major, and 389 minor findings with zero unresolved. This is implementation QA, not independent educator review.
 - Still requires independent review: English/Vietnamese editorial review, CEFR judgments, synonym/antonym/collocation nuance, polysemy modelling, placement ambiguity and distractor review, publication approval, learner calibration, reliability/fairness analysis, and psychometric validation.
-- Current gates: master vocabulary inventory **PASS** (6,000/5,800–6,200, provenance resolved, 298 existing IDs preserved); enriched production vocabulary corpus **FAIL** (298 enriched, zero published), grammar corpus **FAIL** (0/110 strictly qualifying), placement bank **FAIL** (108/600 validated, zero reviewed/published).
+- Vocabulary master inventory: **PASS** (6,000, provenance resolved, all stable IDs preserved).
+- Core vocabulary enrichment: **PASS** (6,000/6,000 master IDs mapped to learner-facing records).
+- Machine validation and QA: **PASS** (6,000/6,000 processed; zero unresolved critical, major, or minor findings).
+- Independent educator/Vietnamese review: **EXTERNAL / NOT COMPLETE**.
+- Production publication approval: **NOT COMPLETE** (zero vocabulary records are `published`). Grammar and placement release gates remain unchanged.
 
-See [the master vocabulary inventory report](master-vocabulary-inventory.md), [the enriched vocabulary audit](vocabulary-quality-audit.md), and [representative placement items](placement-assessment.md#representative-validated-pilot-items) for inspectable content samples and exact limitations.
+See [the final vocabulary QA summary](vocabulary-final-qa.md), [the historical master vocabulary inventory report](master-vocabulary-inventory.md), [the historical 298-record vocabulary audit](vocabulary-quality-audit.md), and [representative placement items](placement-assessment.md#representative-validated-pilot-items) for inspectable evidence and exact limitations.

@@ -8,7 +8,7 @@ The production foundation adds PostgreSQL and Drizzle without moving learning ru
 
 ## Components
 
-- `src/data`: authored source content, stable content identifiers, and application fallback data.
+- `src/data`: authored source content, stable content identifiers, and the bundled learning catalogue.
 - `scripts/seed-content.ts`: idempotent content import with version/checksum tracking.
 - `src/lib/learning` and `src/lib/fsrs`: deterministic business rules and a stable adapter around `ts-fsrs` FSRS v6.
 - `src/lib/auth`: password, opaque-session, request-origin, body-size, and rate-limit boundaries.
@@ -31,7 +31,7 @@ Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit to
 
 ## Scaling and performance
 
-The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; it does not import its catalogue into the route bundle. Other study planners still use the 298-record authored fallback corpus, so completing route-specific retrieval before expanding content remains a performance milestone. Authentication throttling uses an atomic PostgreSQL table in production and retains an in-memory backend only for local/test use.
+The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; the content seed imports all 6,000 enriched records into that database path. Local/test and explicit `validated-preview` deployments can browse all validated records; the default production channel deliberately exposes only `published` records, currently none. Daily planning, learning paths, and study sessions use the full bundled 6,000-entry catalogue and then filter by learner level and progress; there is no 298-record vocabulary fallback. Authentication throttling uses an atomic PostgreSQL table in production and retains an in-memory backend only for local/test use.
 
 ## Known limitations
 

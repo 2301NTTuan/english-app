@@ -63,12 +63,12 @@ Key documentation:
 
 The existing pure TypeScript systems include backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 25–50-question four-domain placement assessment, prerequisite-aware personalized paths, and metadata-driven exercises. Placement selection and scoring remain server-scoped so the browser receives only the active item. Content validation checks stable identifiers, duplicate senses, references, relations, cyclic prerequisites, examples, provenance, item parameters, passage links, and answer ambiguity.
 
-Current bundled lesson content: 298 enriched vocabulary entries, 138 grammar topics (35 enriched lesson records, but zero yet meet the stricter production-detail rubric), 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions), and a 108-item validated placement pilot with six authored passages. A separate metadata-only master inventory contains 6,000 source-audited vocabulary lexical units for later enrichment. Run `npm run content:stats` for exact coverage and release gates. Validated content is not educator-reviewed or production-published.
+Current bundled lesson content includes a 6,000-unit vocabulary master inventory and 6,000 corresponding enriched vocabulary records, all processed by machine QA; 138 grammar topics (35 enriched lesson records, but zero yet meet the stricter production-detail rubric); 107 expressions (30 idioms, 30 phrasal verbs, 40 collocations, 7 common expressions); and a 108-item validated placement pilot with six authored passages. The vocabulary records are `validated`, but independent educator/Vietnamese review and production publication approval are not complete. Run `npm run content:stats` for exact coverage and release gates.
 
 ## Operational notes
 
 - Secrets belong in the deployment environment, never in Git. `.env*` is ignored except `.env.example`.
 - `/api/health` returns only `ok` or `degraded`; a database failure produces HTTP 503 without leaking connection details.
 - Password reset and email-verification tokens are hashed, expiring, and single-use. Outbound delivery supports an environment-configured `resend` adapter; `development` returns local links only outside production, and `disabled` is the safe default. Production requires `APP_BASE_URL`, `EMAIL_FROM`, and provider credentials.
-- The in-process authentication limiter must be replaced with a shared store before horizontal scaling.
+- Authentication throttling uses an atomic PostgreSQL store in production and an in-memory backend only in local/test environments.
 - Review the placeholder Privacy and Terms pages with qualified counsel and add the actual operator details before launch.

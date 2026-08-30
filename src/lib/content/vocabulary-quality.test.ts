@@ -46,9 +46,8 @@ describe("vocabulary production-quality controls", () => {
     expect(audit.duplicateExamples).toEqual([]);
   });
 
-  it("has no repeated definitions in completed CEFR review levels", () => {
-    const completedLevels = new Set<CEFRLevel>(["A1", "A2"]);
-    expect(auditVocabulary(vocabulary.filter((item) => completedLevels.has(item.cefrLevel))).duplicateCandidates).toEqual([]);
+  it("has no repeated definition candidates across the completed corpus", () => {
+    expect(auditVocabulary(vocabulary).duplicateCandidates).toEqual([]);
   });
 
   it("keeps deterministic samples stable and satisfies the 100-per-level gate", () => {

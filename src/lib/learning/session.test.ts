@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { vocabulary } from "@/data/vocabulary";
 import { buildStudySession } from "./session";
 import { createInitialState } from "@/lib/storage/app-repository";
 
@@ -22,5 +23,25 @@ describe("buildStudySession", () => {
     state.mistakes = [state.mistakes[0]];
     const session = buildStudySession(state, new Date("2026-08-23T12:00:00.000Z"));
     expect(session[0].source).toBe("mistakes");
+  });
+
+  it("can select new material from the end of the full 6,000-entry corpus", () => {
+    const state = createInitialState();
+    const progress = state.vocabularyProgress[0];
+    state.settings = { ...state.settings, currentLevel: "C2", dailyTarget: 1, maxNewWordsPerDay: 1 };
+    state.vocabularyProgress = vocabulary.slice(0, -1).map((item) => ({
+      ...progress,
+      itemId: item.id,
+      mastery: { recognition: 100, recall: 100, context: 100, spelling: 100, overall: 100 },
+      review: { ...progress.review, nextReview: "2099-01-01T00:00:00.000Z" },
+    }));
+    state.grammarProgress = [];
+    state.mistakes = [];
+
+    const session = buildStudySession(state, new Date("2026-08-30T12:00:00.000Z"));
+
+    expect(vocabulary).toHaveLength(6_000);
+    expect(session).toHaveLength(1);
+    expect(session[0]).toMatchObject({ itemId: "master-zoology-noun", source: "newVocabulary" });
   });
 });

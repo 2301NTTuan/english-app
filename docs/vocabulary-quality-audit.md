@@ -2,6 +2,9 @@
 
 Audit date: 23 August 2026. Run `npm run content:stats -- --json` for the reproducible machine report and deterministic sample IDs.
 
+> **HISTORICAL AUDIT**
+> This document records the vocabulary corpus at the time of the 298-entry audit. The current corpus contains 6,000 enriched entries and has completed machine QA. See [the final vocabulary QA summary](vocabulary-final-qa.md).
+
 ## Content Quality Audit
 
 All 298 records were machine-audited for identity, required metadata, lifecycle/provenance, definition and Vietnamese presence, examples, POS vocabulary, CEFR/frequency basis, topic specificity, exact and fuzzy lexical-unit duplicates, duplicated examples, relation structure, collocations, and stable IDs. The implementation agent manually inspected the complete 106-record foundational batch, the original seed lists, the full pre-correction antonym report, every generic-topic fallback, and representative content from each available level.
