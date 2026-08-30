@@ -1,5 +1,6 @@
 import type { GrammarTopic } from "@/types/domain";
 import { a1Lessons } from "./grammar/a1";
+import { a2Lessons } from "./grammar/a2";
 
 const topic = (id: string, title: string, level: GrammarTopic["level"], description: string, prerequisites: string[], structures: string[], example: string, mistake: [string, string, string], subtopics: string[]): GrammarTopic => ({
   id, title, level, category: "Core grammar", description, prerequisites,
@@ -56,7 +57,8 @@ const additionalDetailedTopics: GrammarTopic[] = [
 ];
 
 const legacyDetailedTopics: GrammarTopic[] = [...coreDetailedTopics, ...additionalDetailedTopics];
-const detailedTopics: GrammarTopic[] = [...a1Lessons, ...legacyDetailedTopics.filter((item) => !a1Lessons.some((lesson) => lesson.id === item.id))];
+const enrichedTopics = [...a1Lessons, ...a2Lessons];
+const detailedTopics: GrammarTopic[] = [...enrichedTopics, ...legacyDetailedTopics.filter((item) => !enrichedTopics.some((lesson) => lesson.id === item.id))];
 
 export const curriculumOutline: Record<GrammarTopic["level"], string[]> = {
   A1: ["Verb to be", "Subject pronouns", "Object pronouns", "Possessive adjectives", "Possessive pronouns", "Articles: a / an / the", "Plural nouns", "Demonstratives", "There is / There are", "Have / Have got", "Present Simple", "Present Continuous", "Present Simple vs Present Continuous", "Can / Can't", "Imperatives", "Possessive 's", "Some / Any", "Much / Many", "Countable / Uncountable nouns", "Prepositions of place", "Prepositions of time", "Wh- questions", "Adverbs of frequency", "Basic conjunctions"],
@@ -76,7 +78,7 @@ const prerequisiteByTitle: Record<string, string[]> = {
 };
 
 const catalogueTopics = Object.entries(curriculumOutline).flatMap(([level, titles]) => titles.map((title) => {
-  const existing = detailedTopics.find((item) => item.title.toLowerCase() === title.toLowerCase() || (title === "Verb to be" && item.id === "be") || (title === "Present Perfect basics" && item.id === "present-perfect") || (title === "Advanced inversion" && item.id === "inversion") || (title === "Tense and aspect nuance" && item.id === "aspect-nuance"));
+  const existing = detailedTopics.find((item) => item.level === level && (item.title.toLowerCase() === title.toLowerCase() || (title === "Verb to be" && item.id === "be") || (title === "Present Perfect basics" && item.id === "present-perfect") || (title === "Advanced inversion" && item.id === "inversion") || (title === "Tense and aspect nuance" && item.id === "aspect-nuance")));
   if (existing) return existing;
   const id = `${level.toLowerCase()}-${slug(title)}`;
   return topic(id, title, level as GrammarTopic["level"], `Build accurate control of ${title.toLowerCase()} in meaningful English.`, prerequisiteByTitle[title] ?? [], ["Study the core form and its common variations"], `This example demonstrates ${title.toLowerCase()}.`, ["A common learner form.", "A natural corrected form.", "Check the form, meaning, and context together."], ["form", "meaning", "usage"]);
