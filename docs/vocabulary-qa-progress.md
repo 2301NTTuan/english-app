@@ -8,22 +8,22 @@ CURRENT CEFR:
 C1
 
 CURRENT RANGE:
-C1 / level entries 401-550
+C1 / level entries 551-700
 
 LAST CHECKED ENTRY:
-master-gusto-noun / C1 position 400
+master-prohibitive-adjective / C1 position 650
 
 NEXT ENTRY:
-master-gutsy-adjective / C1 position 401
+master-prohibitively-adverb / C1 position 651
 
 CHECKED:
-4825/6000
+5075/6000
 
 CRITICAL FOUND:
-643
+714
 
 MAJOR FOUND:
-2025
+2163
 
 MINOR FOUND:
 389
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-C1 positions 351-400: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+C1 positions 601-650: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-aa298f9 QA vocabulary B2 positions 1101-1525
+2f6b725 QA vocabulary C1 positions 1-400
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.

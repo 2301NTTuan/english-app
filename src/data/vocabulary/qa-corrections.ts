@@ -4616,6 +4616,868 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
   "master-gusto-noun": {
     vietnamese: "sự nhiệt tình, sự hăng hái",
   },
+  "master-gutsy-adjective": {
+    definition: "showing courage and determination in a difficult situation",
+  },
+  "master-hack-noun": {
+    definition: "a person who produces poor-quality work, especially in a creative profession",
+    vietnamese: "người làm nghề thiếu năng lực, kẻ viết thuê tồi",
+  },
+  "master-haggle-verb": {
+    example: "I haggled over the price of the shoes.",
+    topic: "shopping",
+  },
+  "master-hanging-noun": {
+    definition: "the execution of a person by suspending them by the neck with a rope",
+    vietnamese: "việc xử tử bằng cách treo cổ",
+    example: "The country abolished hanging as a form of execution.",
+    topic: "safety",
+  },
+  "master-harass-verb": {
+    definition: "to repeatedly annoy, threaten, or trouble someone",
+    vietnamese: "quấy rối, làm phiền liên tục",
+    topic: "safety",
+  },
+  "master-harassment-noun": {
+    definition: "repeated unwanted behavior that annoys, threatens, or upsets someone",
+    example: "She reported the repeated messages as workplace harassment.",
+    topic: "safety",
+  },
+  "master-harvest-verb": {
+    definition: "to gather a crop when it is ready",
+    vietnamese: "gặt hái, thu hoạch",
+    topic: "nature",
+  },
+  "master-hedgehog-noun": {
+    example: "A frightened hedgehog rolls into a ball to protect its belly.",
+  },
+  "master-heifer-noun": {
+    example: "The young heifer grazed beside the older cattle.",
+  },
+  "master-heighten-verb": {
+    vietnamese: "làm tăng, tăng cường",
+  },
+  "master-hence-adverb": {
+    vietnamese: "do đó, vì thế",
+    topic: "language",
+  },
+  "master-hibernate-verb": {
+    topic: "animals",
+  },
+  "master-hibernation-noun": {
+    topic: "animals",
+  },
+  "master-homely-adjective": {
+    vietnamese: "không hấp dẫn về ngoại hình, bình thường",
+    example: "The character is described as homely but warm and generous.",
+  },
+  "master-honk-noun": {
+    definition: "a loud sound made by a vehicle horn or a goose",
+    vietnamese: "tiếng còi xe, tiếng ngỗng kêu",
+    topic: "sounds",
+  },
+  "master-honk-verb": {
+    vietnamese: "bấm còi, kêu quàng quạc",
+    example: "The driver honked to warn the cyclist.",
+    topic: "sounds",
+  },
+  "master-hostess-noun": {
+    definition: "a woman who receives guests or welcomes customers at a venue",
+    vietnamese: "nữ chủ nhà, nữ nhân viên đón khách",
+    example: "The restaurant hostess showed us to our table.",
+  },
+  "master-hostile-adjective": {
+    example: "The audience became openly hostile toward the speaker.",
+  },
+  "master-hostility-noun": {
+    topic: "relationships",
+  },
+  "master-humble-verb": {
+    definition: "to make someone feel less proud or less important",
+    vietnamese: "làm bớt kiêu ngạo, hạ thấp",
+  },
+  "master-hypocrisy-noun": {
+    definition: "behavior that contradicts the moral beliefs or standards a person claims to hold",
+    vietnamese: "sự đạo đức giả",
+    topic: "society",
+  },
+  "master-hypocritical-adjective": {
+    example: "His hypocritical remarks contradicted his own behavior.",
+  },
+  "master-hypocritically-adverb": {
+    topic: "description",
+  },
+  "master-immensely-adverb": {
+    topic: "description",
+  },
+  "master-immortalize-verb": {
+    definition: "to preserve someone's fame or memory for a very long time",
+    topic: "arts",
+  },
+  "master-imp-noun": {
+    topic: "culture",
+  },
+  "master-impede-verb": {
+    definition: "to delay or prevent someone or something from making progress",
+    example: "Heavy snow impeded the rescue team's progress.",
+    topic: "problem-solving",
+  },
+  "master-impediment-noun": {
+    topic: "problem-solving",
+  },
+  "master-impersonal-adjective": {
+    definition: "lacking warmth, personal interest, or an individual character",
+    vietnamese: "lạnh lùng, không mang tính cá nhân",
+    example: "The automated reply felt cold and impersonal.",
+  },
+  "master-impersonally-adverb": {
+    definition: "without warmth or personal interest",
+    vietnamese: "một cách lạnh lùng, không mang tính cá nhân",
+    topic: "description",
+  },
+  "master-impersonate-verb": {
+    definition: "to pretend to be another person by copying their appearance or behavior",
+    vietnamese: "giả mạo, đóng giả người khác",
+    example: "The thief impersonated a supermarket employee.",
+  },
+  "master-impersonation-noun": {
+    definition: "the act of pretending to be another person",
+    vietnamese: "sự giả mạo, sự đóng giả người khác",
+    example: "Her impersonation of the famous singer delighted the audience.",
+  },
+  "master-impersonator-noun": {
+    definition: "a performer or deceiver who pretends to be another person",
+    vietnamese: "người đóng giả, nghệ sĩ bắt chước",
+    example: "The comedian is a skilled celebrity impersonator.",
+  },
+  "master-impervious-adjective": {
+    example: "The outer layer is impervious to water.",
+    topic: "materials",
+  },
+  "master-impish-adjective": {
+    vietnamese: "tinh nghịch, lém lỉnh",
+    example: "The child gave us an impish grin.",
+  },
+  "master-impishly-adverb": {
+    definition: "in a playfully mischievous way",
+    topic: "description",
+  },
+  "master-implicate-verb": {
+    definition: "to show that someone was involved in a crime or wrongdoing",
+    topic: "safety",
+  },
+  "master-impoverished-adjective": {
+    topic: "society",
+  },
+  "master-incision-noun": {
+    definition: "a surgical cut made in the skin or body tissue",
+    vietnamese: "vết mổ, đường rạch",
+    topic: "health",
+  },
+  "master-incisor-noun": {
+    vietnamese: "răng cửa",
+  },
+  "master-inclusion-noun": {
+    topic: "society",
+  },
+  "master-inclusive-adjective": {
+    vietnamese: "bao trùm, tạo điều kiện hòa nhập",
+    topic: "society",
+  },
+  "master-indefinite-adjective": {
+    definition: "not clearly defined or having no fixed end",
+    vietnamese: "không xác định, không rõ ràng",
+    topic: "time",
+  },
+  "master-indefinitely-adverb": {
+    vietnamese: "vô thời hạn, không xác định thời điểm kết thúc",
+    topic: "time",
+  },
+  "master-individuality-noun": {
+    definition: "the qualities that make a person or thing distinct from others",
+    vietnamese: "cá tính, nét riêng biệt",
+    example: "Her unusual clothing expresses her strong individuality.",
+  },
+  "master-induct-verb": {
+    definition: "to formally admit someone into an organization or position",
+    vietnamese: "kết nạp, làm lễ nhậm chức cho",
+  },
+  "master-induction-noun": {
+    definition: "the formal admission of someone to a position or the introduction of a new employee",
+    vietnamese: "lễ kết nạp, quá trình hướng dẫn ban đầu",
+    example: "All new employees attend an induction on their first day.",
+    topic: "work",
+  },
+  "master-inexcusably-adverb": {
+    topic: "description",
+  },
+  "master-inexhaustible-adjective": {
+    example: "The library offers an apparently inexhaustible supply of information.",
+    topic: "quantity",
+  },
+  "master-inexplicable-adjective": {
+    example: "The equipment failed for an inexplicable reason.",
+  },
+  "master-inexplicably-adverb": {
+    definition: "in a way that is impossible to explain",
+    topic: "description",
+  },
+  "master-ingenious-adjective": {
+    vietnamese: "tài tình, sáng tạo",
+    example: "The engineer devised an ingenious solution to the problem.",
+  },
+  "master-ingenuity-noun": {
+    vietnamese: "sự khéo léo, óc sáng tạo",
+  },
+  "master-inherently-adverb": {
+    definition: "as a natural, permanent, or essential quality",
+    example: "No technology is inherently good or bad.",
+    topic: "description",
+  },
+  "master-injustice-noun": {
+    topic: "society",
+  },
+  "master-innovate-verb": {
+    definition: "to introduce new ideas, methods, or products",
+    vietnamese: "đổi mới, sáng tạo",
+    example: "Small companies must innovate to remain competitive.",
+    topic: "technology",
+  },
+  "master-insecure-adjective": {
+    definition: "not firmly fixed, protected, or safe",
+    example: "The workers replaced the insecure railing.",
+    topic: "safety",
+  },
+  "master-insecurely-adverb": {
+    definition: "in a way that shows a lack of confidence",
+    vietnamese: "một cách thiếu tự tin, bất an",
+    topic: "emotions",
+  },
+  "master-insensitive-adjective": {
+    definition: "not caring about or noticing other people's feelings",
+    vietnamese: "thiếu nhạy cảm, vô tâm",
+    example: "His insensitive joke upset several colleagues.",
+    topic: "relationships",
+  },
+  "master-insensitively-adverb": {
+    definition: "without considering or caring about other people's feelings",
+    vietnamese: "một cách thiếu nhạy cảm, vô tâm",
+    topic: "relationships",
+  },
+  "master-insightful-adjective": {
+    example: "The article offers an insightful analysis of the conflict.",
+    topic: "thinking",
+  },
+  "master-instinctively-adverb": {
+    topic: "description",
+  },
+  "master-institute-verb": {
+    vietnamese: "thiết lập, ban hành",
+  },
+  "master-insubordinate-adjective": {
+    example: "The employee was disciplined for insubordinate behavior.",
+    topic: "work",
+  },
+  "master-insubordination-noun": {
+    topic: "work",
+  },
+  "master-interject-verb": {
+    definition: "to interrupt a conversation by inserting a remark",
+  },
+  "master-interjection-noun": {
+    definition: "a short word or phrase that expresses a sudden feeling",
+    example: "The word \"Yikes\" is an interjection expressing alarm.",
+    topic: "language",
+  },
+  "master-intuitive-adjective": {
+    definition: "based on feelings or instinct rather than conscious reasoning",
+    vietnamese: "thuộc trực giác, theo bản năng",
+    example: "She had an intuitive sense that something was wrong.",
+    topic: "thinking",
+  },
+  "master-intuitively-adverb": {
+    definition: "through instinct or feeling rather than conscious reasoning",
+    example: "She intuitively understood what the frightened child needed.",
+    topic: "thinking",
+  },
+  "master-invoice-noun": {
+    topic: "business",
+  },
+  "master-irate-adjective": {
+    example: "Irate customers demanded an immediate refund.",
+    topic: "emotions",
+  },
+  "master-irately-adverb": {
+    topic: "emotions",
+  },
+  "master-irony-noun": {
+    topic: "communication",
+  },
+  "master-isolated-adjective": {
+    topic: "places",
+  },
+  "master-itinerary-noun": {
+    definition: "a detailed plan of a journey, including places and times",
+    vietnamese: "lịch trình, hành trình",
+    topic: "travel",
+  },
+  "master-jersey-noun": {
+    definition: "a shirt worn by a member of a sports team",
+    vietnamese: "áo thi đấu thể thao",
+    topic: "clothing",
+  },
+  "master-jurisdiction-noun": {
+    definition: "the legal authority to make decisions over a territory or particular cases",
+    example: "The case falls under the jurisdiction of the federal court.",
+    topic: "society",
+  },
+  "master-justly-adverb": {
+    topic: "society",
+  },
+  "master-juvenile-adjective": {
+    definition: "relating to young people or showing childish immaturity",
+    vietnamese: "thuộc thanh thiếu niên, trẻ con",
+    example: "The teacher refused to tolerate such juvenile behavior.",
+  },
+  "master-juvenile-noun": {
+    definition: "a young person or animal that is not yet fully grown",
+    vietnamese: "người vị thành niên, con non",
+    example: "The rescued bird was still a juvenile.",
+  },
+  "master-landscape-verb": {
+    vietnamese: "thiết kế, chăm sóc cảnh quan",
+    example: "They landscaped the garden with native plants and stone paths.",
+  },
+  "master-lapse-noun": {
+    definition: "a temporary failure in attention, judgment, or behavior",
+    example: "A brief lapse in concentration caused the accident.",
+  },
+  "master-latent-adjective": {
+    vietnamese: "tiềm ẩn, tiềm tàng",
+    example: "The test revealed a latent defect in the material.",
+  },
+  "master-lavatory-noun": {
+    example: "The lavatory is at the rear of the aircraft.",
+    topic: "places",
+  },
+  "master-legacy-noun": {
+    topic: "history",
+  },
+  "master-lethargic-adjective": {
+    vietnamese: "uể oải, lờ đờ",
+  },
+  "master-lethargically-adverb": {
+    topic: "description",
+  },
+  "master-lethargy-noun": {
+    definition: "a state of having very little energy or enthusiasm",
+    vietnamese: "trạng thái uể oải, sự thiếu sinh lực",
+    topic: "health",
+  },
+  "master-liaison-noun": {
+    definition: "communication and cooperation between people or groups",
+    vietnamese: "sự liên lạc, sự phối hợp",
+    example: "The officer maintained close liaison with local community leaders.",
+  },
+  "master-likelihood-noun": {
+    vietnamese: "khả năng, xác suất",
+    topic: "possibility",
+  },
+  "master-limitless-adjective": {
+    definition: "having no limit in size, amount, or possibility",
+    example: "Digital storage does not offer truly limitless capacity.",
+  },
+  "master-linearly-adverb": {
+    definition: "in a straight line or a direct sequence",
+    example: "The measured values increased linearly over time.",
+    topic: "science",
+  },
+  "master-ludicrous-adjective": {
+    example: "The committee rejected the ludicrous proposal immediately.",
+  },
+  "master-ludicrously-adverb": {
+    topic: "description",
+  },
+  "master-lust-noun": {
+    definition: "a very strong desire, especially for sex, power, or possessions",
+  },
+  "master-macabre-adjective": {
+    example: "The museum displayed macabre paintings of war and plague.",
+  },
+  "master-magnetic-adjective": {
+    vietnamese: "có từ tính, có sức hút",
+    topic: "science",
+  },
+  "master-magnetically-adverb": {
+    topic: "science",
+  },
+  "master-magnetism-noun": {
+    definition: "the force by which certain materials attract or repel one another",
+    vietnamese: "từ tính, hiện tượng từ",
+    example: "The experiment demonstrates magnetism using two bar magnets.",
+    topic: "science",
+  },
+  "master-malfunction-verb": {
+    topic: "technology",
+  },
+  "master-manicure-noun": {
+    definition: "a cosmetic treatment for the hands and fingernails",
+    vietnamese: "việc chăm sóc móng tay",
+    example: "She booked a manicure before the wedding.",
+  },
+  "master-manicure-verb": {
+    example: "The beautician carefully manicured her fingernails.",
+  },
+  "master-manipulation-noun": {
+    vietnamese: "sự thao túng, sự chi phối",
+    topic: "society",
+  },
+  "master-marginal-adjective": {
+    definition: "small in importance or relating to the effect of one additional unit",
+    vietnamese: "không đáng kể, cận biên",
+    topic: "business",
+  },
+  "master-marginally-adverb": {
+    definition: "only slightly or by a small amount",
+    topic: "description",
+  },
+  "master-marvel-verb": {
+    example: "Visitors marveled at the skill of the ancient builders.",
+    topic: "emotions",
+  },
+  "master-maternal-adjective": {
+    definition: "relating to a mother or a mother's side of a family",
+    vietnamese: "thuộc về mẹ, thuộc bên ngoại",
+    example: "She inherited the tradition from her maternal grandmother.",
+    topic: "family",
+  },
+  "master-meaningless-adjective": {
+    definition: "having no meaning, purpose, or importance",
+  },
+  "master-mechanism-noun": {
+    topic: "science",
+  },
+  "master-methodical-adjective": {
+    example: "The researcher took a methodical approach to the investigation.",
+  },
+  "master-midwife-noun": {
+    topic: "health",
+  },
+  "master-mingle-verb": {
+    definition: "to mix or move among other people or things",
+    example: "The dish mingles the cooking traditions of several countries.",
+  },
+  "master-misplace-verb": {
+    definition: "to put something somewhere and then be unable to find it",
+    vietnamese: "để thất lạc, để nhầm chỗ",
+  },
+  "master-monotonously-adverb": {
+    topic: "description",
+  },
+  "master-motley-adjective": {
+    definition: "made up of people or things that are very different from one another",
+    vietnamese: "hỗn tạp, đủ loại",
+    example: "A motley group of volunteers assembled outside the hall.",
+  },
+  "master-mountaineer-noun": {
+    vietnamese: "nhà leo núi",
+    topic: "sports",
+  },
+  "master-munch-verb": {
+    definition: "to eat something steadily and often noisily",
+    example: "The children munched on apples during the walk.",
+  },
+  "master-muscular-adjective": {
+    definition: "having well-developed and powerful muscles",
+    vietnamese: "có cơ bắp, lực lưỡng",
+    example: "The muscular athlete lifted the heavy weight easily.",
+    topic: "body",
+  },
+  "master-mutually-adverb": {
+    definition: "in a way that is shared by or affects each side equally",
+    topic: "relationships",
+  },
+  "master-mythological-adjective": {
+    vietnamese: "thuộc thần thoại",
+    topic: "culture",
+  },
+  "master-mythology-noun": {
+    definition: "a collection of traditional stories about gods, heroes, or a culture's origins",
+    vietnamese: "thần thoại, hệ thống thần thoại",
+    example: "Tolkien invented a complex mythology for Middle-earth.",
+    topic: "culture",
+  },
+  "master-naive-adjective": {
+    example: "It was naive of him to trust the false offer.",
+  },
+  "master-naively-adverb": {
+    topic: "description",
+  },
+  "master-naturalness-noun": {
+    vietnamese: "vẻ tự nhiên, tính tự nhiên",
+    example: "Critics praised the naturalness of her performance.",
+  },
+  "master-neglectful-adjective": {
+    example: "Neglectful owners failed to provide the animals with clean water.",
+    topic: "safety",
+  },
+  "master-negligent-adjective": {
+    example: "The court found the company negligent in maintaining the equipment.",
+    topic: "safety",
+  },
+  "master-negligently-adverb": {
+    vietnamese: "một cách cẩu thả, lơ là",
+    topic: "description",
+  },
+  "master-niche-noun": {
+    topic: "business",
+  },
+  "master-nocturnal-adjective": {
+    definition: "active mainly during the night",
+    vietnamese: "hoạt động về đêm",
+    example: "Owls are nocturnal birds that hunt after dark.",
+    topic: "animals",
+  },
+  "master-nondescript-adjective": {
+    example: "He wore a nondescript gray coat that attracted no attention.",
+  },
+  "master-numb-adjective": {
+    topic: "body",
+  },
+  "master-obscure-adjective": {
+    vietnamese: "khó hiểu, mơ hồ, ít được biết đến",
+    example: "The instructions were obscure and difficult to follow.",
+    topic: "language",
+  },
+  "master-obscure-verb": {
+    definition: "to prevent something from being seen or understood clearly",
+    vietnamese: "che khuất, làm khó hiểu",
+    topic: "perception",
+  },
+  "master-obscurely-adverb": {
+    definition: "in a way that is unclear or difficult to understand",
+    vietnamese: "một cách mơ hồ, khó hiểu",
+    topic: "language",
+  },
+  "master-occupant-noun": {
+    vietnamese: "người cư ngụ, người sử dụng một chỗ",
+    example: "The building's current occupant plans to move next month.",
+  },
+  "master-occupational-adjective": {
+    definition: "relating to a person's job or profession",
+    vietnamese: "thuộc nghề nghiệp, liên quan đến công việc",
+    example: "Hearing loss is an occupational hazard for some factory workers.",
+    topic: "work",
+  },
+  "master-offspring-noun": {
+    definition: "a person's child or an animal's young",
+    vietnamese: "con cái, con non",
+    example: "The birds feed their offspring until they can fly.",
+    topic: "family",
+  },
+  "master-orchard-noun": {
+    topic: "nature",
+  },
+  "master-ordinarily-adverb": {
+    topic: "description",
+  },
+  "master-organizational-adjective": {
+    definition: "relating to the way an organization is arranged or managed",
+    vietnamese: "thuộc tổ chức, thuộc cơ cấu tổ chức",
+    example: "The merger required major organizational changes.",
+    topic: "work",
+  },
+  "master-orphan-verb": {
+    topic: "family",
+  },
+  "master-otter-noun": {
+    definition: "a water-dwelling mammal with thick fur and webbed feet",
+    example: "An otter floated on its back while eating a shellfish.",
+  },
+  "master-outset-noun": {
+    definition: "the beginning of an event or process",
+  },
+  "master-oversee-verb": {
+    definition: "to supervise a person, activity, or project",
+    example: "A senior engineer will oversee the construction work.",
+    topic: "work",
+  },
+  "master-overseer-noun": {
+    definition: "a person who supervises workers or an activity",
+    example: "The site overseer checked that everyone followed the safety rules.",
+    topic: "work",
+  },
+  "master-pace-verb": {
+    definition: "to walk back and forth, often because of worry or impatience",
+  },
+  "master-paddle-verb": {
+    definition: "to move a small boat through water using a paddle",
+    example: "We paddled the canoe across the calm lake.",
+  },
+  "master-panorama-noun": {
+    definition: "a wide, complete view of a surrounding area",
+    vietnamese: "toàn cảnh, quang cảnh rộng",
+    example: "From the summit, we admired a panorama of the valley.",
+    topic: "places",
+  },
+  "master-panoramic-adjective": {
+    example: "The rooftop terrace offers panoramic views of the city.",
+    topic: "places",
+  },
+  "master-parasite-noun": {
+    definition: "an organism that lives on or inside another organism and takes nutrients from it",
+    vietnamese: "sinh vật ký sinh, ký sinh trùng",
+    example: "The tick is a parasite that feeds on its host's blood.",
+    topic: "animals",
+  },
+  "master-paternal-adjective": {
+    definition: "relating to a father or a father's side of a family",
+    vietnamese: "thuộc về cha, thuộc bên nội",
+    example: "Her paternal grandfather taught her to play chess.",
+    topic: "family",
+  },
+  "master-paternalistic-adjective": {
+    definition: "controlling people while claiming to act for their benefit",
+    vietnamese: "mang tính gia trưởng, bao bọc nhưng kiểm soát",
+    topic: "society",
+  },
+  "master-pathos-noun": {
+    topic: "arts",
+  },
+  "master-paywall-noun": {
+    topic: "technology",
+  },
+  "master-peacock-noun": {
+    definition: "a large male bird with long, brightly colored tail feathers",
+  },
+  "master-peasant-noun": {
+    example: "The novel follows a peasant family working a small farm.",
+  },
+  "master-pedicure-noun": {
+    definition: "a cosmetic treatment for the feet and toenails",
+    vietnamese: "việc chăm sóc móng chân",
+    example: "She booked a pedicure at the salon.",
+  },
+  "master-pendulous-adjective": {
+    example: "Pendulous branches hung low over the stream.",
+  },
+  "master-pendulum-noun": {
+    example: "The clock's pendulum swung steadily from side to side.",
+  },
+  "master-peninsula-noun": {
+    example: "The city lies on a peninsula surrounded by the sea.",
+  },
+  "master-perceptive-adjective": {
+    definition: "quick to notice and understand things that are not obvious",
+    vietnamese: "tinh ý, sâu sắc",
+    example: "Her perceptive questions revealed the weakness in the proposal.",
+    topic: "thinking",
+  },
+  "master-perceptively-adverb": {
+    definition: "in a way that shows clear and sensitive understanding",
+    vietnamese: "một cách tinh tế, sâu sắc",
+    topic: "thinking",
+  },
+  "master-perpetuate-verb": {
+    vietnamese: "duy trì, làm kéo dài",
+    example: "Repeating the rumor will only perpetuate the misunderstanding.",
+    topic: "society",
+  },
+  "master-persecute-verb": {
+    definition: "to treat someone cruelly or unfairly because of their identity or beliefs",
+    vietnamese: "đàn áp, truy hại",
+    topic: "safety",
+  },
+  "master-persecution-noun": {
+    topic: "society",
+  },
+  "master-persuasively-adverb": {
+    definition: "in a way that successfully convinces someone",
+    vietnamese: "một cách thuyết phục",
+    example: "She argued persuasively for greater investment in education.",
+  },
+  "master-pertinent-adjective": {
+    example: "The witness provided several details pertinent to the investigation.",
+  },
+  "master-phenomenal-adjective": {
+    vietnamese: "phi thường, cực kỳ ấn tượng",
+  },
+  "master-phenomenally-adverb": {
+    topic: "description",
+  },
+  "master-physicality-noun": {
+    definition: "the physical strength, presence, or qualities of a person",
+    vietnamese: "thể chất, sức mạnh thể chất",
+    topic: "sports",
+  },
+  "master-physique-noun": {
+    vietnamese: "vóc dáng, thể hình",
+    topic: "body",
+  },
+  "master-pigeon-noun": {
+    example: "A pigeon nested on the ledge outside our window.",
+  },
+  "master-pinnacle-noun": {
+    definition: "the highest point of achievement or success",
+    vietnamese: "đỉnh cao, tột đỉnh",
+    topic: "success",
+  },
+  "master-pioneer-noun": {
+    definition: "a person who is among the first to explore or develop a new area",
+    vietnamese: "người tiên phong, người khai phá",
+    example: "She was a pioneer in the field of computer programming.",
+  },
+  "master-pioneer-verb": {
+    definition: "to be the first to develop or use a new method or field",
+    vietnamese: "tiên phong, khai phá",
+    example: "The laboratory pioneered a new form of treatment.",
+    topic: "technology",
+  },
+  "master-placid-adjective": {
+    definition: "calm, peaceful, and not easily disturbed",
+    vietnamese: "yên bình, điềm tĩnh",
+  },
+  "master-placidly-adverb": {
+    topic: "description",
+  },
+  "master-plague-verb": {
+    definition: "to cause someone or something repeated trouble or suffering",
+    vietnamese: "gây khổ sở, liên tục gây rắc rối",
+    example: "Aircraft delays plagued the airport throughout the winter.",
+    topic: "problem-solving",
+  },
+  "master-plaque-noun": {
+    definition: "a flat sign bearing words that commemorate a person or event",
+    vietnamese: "tấm biển, bảng kỷ niệm",
+    example: "A bronze plaque marks the birthplace of the author.",
+    topic: "objects",
+  },
+  "master-plausibility-noun": {
+    definition: "the quality of seeming reasonable or likely to be true",
+    topic: "thinking",
+  },
+  "master-plausible-adjective": {
+    example: "She offered a plausible explanation for the delay.",
+    topic: "thinking",
+  },
+  "master-plausibly-adverb": {
+    definition: "in a way that seems reasonable or likely to be true",
+    topic: "description",
+  },
+  "master-pleasurable-adjective": {
+    example: "The warm bath was a deeply pleasurable experience.",
+    topic: "emotions",
+  },
+  "master-ploy-noun": {
+    definition: "a clever plan designed to gain an advantage, often by tricking someone",
+    vietnamese: "mánh khóe, chiến thuật",
+    example: "The discount was a marketing ploy to attract new customers.",
+    topic: "thinking",
+  },
+  "master-plumbing-noun": {
+    definition: "the system of pipes and fittings that carries water through a building",
+    vietnamese: "hệ thống ống nước",
+    example: "The old house needs extensive plumbing repairs.",
+    topic: "home",
+  },
+  "master-plummet-verb": {
+    topic: "change",
+  },
+  "master-plunge-noun": {
+    example: "He took a plunge into the cold lake.",
+  },
+  "master-poise-noun": {
+    definition: "calm confidence and self-control",
+    vietnamese: "sự điềm tĩnh, sự tự chủ",
+    topic: "emotions",
+  },
+  "master-popularization-noun": {
+    definition: "the process of making something widely known, understood, or enjoyed",
+    topic: "education",
+  },
+  "master-portable-noun": {
+    definition: "a small device, such as a computer or radio, designed to be carried",
+    vietnamese: "thiết bị xách tay",
+    example: "He listened to the match on a battery-powered portable.",
+  },
+  "master-portray-verb": {
+    definition: "to represent or describe someone or something in art, writing, or speech",
+    vietnamese: "miêu tả, khắc họa",
+    example: "The film portrays the scientist as a determined reformer.",
+    topic: "arts",
+  },
+  "master-portrayal-noun": {
+    definition: "the way someone or something is represented in art, writing, or media",
+    vietnamese: "sự miêu tả, sự khắc họa",
+    example: "Critics praised the actor's sensitive portrayal of the leader.",
+    topic: "arts",
+  },
+  "master-pose-verb": {
+    definition: "to present a question, problem, or threat for consideration",
+    vietnamese: "đặt ra, nêu ra",
+    topic: "communication",
+  },
+  "master-possessor-noun": {
+    topic: "ownership",
+  },
+  "master-posture-noun": {
+    topic: "body",
+  },
+  "master-preacher-noun": {
+    definition: "a person who delivers religious sermons or publicly promotes a belief",
+    example: "The preacher addressed the congregation on Sunday morning.",
+  },
+  "master-precision-noun": {
+    example: "The component was manufactured with remarkable precision.",
+    topic: "science",
+  },
+  "master-predecessor-noun": {
+    example: "Her predecessor served in the role for ten years.",
+  },
+  "master-premier-adjective": {
+    vietnamese: "hàng đầu, quan trọng nhất",
+    example: "The city is one of the country's premier cultural destinations.",
+  },
+  "master-premier-noun": {
+    example: "The provincial premier announced a new housing policy.",
+    topic: "society",
+  },
+  "master-premise-noun": {
+    definition: "an idea or statement on which an argument or conclusion is based",
+    topic: "thinking",
+  },
+  "master-premises-noun": {
+    vietnamese: "khuôn viên, nhà và đất thuộc một cơ sở",
+    example: "The organization will move its headquarters to new premises.",
+  },
+  "master-primitively-adverb": {
+    definition: "in a simple or undeveloped way",
+    topic: "description",
+  },
+  "master-principally-adverb": {
+    topic: "description",
+  },
+  "master-privileged-adjective": {
+    topic: "society",
+  },
+  "master-professionalism-noun": {
+    vietnamese: "tính chuyên nghiệp",
+    topic: "work",
+  },
+  "master-profound-adjective": {
+    definition: "very great, intense, or showing deep understanding",
+    vietnamese: "sâu sắc, to lớn",
+    example: "The discovery had a profound effect on modern medicine.",
+  },
+  "master-profoundly-adverb": {
+    topic: "description",
+  },
+  "master-prohibitive-adjective": {
+    definition: "so expensive or difficult that it prevents people from doing something",
+    vietnamese: "quá cao hoặc khó đến mức cản trở",
+    example: "The prohibitive cost forced the team to abandon the project.",
+    topic: "money",
+  },
   "master-activity-noun": {
     definition: "something people do for work, learning, exercise, or enjoyment",
     vietnamese: "hoạt động",
