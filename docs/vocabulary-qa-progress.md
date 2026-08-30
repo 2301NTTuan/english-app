@@ -8,25 +8,25 @@ CURRENT CEFR:
 B2
 
 CURRENT RANGE:
-B2 / level entries 901-1100
+B2 / level entries 1101-1300
 
 LAST CHECKED ENTRY:
-master-mock-adjective / B2 position 900
+master-racism-noun / B2 position 1100
 
 NEXT ENTRY:
-master-modest-adjective / B2 position 901
+master-rack-noun / B2 position 1101
 
 CHECKED:
-3800/6000
+4000/6000
 
 CRITICAL FOUND:
-439
+465
 
 MAJOR FOUND:
-1506
+1593
 
 MINOR FOUND:
-350
+388
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B2 positions 876-900: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B2 positions 1051-1100: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-043c565 QA vocabulary B2 positions 501-750
+4e4e8c1 QA vocabulary B2 positions 751-900
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.

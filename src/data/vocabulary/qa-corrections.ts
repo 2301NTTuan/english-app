@@ -2122,6 +2122,478 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
     vietnamese: "giả, mô phỏng",
     example: "Students took part in a mock election at school.",
   },
+  "master-modest-adjective": {
+    example: "They live in a modest apartment near the station.",
+  },
+  "master-modification-noun": { topic: "change" },
+  "master-moral-adjective": {
+    example: "She believed she had a moral duty to tell the truth.",
+    topic: "society",
+  },
+  "master-morality-noun": {
+    definition: "principles and beliefs about what behavior is right or wrong",
+    example: "The novel raises difficult questions about morality and justice.",
+    topic: "society",
+  },
+  "master-mortgage-noun": {
+    vietnamese: "khoản vay thế chấp",
+  },
+  "master-motion-noun": { topic: "movement" },
+  "master-mount-verb": {
+    definition: "to climb onto a horse, bicycle, or other object",
+  },
+  "master-multiple-adjective": { topic: "quantity" },
+  "master-multiply-verb": { topic: "science" },
+  "master-musical-noun": {
+    vietnamese: "nhạc kịch",
+    topic: "arts",
+  },
+  "master-nationwide-adjective": { topic: "society" },
+  "master-nationwide-adverb": { topic: "places" },
+  "master-naval-adjective": { topic: "society" },
+  "master-navy-noun": {
+    vietnamese: "màu xanh hải quân, xanh đậm",
+  },
+  "master-necessity-noun": {
+    definition: "something that is needed or must be done",
+    example: "Clean drinking water is a basic necessity.",
+  },
+  "master-need-noun": { topic: "states" },
+  "master-neglect-noun": {
+    vietnamese: "sự sao nhãng, sự bỏ bê",
+    example: "Years of neglect left the building in poor condition.",
+  },
+  "master-neither-conjunction": {
+    vietnamese: "cả hai đều không",
+  },
+  "master-nicely-adverb": {
+    example: "The newly painted walls match the furniture nicely.",
+    topic: "description",
+  },
+  "master-nightmare-noun": {
+    example: "She woke suddenly after having a terrible nightmare.",
+    topic: "emotions",
+  },
+  "master-nomination-noun": {
+    definition: "the act of officially suggesting someone for a position or award",
+    vietnamese: "sự đề cử",
+    example: "Her performance earned her a nomination for best actress.",
+    topic: "society",
+  },
+  "master-nominee-noun": {
+    definition: "a person who has been officially suggested for a position or award",
+    vietnamese: "người được đề cử, ứng viên",
+    example: "Each nominee gave a short speech before the vote.",
+    topic: "society",
+  },
+  "master-numerical-adjective": {
+    definition: "relating to or expressed in numbers",
+    vietnamese: "thuộc số, bằng số",
+    topic: "science",
+  },
+  "master-nursery-noun": {
+    definition: "a place where young children are cared for during the day",
+    vietnamese: "nhà trẻ, lớp giữ trẻ",
+    topic: "education",
+  },
+  "master-nut-noun": {
+    definition: "a dry fruit or seed with a hard shell that can often be eaten",
+    vietnamese: "hạt, quả hạch",
+    topic: "food",
+  },
+  "master-object-verb": {
+    definition: "to express disagreement with or opposition to something",
+  },
+  "master-obligation-noun": { topic: "society" },
+  "master-observer-noun": {
+    example: "Independent observers monitored the election closely.",
+  },
+  "master-obsession-noun": { topic: "emotions" },
+  "master-odd-adjective": {
+    vietnamese: "kỳ lạ, khác thường",
+  },
+  "master-offend-verb": {
+    definition: "to make someone feel upset, hurt, or angry",
+    example: "I did not mean to offend anyone with my comment.",
+    topic: "relationships",
+  },
+  "master-offender-noun": { topic: "society" },
+  "master-official-noun": { topic: "society" },
+  "master-offshore-adjective": {
+    definition: "located at sea away from the coast, or moving from land toward the sea",
+    example: "Strong offshore winds delayed the rescue operation.",
+    topic: "places",
+  },
+  "master-olive-noun": {
+    vietnamese: "quả ô liu",
+    topic: "food",
+  },
+  "master-openly-adverb": {
+    definition: "in a direct and public way without hiding anything",
+    example: "She openly criticized the decision during the meeting.",
+  },
+  "master-operator-noun": {
+    definition: "a person whose job is to control a machine or system",
+    vietnamese: "người vận hành, người điều khiển máy",
+    topic: "work",
+  },
+  "master-opponent-noun": {
+    definition: "a person or team that competes against another in a contest or argument",
+    example: "She defeated her opponent in the final match.",
+    topic: "sports",
+  },
+  "master-optimism-noun": {
+    example: "Despite the setback, the team remained full of optimism.",
+    topic: "emotions",
+  },
+  "master-optimistic-adjective": {
+    vietnamese: "lạc quan",
+    example: "He is optimistic that his plan will succeed.",
+    topic: "emotions",
+  },
+  "master-oral-adjective": { topic: "language" },
+  "master-originally-adverb": {
+    definition: "at first or at the beginning",
+    vietnamese: "ban đầu, lúc đầu",
+    example: "The building was originally designed as a library.",
+    topic: "time",
+  },
+  "master-originate-verb": { topic: "change" },
+  "master-outbreak-noun": {
+    definition: "a sudden start of disease, violence, or another harmful event",
+    vietnamese: "sự bùng phát, sự bùng nổ",
+    example: "The city prepared for a possible outbreak of disease.",
+  },
+  "master-outfit-noun": {
+    vietnamese: "bộ trang phục, quần áo",
+    topic: "clothing",
+  },
+  "master-outline-noun": {
+    example: "She drew the outline of the building in pencil.",
+    topic: "arts",
+  },
+  "master-outlook-noun": {
+    vietnamese: "quan điểm, cách nhìn, triển vọng",
+  },
+  "master-output-noun": {
+    vietnamese: "sản lượng, đầu ra",
+    topic: "work",
+  },
+  "master-outrage-noun": {
+    definition: "an act or event that causes great shock and anger",
+    vietnamese: "điều gây phẫn nộ, hành động tàn bạo",
+    example: "The attack on the shelter was a public outrage.",
+    topic: "society",
+  },
+  "master-outside-adjective": {
+    example: "The outside wall needs a fresh coat of paint.",
+  },
+  "master-outside-noun": {
+    example: "The door can only be opened from the outside.",
+  },
+  "master-overlook-verb": {
+    definition: "to fail to notice something or understand its importance",
+    vietnamese: "bỏ sót, không để ý",
+    topic: "thinking",
+  },
+  "master-overseas-adjective": {
+    example: "The company hopes to expand into overseas markets.",
+    topic: "travel",
+  },
+  "master-overtime-adverb": { topic: "work" },
+  "master-overtime-noun": {
+    vietnamese: "hiệp phụ, thời gian thi đấu thêm",
+    topic: "sports",
+  },
+  "master-panel-noun": {
+    definition: "a group of people chosen to discuss, judge, or advise on something",
+    vietnamese: "ban, hội đồng, nhóm chuyên gia",
+    topic: "society",
+  },
+  "master-panic-verb": {
+    vietnamese: "hoảng sợ, hoảng loạn",
+    example: "Passengers began to panic when they smelled smoke.",
+  },
+  "master-paradox-noun": { topic: "thinking" },
+  "master-partnership-noun": {
+    vietnamese: "quan hệ đối tác, sự hợp tác",
+    topic: "business",
+  },
+  "master-passionate-adjective": {
+    example: "She gave a passionate speech about protecting wildlife.",
+    topic: "emotions",
+  },
+  "master-pave-verb": { topic: "work" },
+  "master-pavement-noun": {
+    vietnamese: "vỉa hè, lối đi lát đá",
+    example: "Pedestrians waited on the pavement beside the road.",
+    topic: "places",
+  },
+  "master-payment-noun": { topic: "money" },
+  "master-peak-noun": {
+    definition: "the highest point or level reached by something",
+    vietnamese: "đỉnh, mức cao nhất",
+    topic: "change",
+  },
+  "master-penalty-noun": { topic: "society" },
+  "master-penetrate-verb": {
+    definition: "to enter or pass through something",
+    topic: "movement",
+  },
+  "master-percentage-noun": { topic: "quantity" },
+  "master-perception-noun": {
+    definition: "the way someone understands or thinks about something",
+    topic: "thinking",
+  },
+  "master-persist-verb": {
+    example: "She persisted with the task despite repeated difficulties.",
+    topic: "success",
+  },
+  "master-personnel-noun": {
+    example: "All personnel must attend the safety training.",
+    topic: "work",
+  },
+  "master-philosophical-adjective": {
+    example: "The course examines several philosophical questions about freedom.",
+    topic: "thinking",
+  },
+  "master-photograph-verb": { topic: "arts" },
+  "master-physician-noun": { topic: "health" },
+  "master-pi-noun": {
+    definition: "the number representing the ratio of a circle's circumference to its diameter",
+    vietnamese: "số pi",
+    topic: "science",
+  },
+  "master-picture-verb": {
+    vietnamese: "hình dung, tưởng tượng",
+    example: "Picture yourself living beside a quiet lake.",
+    topic: "thinking",
+  },
+  "master-pin-noun": {
+    example: "She used a pin to hold the fabric in place.",
+  },
+  "master-pine-noun": {
+    definition: "an evergreen tree with long, thin leaves called needles",
+    vietnamese: "cây thông",
+  },
+  "master-pitch-noun": {
+    vietnamese: "cú ném bóng",
+    topic: "sports",
+  },
+  "master-pitch-verb": {
+    definition: "to throw a ball toward a target",
+    vietnamese: "ném bóng",
+    example: "He pitched the ball across the field.",
+    topic: "sports",
+  },
+  "master-plague-noun": { topic: "health" },
+  "master-plead-verb": {
+    vietnamese: "van xin, khẩn cầu, biện hộ",
+    topic: "relationships",
+  },
+  "master-plot-noun": {
+    vietnamese: "âm mưu, kế hoạch bí mật",
+    topic: "society",
+  },
+  "master-poison-verb": { topic: "safety" },
+  "master-polish-noun": {
+    vietnamese: "chất đánh bóng",
+    example: "She applied furniture polish to the wooden table.",
+  },
+  "master-politically-adverb": {
+    example: "The issue remains politically sensitive.",
+    topic: "society",
+  },
+  "master-pop-verb": { topic: "safety" },
+  "master-popularity-noun": { topic: "society" },
+  "master-portion-noun": { topic: "quantity" },
+  "master-postpone-verb": { topic: "time" },
+  "master-potential-adjective": {
+    definition: "possible or likely to develop into something in the future",
+    topic: "possibility",
+  },
+  "master-potentially-adverb": {
+    vietnamese: "có khả năng, tiềm tàng",
+    topic: "possibility",
+  },
+  "master-pound-verb": {
+    vietnamese: "đập mạnh, nện",
+  },
+  "master-powder-verb": {
+    definition: "to cover something with a fine powder",
+    example: "Powder the cake with a little sugar before serving.",
+    topic: "food",
+  },
+  "master-practically-adverb": {
+    definition: "almost or very nearly",
+    vietnamese: "gần như, hầu như",
+  },
+  "master-precede-verb": { topic: "time" },
+  "master-precisely-adverb": {
+    definition: "in an exact and accurate way",
+    example: "The train arrived precisely at nine o'clock.",
+    topic: "time",
+  },
+  "master-predictable-adjective": {
+    example: "The film followed a predictable pattern from beginning to end.",
+    topic: "possibility",
+  },
+  "master-predictor-noun": { topic: "prediction" },
+  "master-preliminary-adjective": {
+    example: "A preliminary investigation found no evidence of fraud.",
+    topic: "planning",
+  },
+  "master-prescribe-verb": {
+    definition: "to officially order a medicine or treatment for a patient",
+    vietnamese: "kê đơn, chỉ định điều trị",
+    example: "The doctor prescribed some tablets for the infection.",
+    topic: "health",
+  },
+  "master-present-verb": {
+    example: "She presented the results to the committee.",
+    topic: "communication",
+  },
+  "master-presidency-noun": {
+    example: "The economy grew steadily during her presidency.",
+    topic: "society",
+  },
+  "master-presidential-adjective": {
+    vietnamese: "thuộc tổng thống, thuộc chủ tịch",
+    example: "The presidential election will take place in November.",
+    topic: "society",
+  },
+  "master-presumably-adverb": { topic: "thinking" },
+  "master-prevail-verb": {
+    definition: "to be common or dominant, or to succeed in the end",
+    vietnamese: "chiếm ưu thế, thắng thế",
+    topic: "success",
+  },
+  "master-prevention-noun": { topic: "health" },
+  "master-previously-adverb": { topic: "time" },
+  "master-price-verb": { topic: "money" },
+  "master-primary-adjective": {
+    definition: "main, most important, or first in order",
+    topic: "education",
+  },
+  "master-prime-adjective": {
+    example: "The prime reason for the delay was a lack of funding.",
+  },
+  "master-principal-noun": { topic: "education" },
+  "master-prior-adjective": {
+    definition: "happening or existing before a particular time or event",
+    topic: "time",
+  },
+  "master-privately-adverb": {
+    definition: "away from public attention or without other people present",
+    topic: "relationships",
+  },
+  "master-privilege-noun": { topic: "society" },
+  "master-probable-adjective": {
+    vietnamese: "có khả năng xảy ra, có lẽ đúng",
+    topic: "possibility",
+  },
+  "master-probe-noun": {
+    definition: "a thin medical instrument used to examine a wound or part of the body",
+    example: "The doctor used a probe to examine the wound.",
+    topic: "health",
+  },
+  "master-process-verb": { topic: "materials" },
+  "master-professional-noun": { topic: "work" },
+  "master-profile-noun": {
+    definition: "a description of the main characteristics of a person or group",
+    vietnamese: "hồ sơ, bản mô tả đặc điểm",
+    topic: "society",
+  },
+  "master-profit-noun": {
+    vietnamese: "lợi nhuận",
+    example: "The company made a substantial profit last year.",
+    topic: "money",
+  },
+  "master-profitable-adjective": { topic: "money" },
+  "master-programmer-noun": {
+    example: "The programmer fixed a serious error in the application.",
+    topic: "technology",
+  },
+  "master-progress-verb": { topic: "change" },
+  "master-prohibit-verb": { topic: "society" },
+  "master-project-verb": {
+    vietnamese: "dự đoán, ước tính",
+    topic: "prediction",
+  },
+  "master-projection-noun": {
+    vietnamese: "sự dự báo, số liệu dự kiến",
+    example: "The latest projection shows that sales will rise next year.",
+    topic: "prediction",
+  },
+  "master-prompt-noun": {
+    vietnamese: "đề bài, lời gợi ý",
+    topic: "education",
+  },
+  "master-prompt-verb": { topic: "communication" },
+  "master-prosecute-verb": {
+    definition: "to bring a criminal case against someone in a court of law",
+    vietnamese: "truy tố, khởi tố",
+    example: "The authorities decided to prosecute the company for fraud.",
+  },
+  "master-prospect-noun": {
+    vietnamese: "triển vọng, khả năng xảy ra",
+    topic: "possibility",
+  },
+  "master-prosper-verb": {
+    definition: "to become successful, wealthy, or strong",
+    example: "Local businesses began to prosper after tourism increased.",
+    topic: "success",
+  },
+  "master-protest-verb": { topic: "society" },
+  "master-province-noun": {
+    example: "Canada has ten provinces and three territories.",
+  },
+  "master-provision-noun": { topic: "society" },
+  "master-psychology-noun": { topic: "science" },
+  "master-publication-noun": { topic: "communication" },
+  "master-publicity-noun": {
+    definition: "public attention or information used to promote someone or something",
+    vietnamese: "sự chú ý của công chúng, hoạt động quảng bá",
+    example: "The charity received extensive publicity after the event.",
+  },
+  "master-pulse-noun": { topic: "health" },
+  "master-punch-noun": {
+    example: "The boxer landed a powerful punch to his opponent's body.",
+    topic: "safety",
+  },
+  "master-punch-verb": { topic: "safety" },
+  "master-purchase-noun": { topic: "shopping" },
+  "master-purchase-verb": { topic: "shopping" },
+  "master-pursuit-noun": {
+    definition: "the act of trying to achieve or obtain something over time",
+    vietnamese: "sự theo đuổi, việc mưu cầu",
+    example: "She moved abroad in pursuit of a better career.",
+    topic: "success",
+  },
+  "master-qualification-noun": { topic: "work" },
+  "master-quantify-verb": { topic: "science" },
+  "master-query-noun": {
+    example: "Please contact our office if you have a query.",
+  },
+  "master-question-verb": {
+    vietnamese: "đặt nghi vấn, chất vấn",
+    topic: "thinking",
+  },
+  "master-queue-verb": {
+    vietnamese: "xếp hàng, nối đuôi nhau",
+    example: "Customers queued outside the shop before it opened.",
+  },
+  "master-quiet-noun": {
+    definition: "a state or period with little or no noise",
+    example: "She enjoyed the quiet of the early morning.",
+    topic: "sounds",
+  },
+  "master-quotation-noun": { topic: "language" },
+  "master-racism-noun": {
+    definition: "unfair treatment based on race, or the belief that some races are superior to others",
+    example: "The campaign encourages students to speak out against racism.",
+    topic: "society",
+  },
   "master-activity-noun": {
     definition: "something people do for work, learning, exercise, or enjoyment",
     vietnamese: "hoạt động",
