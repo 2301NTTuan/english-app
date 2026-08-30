@@ -5,28 +5,28 @@ STATUS:
 IN_PROGRESS
 
 CURRENT CEFR:
-B2
+C1
 
 CURRENT RANGE:
-B2 / level entries 1101-1300
+C1 / level entries 1-200
 
 LAST CHECKED ENTRY:
-master-racism-noun / B2 position 1100
+master-yield-verb / B2 position 1525
 
 NEXT ENTRY:
-master-rack-noun / B2 position 1101
+v29 / C1 position 1
 
 CHECKED:
-4000/6000
+4425/6000
 
 CRITICAL FOUND:
-465
+549
 
 MAJOR FOUND:
-1593
+1811
 
 MINOR FOUND:
-388
+389
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B2 positions 1051-1100: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B2 positions 1501-1525: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-4e4e8c1 QA vocabulary B2 positions 751-900
+d128252 QA vocabulary B2 positions 901-1100
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
