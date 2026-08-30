@@ -20,10 +20,10 @@ describe("learning content pipeline", () => {
     expect(validateLearningContent({ vocabulary, grammar: grammarTopics, expressions, exercises, placement: placementQuestions, readingPassages, provenance: contentProvenanceBatches })).toEqual([]);
   });
 
-  it("recognizes the completed opening A1 grammar batch and audits the whole catalogue", () => {
+  it("recognizes the completed A1 grammar curriculum and audits the whole catalogue", () => {
     expect(grammarTopics).toHaveLength(138);
-    expect(grammarTopics.slice(0, 12).flatMap(grammarLessonIssues)).toEqual([]);
-    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(12);
+    expect(grammarTopics.filter((topic) => topic.level === "A1").flatMap(grammarLessonIssues)).toEqual([]);
+    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(24);
   });
 
   it("reports duplicate IDs, self-relations, broken prerequisites, and ambiguous choices", () => {
