@@ -8,25 +8,25 @@ CURRENT CEFR:
 B1
 
 CURRENT RANGE:
-B1 / level entries 801-1200
+B1 / level entries 1101-1200
 
 LAST CHECKED ENTRY:
-master-politician-noun / B1 position 800
+master-tick-noun / B1 position 1100
 
 NEXT ENTRY:
-master-politics-noun / B1 position 801
+master-tick-verb / B1 position 1101
 
 CHECKED:
-2500/6000
+2800/6000
 
 CRITICAL FOUND:
-253
+304
 
 MAJOR FOUND:
-907
+1052
 
 MINOR FOUND:
-166
+198
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B1 positions 751-800: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B1 positions 1051-1100: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-QA vocabulary B1 positions 701-800 (this checkpoint)
+504a6fd QA vocabulary B1 positions 701-800
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
