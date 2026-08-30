@@ -8,25 +8,25 @@ CURRENT CEFR:
 B2
 
 CURRENT RANGE:
-B2 / level entries 1-250
+B2 / level entries 301-500
 
 LAST CHECKED ENTRY:
-master-yet-conjunction / B1 position 1200
+master-burial-noun / B2 position 300
 
 NEXT ENTRY:
-v1 / B2 position 1
+master-bustle-verb / B2 position 301
 
 CHECKED:
-2900/6000
+3200/6000
 
 CRITICAL FOUND:
-318
+367
 
 MAJOR FOUND:
-1101
+1242
 
 MINOR FOUND:
-209
+239
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B1 positions 1-1200: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B2 positions 251-300: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-9e950d8 QA vocabulary B1 positions 801-1100
+55fb132 QA vocabulary B1 positions 1101-1200
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.

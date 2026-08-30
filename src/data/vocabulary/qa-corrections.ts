@@ -9,6 +9,8 @@ interface VocabularyQaCorrection {
 
 /** Confirmed learner-facing corrections found during the 6,000-entry production QA pass. */
 export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
+  "v24": { topic: "description" },
+  "v82": { topic: "communication" },
   "v14": { definition: "completely necessary or extremely important" },
   "v16": { definition: "happening often or at short intervals" },
   "v36": { topic: "safety" },
@@ -17,11 +19,712 @@ export const vocabularyQaCorrections: Record<string, VocabularyQaCorrection> = {
   "v52": { topic: "memory" },
   "v59": { topic: "description" },
   "v72": { definition: "to happen or take place" },
+  "v78": { example: "Clear examples enhance learner understanding." },
   "a1-city": { topic: "places" },
   "master-about-adverb": {
     definition: "approximately; a little more or less than a number or amount",
     vietnamese: "khoảng, xấp xỉ",
     example: "The journey takes about an hour.",
+  },
+  "master-abandoned-adjective": {
+    example: "The hikers found an abandoned farmhouse.",
+    topic: "places",
+  },
+  "master-abnormally-adverb": { topic: "description" },
+  "master-aboriginal-adjective": {
+    vietnamese: "thuộc Thổ dân Úc",
+    topic: "culture",
+  },
+  "master-abruptly-adverb": {
+    example: "The meeting ended abruptly when the alarm sounded.",
+    topic: "time",
+  },
+  "master-absentee-noun": {
+    definition: "a person who is expected to be present but is absent",
+    vietnamese: "người vắng mặt, người nghỉ",
+    topic: "education",
+  },
+  "master-abuse-noun": {
+    definition: "cruel, violent, or harmful treatment of a person or animal",
+    vietnamese: "sự ngược đãi, sự lạm dụng",
+    example: "The organization provides support for victims of abuse.",
+    topic: "safety",
+  },
+  "master-access-verb": {
+    vietnamese: "truy cập, tiếp cận",
+    topic: "technology",
+  },
+  "master-accessibility-noun": {
+    definition: "the quality of being easy to reach, enter, use, or understand",
+    vietnamese: "khả năng tiếp cận, tính dễ sử dụng",
+    topic: "places",
+  },
+  "master-accommodation-noun": { topic: "travel" },
+  "master-accordingly-adverb": {
+    definition: "in a way that is suitable for the situation or follows from it",
+    vietnamese: "theo đó, do vậy",
+    example: "The road was closed, so we changed our route accordingly.",
+    topic: "language",
+  },
+  "master-accumulate-verb": {
+    definition: "to gradually collect or increase in amount over time",
+    vietnamese: "tích lũy, tích tụ",
+    topic: "quantity",
+  },
+  "master-accusation-noun": {
+    definition: "a claim that someone has done something wrong or illegal",
+    vietnamese: "lời buộc tội, sự cáo buộc",
+    example: "She denied the accusation and requested an investigation.",
+    topic: "society",
+  },
+  "master-ache-verb": { topic: "health" },
+  "master-achievable-adjective": { topic: "success" },
+  "master-acid-noun": {
+    definition: "a chemical substance that can react with other materials and may burn them",
+    topic: "science",
+  },
+  "master-acquisition-noun": {
+    vietnamese: "sự thu nhận, sự mua lại",
+    example: "The company announced the acquisition of a smaller competitor.",
+    topic: "business",
+  },
+  "master-actively-adverb": { topic: "actions" },
+  "master-acute-adjective": {
+    vietnamese: "nhọn, nhỏ hơn 90 độ",
+    topic: "science",
+  },
+  "master-adaptable-adjective": {
+    definition: "able to change in order to suit new conditions",
+    vietnamese: "có khả năng thích nghi, linh hoạt",
+    topic: "skills",
+  },
+  "master-addict-noun": {
+    definition: "a person who is unable to stop using a harmful substance or activity",
+    vietnamese: "người nghiện",
+    example: "The recovering addict joined a support program.",
+    topic: "health",
+  },
+  "master-addicted-adjective": {
+    vietnamese: "nghiện, lệ thuộc",
+    topic: "health",
+  },
+  "master-addiction-noun": {
+    definition: "a strong dependence on a substance or activity that is difficult to stop",
+    vietnamese: "chứng nghiện, sự lệ thuộc",
+    topic: "health",
+  },
+  "master-additionally-adverb": {
+    definition: "as an extra fact or in addition to something already mentioned",
+    topic: "language",
+  },
+  "master-adequately-adverb": { topic: "description" },
+  "master-adjustment-noun": {
+    definition: "a small change made to improve something or make it more suitable",
+    vietnamese: "sự điều chỉnh, sự sửa đổi",
+    example: "A small adjustment improved the chair's height.",
+    topic: "change",
+  },
+  "master-administrative-adjective": { topic: "work" },
+  "master-admirable-adjective": { topic: "emotions" },
+  "master-admiringly-adverb": {
+    vietnamese: "một cách ngưỡng mộ, thán phục",
+    example: "That was excellent, she said admiringly.",
+    topic: "emotions",
+  },
+  "master-admittedly-adverb": {
+    definition: "used when accepting that something is true, often before adding a contrast",
+    example: "Admittedly, the plan still needs more work.",
+    topic: "language",
+  },
+  "master-adopted-adjective": { topic: "family" },
+  "master-adoption-noun": {
+    definition: "the legal act of taking a child or animal into a new family or home",
+    vietnamese: "sự nhận nuôi",
+    topic: "family",
+  },
+  "master-adorn-verb": {
+    example: "Colorful flags adorn the entrance to the hall.",
+    topic: "arts",
+  },
+  "master-advance-noun": {
+    definition: "progress or improvement in knowledge, technology, or ability",
+    vietnamese: "sự tiến bộ, bước tiến",
+    example: "The discovery was a major advance in medicine.",
+    topic: "success",
+  },
+  "master-advancement-noun": { topic: "success" },
+  "master-advent-noun": {
+    example: "The advent of smartphones changed everyday communication.",
+    topic: "events",
+  },
+  "master-adventurous-adjective": {
+    example: "The adventurous travelers explored the remote island.",
+    topic: "travel",
+  },
+  "master-adverse-adjective": {
+    definition: "harmful or likely to prevent success",
+    vietnamese: "bất lợi, có hại",
+    example: "The medicine caused no adverse effects.",
+  },
+  "master-adversely-adverb": { topic: "description" },
+  "master-adversity-noun": {
+    vietnamese: "nghịch cảnh, hoàn cảnh khó khăn",
+    example: "The community remained united during adversity.",
+  },
+  "master-affectionate-adjective": {
+    example: "The child gave her grandmother an affectionate hug.",
+    topic: "relationships",
+  },
+  "master-affectionately-adverb": {
+    definition: "in a way that shows love or fondness",
+    topic: "relationships",
+  },
+  "master-affordable-adjective": {
+    vietnamese: "có giá phải chăng, có thể chi trả",
+    topic: "money",
+  },
+  "master-aggressively-adverb": {
+    vietnamese: "một cách hung hăng, quyết liệt",
+    topic: "safety",
+  },
+  "master-agony-noun": {
+    example: "The injured runner cried out in agony.",
+    topic: "health",
+  },
+  "master-aim-verb": {
+    vietnamese: "nhằm, hướng đến",
+    topic: "planning",
+  },
+  "master-aircraft-noun": { topic: "travel" },
+  "master-aircrew-noun": {
+    vietnamese: "phi hành đoàn",
+    topic: "work",
+  },
+  "master-alcoholic-noun": {
+    definition: "a person who has a dependence on alcohol",
+    example: "The recovering alcoholic receives professional support.",
+    topic: "health",
+  },
+  "master-alcoholism-noun": {
+    definition: "a medical condition involving dependence on alcohol",
+    vietnamese: "chứng nghiện rượu",
+    example: "Treatment for alcoholism can include counseling and medical care.",
+    topic: "health",
+  },
+  "master-alert-verb": { topic: "safety" },
+  "master-allegation-noun": {
+    vietnamese: "cáo buộc chưa được chứng minh",
+    example: "The organization opened an inquiry into the allegation.",
+    topic: "society",
+  },
+  "master-alliance-noun": {
+    definition: "an agreement between people, groups, or countries to support one another",
+    vietnamese: "liên minh, khối đồng minh",
+    example: "The two organizations formed an alliance to protect the river.",
+    topic: "society",
+  },
+  "master-ally-noun": {
+    definition: "a person, group, or country that supports another",
+    vietnamese: "đồng minh, người ủng hộ",
+    example: "The organization found a strong ally in the local council.",
+  },
+  "master-alphabetical-adjective": {
+    vietnamese: "theo thứ tự bảng chữ cái",
+    topic: "language",
+  },
+  "master-altar-noun": {
+    definition: "a table or raised structure used in religious ceremonies",
+    example: "Flowers were placed on the altar before the ceremony.",
+    topic: "culture",
+  },
+  "master-alternate-verb": {
+    definition: "to change repeatedly between two positions, activities, or states",
+  },
+  "master-alternatively-adverb": {
+    vietnamese: "hoặc là, thay vào đó",
+    topic: "language",
+  },
+  "master-altitude-noun": {
+    vietnamese: "độ cao so với mực nước biển",
+    topic: "nature",
+  },
+  "master-amaze-verb": { topic: "emotions" },
+  "master-amazingly-adverb": { topic: "description" },
+  "master-ambassador-noun": { topic: "society" },
+  "master-ambiguity-noun": {
+    definition: "the quality of having more than one possible meaning",
+    vietnamese: "sự mơ hồ, sự đa nghĩa",
+    example: "The ambiguity of the sentence confused several readers.",
+    topic: "language",
+  },
+  "master-ammonia-noun": {
+    definition: "a colorless gas with a strong smell that is used in cleaning products",
+    vietnamese: "amoniac",
+    example: "The cleaner contains a small amount of ammonia.",
+    topic: "science",
+  },
+  "master-ample-adjective": {
+    vietnamese: "dồi dào, dư dả",
+    topic: "quantity",
+  },
+  "master-amplifier-noun": { topic: "technology" },
+  "master-amplify-verb": {
+    vietnamese: "khuếch đại, làm lớn hơn",
+  },
+  "master-amuse-verb": {
+    vietnamese: "làm vui, làm thích thú",
+    topic: "emotions",
+  },
+  "master-analogy-noun": { topic: "comparison" },
+  "master-analyst-noun": { topic: "work" },
+  "master-anchor-noun": { topic: "travel" },
+  "master-anchorage-noun": {
+    definition: "a safe place where boats can anchor",
+    vietnamese: "nơi neo đậu",
+    topic: "travel",
+  },
+  "master-animate-verb": { topic: "technology" },
+  "master-anonymous-adjective": {
+    definition: "made or given without revealing the name of the person responsible",
+    example: "The newspaper received an anonymous letter.",
+    topic: "communication",
+  },
+  "master-antiaircraft-adjective": {
+    example: "The base installed antiaircraft defenses.",
+    topic: "safety",
+  },
+  "master-antibacterial-adjective": { topic: "health" },
+  "master-anticipate-verb": {
+    definition: "to expect something and prepare for it before it happens",
+    vietnamese: "dự đoán, lường trước",
+    example: "We anticipate heavier traffic during the holiday.",
+    topic: "prediction",
+  },
+  "master-apostrophe-noun": {
+    definition: "a punctuation mark used to show missing letters or possession",
+    vietnamese: "dấu nháy đơn, dấu lược",
+    example: "The word don't contains an apostrophe.",
+    topic: "language",
+  },
+  "master-applicant-noun": { topic: "work" },
+  "master-appreciative-adjective": {
+    vietnamese: "biết ơn, trân trọng",
+    example: "The audience was appreciative of her careful work.",
+    topic: "emotions",
+  },
+  "master-appropriately-adverb": { topic: "description" },
+  "master-approximate-adjective": {
+    definition: "close to the correct number or amount but not exact",
+    vietnamese: "xấp xỉ, gần đúng",
+    example: "Can you give me an approximate cost for the repair?",
+  },
+  "master-arch-noun": { topic: "objects" },
+  "master-arctic-adjective": {
+    definition: "extremely cold like the Arctic region",
+    example: "The expedition faced arctic temperatures.",
+    topic: "weather",
+  },
+  "master-arena-noun": { topic: "places" },
+  "master-aristocracy-noun": {
+    definition: "the highest social class, traditionally made up of people with inherited titles",
+    vietnamese: "tầng lớp quý tộc",
+    example: "The old aristocracy owned much of the land.",
+    topic: "society",
+  },
+  "master-armful-noun": {
+    definition: "the amount of something that can be carried in one or both arms",
+    vietnamese: "một ôm, lượng ôm được",
+    example: "She carried an armful of books upstairs.",
+  },
+  "master-artery-noun": {
+    example: "The surgeon repaired a damaged artery.",
+    topic: "health",
+  },
+  "master-articulate-verb": { topic: "communication" },
+  "master-artificially-adverb": { topic: "description" },
+  "master-artistry-noun": {
+    vietnamese: "tài nghệ, kỹ năng nghệ thuật",
+    topic: "arts",
+  },
+  "master-ash-noun": {
+    example: "There was nothing left of the wood but ash.",
+  },
+  "master-aspiration-noun": { topic: "success" },
+  "master-aspire-verb": {
+    definition: "to have a strong desire to achieve or become something",
+    vietnamese: "khao khát, mong muốn đạt tới",
+    example: "Many young athletes aspire to compete internationally.",
+    topic: "success",
+  },
+  "master-assault-noun": {
+    definition: "a violent physical attack on a person",
+    vietnamese: "cuộc tấn công, hành vi hành hung",
+    example: "The police investigated the reported assault.",
+    topic: "safety",
+  },
+  "master-assemble-verb": { topic: "actions" },
+  "master-assembly-noun": {
+    definition: "a meeting of a group of people for a particular purpose",
+    vietnamese: "buổi tập trung, cuộc họp",
+    topic: "society",
+  },
+  "master-assert-verb": {
+    definition: "to state something firmly and confidently",
+    vietnamese: "khẳng định, quả quyết",
+    example: "She asserted her right to speak at the meeting.",
+  },
+  "master-assumption-noun": { topic: "thinking" },
+  "master-assurance-noun": { topic: "communication" },
+  "master-astonish-verb": { topic: "emotions" },
+  "master-astonished-adjective": { topic: "emotions" },
+  "master-astonishing-adjective": {
+    definition: "extremely surprising or impressive",
+    vietnamese: "đáng kinh ngạc, gây sửng sốt",
+  },
+  "master-astronomy-noun": {
+    example: "She studied astronomy at university.",
+    topic: "science",
+  },
+  "master-athletics-noun": { topic: "sports" },
+  "master-attached-adjective": { topic: "relationships" },
+  "master-attainable-adjective": { topic: "success" },
+  "master-attainment-noun": {
+    example: "Her degree marked an important personal attainment.",
+    topic: "success",
+  },
+  "master-attendance-noun": { topic: "events" },
+  "master-attentively-adverb": {
+    example: "The students listened attentively to the instructions.",
+  },
+  "master-attractiveness-noun": {
+    definition: "the quality of being pleasant, appealing, or beautiful",
+    vietnamese: "sức hấp dẫn, vẻ thu hút",
+    example: "Good transport links increase the town's attractiveness.",
+  },
+  "master-attribute-noun": {
+    definition: "a quality or feature of a person or thing",
+    topic: "description",
+  },
+  "master-attribute-verb": {
+    definition: "to regard something as being caused or created by a particular person or thing",
+  },
+  "master-atypical-adjective": {
+    example: "Such warm weather is atypical for January.",
+  },
+  "master-aubergine-noun": {
+    definition: "a purple, egg-shaped fruit that is cooked and eaten as a vegetable",
+    example: "She sliced the aubergine before roasting it.",
+  },
+  "master-audit-noun": {
+    definition: "an official examination of financial records or business processes",
+    vietnamese: "cuộc kiểm toán, sự kiểm tra",
+    example: "The annual audit found no accounting errors.",
+    topic: "business",
+  },
+  "master-audition-noun": {
+    definition: "a short performance used to decide whether someone gets a role",
+    vietnamese: "buổi thử vai, buổi thử giọng",
+    topic: "arts",
+  },
+  "master-availability-noun": {
+    definition: "the state of being ready or able to be used or obtained",
+    vietnamese: "tính sẵn có, khả năng sử dụng",
+    example: "Ticket availability is limited this weekend.",
+  },
+  "master-awe-noun": {
+    vietnamese: "sự kính sợ, cảm giác thán phục",
+  },
+  "master-axis-noun": { topic: "science" },
+  "master-backup-noun": { topic: "technology" },
+  "master-backyard-noun": { topic: "home" },
+  "master-badge-noun": { topic: "objects" },
+  "master-balance-verb": { topic: "movement" },
+  "master-balky-adjective": {
+    definition: "unwilling to work, move, or cooperate",
+    example: "The mechanic repaired the balky engine.",
+  },
+  "master-ballad-noun": { topic: "arts" },
+  "master-ballet-noun": { topic: "arts" },
+  "master-ballot-noun": { topic: "society" },
+  "master-ban-noun": { topic: "society" },
+  "master-banker-noun": { topic: "money" },
+  "master-bankrupt-verb": {
+    definition: "to cause a person or business to lose all available money",
+    example: "The long legal dispute could bankrupt the small company.",
+    topic: "money",
+  },
+  "master-bankruptcy-noun": { topic: "money" },
+  "master-barbershop-noun": { topic: "places" },
+  "master-bare-verb": {
+    example: "Please bare your arm for the examination.",
+    topic: "health",
+  },
+  "master-bargain-verb": { topic: "business" },
+  "master-bark-verb": { topic: "sounds" },
+  "master-barley-noun": {
+    example: "Farmers grow barley for food and animal feed.",
+  },
+  "master-barn-noun": {
+    vietnamese: "chuồng trại, kho nông trại",
+    topic: "places",
+  },
+  "master-barometer-noun": {
+    example: "The barometer showed a sudden drop in air pressure.",
+    topic: "science",
+  },
+  "master-barrier-noun": { topic: "problem-solving" },
+  "master-bartender-noun": {
+    example: "The bartender prepared drinks for the guests.",
+    topic: "work",
+  },
+  "master-bathhouse-noun": { topic: "places" },
+  "master-battlefield-noun": { topic: "history" },
+  "master-beagle-noun": {
+    example: "The beagle followed the scent through the field.",
+  },
+  "master-bearing-noun": {
+    vietnamese: "mối liên quan, ảnh hưởng",
+    topic: "thinking",
+  },
+  "master-beat-noun": { topic: "arts" },
+  "master-beautify-verb": {
+    example: "Residents planted flowers to beautify the street.",
+  },
+  "master-bellow-verb": { topic: "sounds" },
+  "master-belongings-noun": {
+    vietnamese: "đồ đạc, tư trang",
+    topic: "ownership",
+  },
+  "master-bend-noun": {
+    definition: "a curve or change in direction",
+  },
+  "master-benefit-verb": { topic: "success" },
+  "master-bestow-verb": {
+    vietnamese: "trao tặng, ban cho",
+    example: "The university will bestow an award on the researcher.",
+    topic: "society",
+  },
+  "master-bestseller-noun": { topic: "literature" },
+  "master-betray-verb": {
+    vietnamese: "phản bội, phụ lòng",
+    example: "He refused to betray the trust of his friends.",
+    topic: "relationships",
+  },
+  "master-bewilder-verb": {
+    example: "The complicated map may bewilder first-time visitors.",
+  },
+  "master-bid-verb": { topic: "business" },
+  "master-bidding-noun": {
+    definition: "the process of offering prices to buy something or win a contract",
+    vietnamese: "sự đấu giá, sự dự thầu",
+    topic: "business",
+  },
+  "master-bikini-noun": { topic: "clothing" },
+  "master-bind-verb": {
+    vietnamese: "buộc, trói, đóng lại",
+  },
+  "master-biological-adjective": {
+    example: "The researchers examined several biological processes.",
+    topic: "science",
+  },
+  "master-biotechnology-noun": { topic: "science" },
+  "master-birthplace-noun": {
+    example: "The museum stands near the writer's birthplace.",
+  },
+  "master-bitterly-adverb": { topic: "emotions" },
+  "master-blade-noun": {
+    example: "The knife has a sharp steel blade.",
+    topic: "objects",
+  },
+  "master-blast-noun": {
+    definition: "a sudden explosion or powerful burst of air",
+    vietnamese: "vụ nổ, luồng khí mạnh",
+    topic: "safety",
+  },
+  "master-blast-verb": {
+    definition: "to produce a very loud and harsh sound",
+    vietnamese: "phát ra âm thanh lớn, gầm vang",
+    topic: "sounds",
+  },
+  "master-blaze-noun": {
+    example: "Firefighters worked through the night to control the blaze.",
+    topic: "safety",
+  },
+  "master-blaze-verb": { topic: "safety" },
+  "master-blend-noun": { topic: "language" },
+  "master-blindly-adverb": { topic: "description" },
+  "master-blindness-noun": {
+    vietnamese: "tình trạng mù lòa, mất thị lực",
+    topic: "health",
+  },
+  "master-blink-verb": { topic: "body" },
+  "master-bloody-adjective": {
+    definition: "covered with or marked by blood",
+    vietnamese: "đẫm máu, dính máu",
+    example: "The medic replaced the bloody bandage.",
+    topic: "safety",
+  },
+  "master-bloody-adverb": {
+    definition: "used informally to mean very or extremely",
+    vietnamese: "rất, vô cùng",
+    example: "The final stage was bloody difficult.",
+    topic: "language",
+  },
+  "master-blooming-adjective": {
+    definition: "producing flowers or covered with flowers",
+    vietnamese: "đang nở hoa",
+    topic: "nature",
+  },
+  "master-blur-verb": {
+    example: "Rain can blur the view through the window.",
+    topic: "senses",
+  },
+  "master-blush-verb": { topic: "emotions" },
+  "master-bolt-noun": {
+    vietnamese: "bu lông, chốt",
+  },
+  "master-bolt-verb": {
+    vietnamese: "chạy vụt đi, bỏ chạy",
+    example: "The horse may bolt if it hears a sudden noise.",
+  },
+  "master-bomber-noun": {
+    definition: "an aircraft designed to carry and drop bombs",
+    vietnamese: "máy bay ném bom",
+    example: "The aviation museum restored a historic bomber.",
+    topic: "history",
+  },
+  "master-bombing-noun": {
+    definition: "an attack in which one or more bombs are used",
+    example: "The bombing damaged several empty buildings.",
+    topic: "safety",
+  },
+  "master-bony-adjective": {
+    definition: "containing many bones or having bones that are easy to see",
+    example: "This fish is too bony for young children.",
+  },
+  "master-booklet-noun": {
+    definition: "a small, thin book with a few pages",
+    example: "The clinic gave each patient an information booklet.",
+  },
+  "master-boost-noun": {
+    vietnamese: "sự đẩy lên, sự thúc đẩy",
+  },
+  "master-boost-verb": {
+    example: "The campaign helped boost ticket sales.",
+  },
+  "master-booth-noun": {
+    definition: "a small enclosed space or stall for a particular purpose",
+    vietnamese: "quầy, gian, buồng nhỏ",
+    example: "The company displayed its products at a trade-show booth.",
+  },
+  "master-bossy-adjective": {
+    vietnamese: "hay ra lệnh, thích sai khiến",
+  },
+  "master-botany-noun": { topic: "science" },
+  "master-bottle-verb": {
+    definition: "to put a liquid into bottles for storage or sale",
+    vietnamese: "đóng chai",
+    example: "The farm bottles fresh juice every morning.",
+    topic: "business",
+  },
+  "master-bourbon-noun": {
+    vietnamese: "rượu bourbon",
+  },
+  "master-bow-verb": {
+    definition: "to bend the head or upper body forward as a greeting or sign of respect",
+    vietnamese: "cúi đầu, cúi chào",
+    topic: "culture",
+  },
+  "master-boxer-noun": {
+    example: "The boxer trained daily for the championship.",
+    topic: "sports",
+  },
+  "master-brag-noun": {
+    example: "His claim about the record sounded like an empty brag.",
+  },
+  "master-brake-verb": {
+    vietnamese: "phanh, hãm lại",
+    topic: "travel",
+  },
+  "master-bravery-noun": {
+    vietnamese: "lòng can đảm, sự dũng cảm",
+    topic: "emotions",
+  },
+  "master-breakdown-noun": { topic: "travel" },
+  "master-breakup-noun": {
+    vietnamese: "sự chia tay, sự tan vỡ",
+    example: "She needed time to recover from the breakup.",
+    topic: "relationships",
+  },
+  "master-breathtaking-adjective": {
+    example: "The mountain offered a breathtaking view of the valley.",
+  },
+  "master-breed-noun": { topic: "animals" },
+  "master-breezy-adjective": {
+    example: "It was a bright and breezy afternoon.",
+    topic: "weather",
+  },
+  "master-brewery-noun": { topic: "places" },
+  "master-brilliantly-adverb": { topic: "description" },
+  "master-broadcaster-noun": {
+    definition: "a person who presents programs on radio or television",
+    vietnamese: "phát thanh viên, người dẫn chương trình",
+    example: "The broadcaster interviewed two experts live on air.",
+    topic: "work",
+  },
+  "master-brochure-noun": {
+    example: "The clinic published a brochure about gum disease.",
+  },
+  "master-brother-in-law-noun": { topic: "family" },
+  "master-browse-verb": {
+    definition: "to look through information or goods casually without a specific goal",
+    vietnamese: "xem lướt, duyệt qua",
+  },
+  "master-browser-noun": {
+    definition: "a computer program used to view websites on the internet",
+    vietnamese: "trình duyệt web",
+    example: "Update your browser before opening the website.",
+    topic: "technology",
+  },
+  "master-bruise-noun": { topic: "health" },
+  "master-bulimia-noun": {
+    definition: "an eating disorder involving repeated overeating followed by attempts to avoid weight gain",
+    vietnamese: "chứng ăn vô độ",
+    topic: "health",
+  },
+  "master-bully-verb": {
+    definition: "to frighten or hurt someone repeatedly in order to control them",
+    example: "Older students must not bully younger children.",
+    topic: "safety",
+  },
+  "master-bumper-noun": {
+    vietnamese: "cản xe, thanh giảm va",
+    topic: "travel",
+  },
+  "master-bun-noun": {
+    vietnamese: "bánh mì tròn nhỏ",
+  },
+  "master-burden-verb": {
+    definition: "to give someone a heavy responsibility or difficult problem",
+    vietnamese: "làm nặng gánh, gây gánh nặng",
+    topic: "responsibility",
+  },
+  "master-burdensome-adjective": {
+    definition: "difficult to carry out or deal with",
+    example: "The new reporting process became burdensome for small teams.",
+  },
+  "master-bureaucracy-noun": {
+    definition: "a system with many official rules and administrative procedures",
+    vietnamese: "hệ thống quan liêu, bộ máy hành chính",
+  },
+  "master-burglary-noun": {
+    vietnamese: "tội đột nhập trộm cắp",
+    topic: "safety",
+  },
+  "master-burgle-verb": { topic: "safety" },
+  "master-burial-noun": {
+    example: "The family arranged a private burial.",
+    topic: "culture",
   },
   "master-activity-noun": {
     definition: "something people do for work, learning, exercise, or enjoyment",
