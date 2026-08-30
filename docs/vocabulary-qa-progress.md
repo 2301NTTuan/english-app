@@ -8,25 +8,25 @@ CURRENT CEFR:
 B2
 
 CURRENT RANGE:
-B2 / level entries 501-700
+B2 / level entries 701-900
 
 LAST CHECKED ENTRY:
-master-desperately-adverb / B2 position 500
+master-illustrate-verb / B2 position 750
 
 NEXT ENTRY:
-master-detect-verb / B2 position 501
+master-illustration-noun / B2 position 751
 
 CHECKED:
-3400/6000
+3650/6000
 
 CRITICAL FOUND:
-399
+420
 
 MAJOR FOUND:
-1337
+1443
 
 MINOR FOUND:
-259
+316
 
 CRITICAL UNRESOLVED:
 0
@@ -38,10 +38,10 @@ MINOR UNRESOLVED:
 0
 
 LAST VALIDATION:
-B2 positions 451-500: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
+B2 positions 701-750: 0 structural blockers, 0 semantic candidates, 0 repeated definitions, and 0 repeated Vietnamese groups
 
 LAST CHECKPOINT COMMIT:
-9e72dff QA vocabulary B2 positions 1-300
+0e4449f QA vocabulary B2 positions 301-500
 
 NEXT ACTION:
 Continue from NEXT ENTRY only.
