@@ -4,6 +4,7 @@ import { expandedPhrasalVerbs } from "@/data/expression-phrasal-verbs-bank";
 import { intermediatePhrasalVerbs } from "@/data/expression-phrasal-verbs-intermediate-bank";
 import { advancedPhrasalVerbs } from "@/data/expression-phrasal-verbs-advanced-bank";
 import { basicCollocations } from "@/data/expression-collocations-basic-bank";
+import { generalCollocations } from "@/data/expression-collocations-general-bank";
 
 const coreExpressions: ExpressionItem[] = [
   { id: "e1", expression: "break the ice", kind: "idiom", meaning: "make people feel comfortable in a new social situation", vietnameseMeaning: "phá tan sự ngượng ngùng, bắt đầu làm quen", cefrLevel: "B1", examples: ["I told a joke to break the ice."], usageNotes: "Informal and common in social or professional introductions.", tags: ["social"], status: "validated" },
@@ -125,4 +126,4 @@ const separabilityCorrections: Record<string, NonNullable<ExpressionItem["separa
   "go over": "separable",
 };
 
-export const expressions: ExpressionItem[] = [...coreExpressions, ...moreExpressions.map(([expression, kind, meaning, vietnameseMeaning, cefrLevel, example, usageNotes, category], index) => ({ id: `e${coreExpressions.length + index + 1}`, expression, kind, meaning, vietnameseMeaning, cefrLevel, examples: [example], usageNotes, tags: [category], status: "validated" as const, ...(kind === "phrasal-verb" ? { relatedVerb: expression.split(" ")[0], separability: separabilityCorrections[expression] ?? (usageNotes.toLowerCase().startsWith("separable") ? "separable" as const : usageNotes.toLowerCase().startsWith("inseparable") ? "inseparable" as const : "both" as const) } : {}) })), ...expandedIdioms, ...expandedPhrasalVerbs, ...intermediatePhrasalVerbs, ...advancedPhrasalVerbs, ...basicCollocations];
+export const expressions: ExpressionItem[] = [...coreExpressions, ...moreExpressions.map(([expression, kind, meaning, vietnameseMeaning, cefrLevel, example, usageNotes, category], index) => ({ id: `e${coreExpressions.length + index + 1}`, expression, kind, meaning, vietnameseMeaning, cefrLevel, examples: [example], usageNotes, tags: [category], status: "validated" as const, ...(kind === "phrasal-verb" ? { relatedVerb: expression.split(" ")[0], separability: separabilityCorrections[expression] ?? (usageNotes.toLowerCase().startsWith("separable") ? "separable" as const : usageNotes.toLowerCase().startsWith("inseparable") ? "inseparable" as const : "both" as const) } : {}) })), ...expandedIdioms, ...expandedPhrasalVerbs, ...intermediatePhrasalVerbs, ...advancedPhrasalVerbs, ...basicCollocations, ...generalCollocations];
