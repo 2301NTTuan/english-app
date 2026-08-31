@@ -1,9 +1,10 @@
 import type { CEFRLevel, PlacementQuestion, ReadingPassage } from "@/types/domain";
+import { additionalReadingPassages, additionalReadingQuestions } from "@/data/placement-reading-bank";
 
 const provenanceId = "placement-core-2026-08";
 const CEFR_LEVELS: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
-export const readingPassages: ReadingPassage[] = [
+const coreReadingPassages: ReadingPassage[] = [
   { id: "reading-a1-library", title: "At the library", level: "A1", status: "validated", provenanceId, text: "Mina goes to the library after school on Tuesday. She returns one book and borrows a book about animals. The library closes at six, so she leaves at half past five." },
   { id: "reading-a2-garden", title: "A shared garden", level: "A2", status: "validated", provenanceId, text: "People in West Street turned an empty space into a small garden last spring. Neighbours grow vegetables there and meet on Saturday mornings. New members do not need gardening experience, but they should bring their own gloves." },
   { id: "reading-b1-remote", title: "A different workday", level: "B1", status: "validated", provenanceId, text: "When Ravi began working from home, he expected to save time and feel less tired. He did enjoy avoiding the crowded train, but he found it difficult to stop working in the evening. He now takes a short walk at the end of the day. The walk creates a clear boundary between work and free time." },
@@ -34,7 +35,7 @@ const readingSeeds: ReadingSeed[] = [
   ["C2", "reading-c2-memory", "argument", "Why is a changing narrative not necessarily fraudulent?", ["Selection is part of how societies interpret inheritance", "All historical narratives are equally accurate", "Ceremonies preserve every account without alteration", "Public memory has no connection to the past"], "Selection is part of how societies interpret inheritance", "The writer distinguishes interpretive revision from deliberate falsification."],
 ];
 
-export const readingPlacementQuestions: PlacementQuestion[] = readingSeeds.map(([level, passageId, subtopic, prompt, options, answer, explanation], index) => ({
+const coreReadingPlacementQuestions: PlacementQuestion[] = readingSeeds.map(([level, passageId, subtopic, prompt, options, answer, explanation], index) => ({
   id: `placement-reading-${level.toLowerCase()}-${index + 1}`,
   itemId: passageId,
   knowledgeType: "vocabulary",
@@ -54,4 +55,6 @@ export const readingPlacementQuestions: PlacementQuestion[] = readingSeeds.map((
   passageId,
 }));
 
+export const readingPassages: ReadingPassage[] = [...coreReadingPassages, ...additionalReadingPassages];
+export const readingPlacementQuestions: PlacementQuestion[] = [...coreReadingPlacementQuestions, ...additionalReadingQuestions];
 export const readingPassagesById = new Map(readingPassages.map((passage) => [passage.id, passage]));
