@@ -3,6 +3,7 @@ import { a1Lessons } from "./grammar/a1";
 import { a2Lessons } from "./grammar/a2";
 import { b1Lessons } from "./grammar/b1";
 import { b2Lessons } from "./grammar/b2";
+import { c1Lessons } from "./grammar/c1";
 
 const topic = (id: string, title: string, level: GrammarTopic["level"], description: string, prerequisites: string[], structures: string[], example: string, mistake: [string, string, string], subtopics: string[]): GrammarTopic => ({
   id, title, level, category: "Core grammar", description, prerequisites,
@@ -59,7 +60,7 @@ const additionalDetailedTopics: GrammarTopic[] = [
 ];
 
 const legacyDetailedTopics: GrammarTopic[] = [...coreDetailedTopics, ...additionalDetailedTopics];
-const enrichedTopics = [...a1Lessons, ...a2Lessons, ...b1Lessons, ...b2Lessons];
+const enrichedTopics = [...a1Lessons, ...a2Lessons, ...b1Lessons, ...b2Lessons, ...c1Lessons];
 const detailedTopics: GrammarTopic[] = [...enrichedTopics, ...legacyDetailedTopics.filter((item) => !enrichedTopics.some((lesson) => lesson.id === item.id))];
 
 export const curriculumOutline: Record<GrammarTopic["level"], string[]> = {
