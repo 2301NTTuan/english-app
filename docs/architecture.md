@@ -19,7 +19,7 @@ The production foundation adds PostgreSQL and Drizzle without moving learning ru
 
 ## Persistence decision
 
-The normalized schema is the system of record for core learning events. Session completion atomically inserts one idempotent session and its answers, then upserts vocabulary/grammar mastery, review state, mistakes, preferences, an active learning path, audit evidence, and the hydration snapshot. Placement completion follows the same pattern for attempts and diagnostic answers. Unknown content references abort the whole transaction. Replaying an idempotency key returns success without changing review counts or path versions.
+The normalized schema is the system of record for core learning events. Session completion atomically inserts one idempotent session and its answers, then upserts vocabulary/grammar mastery, review state, mistakes, preferences, an active learning path, audit evidence, and the hydration snapshot. Expression attempts are recorded as session items, but expression-specific mastery/review is not yet projected through `AppState`. Placement completion follows the same pattern for attempts and diagnostic answers. Unknown vocabulary/grammar content references abort the whole transaction. Replaying an idempotency key returns success without changing review counts or path versions.
 
 The validated, versioned `AppState` snapshot remains a compatibility fallback for explicit browser-data import and recovery. Hydration is projected from normalized preferences, progress, review, mistake, session, and placement rows. General debounced state saves can update preferences only; they cannot overwrite learning events. Per-account advisory locks serialize session and placement completion, and stale review versions return an explicit conflict.
 
@@ -31,7 +31,9 @@ Credentials authentication uses bcrypt with cost 12 and random opaque 256-bit to
 
 ## Scaling and performance
 
-The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, and session-idempotency queries. The vocabulary browser uses authenticated database search and filters with a hard 24-record page limit; the content seed imports all 6,000 enriched records into that database path. Local/test and explicit `validated-preview` deployments can browse all validated records; the default production channel deliberately exposes only `published` records, currently none. Daily planning, learning paths, and study sessions use the full bundled 6,000-entry catalogue and then filter by learner level and progress; there is no 298-record vocabulary fallback. Authentication throttling uses an atomic PostgreSQL table in production and retains an in-memory backend only for local/test use.
+The pool defaults to 10 connections per process. Composite indexes support due-review, user/date, knowledge, active-path, content-level/frequency, release-channel, and session-idempotency queries. The idempotent seed currently imports 6,000 enriched vocabulary records, 138 grammar topics/lessons, 612 Placement items with 22 passages, and 1,621 Expressions.
+
+Vocabulary and Expressions browsers use authenticated, bounded PostgreSQL queries; Grammar loads its active database catalogue; Placement selection remains server-scoped. Local/test and explicit preview channels can expose validated Vocabulary, Placement, and Expressions content. Default production filtering exposes only `published` records for those lifecycle-managed corpora, currently none; Grammar has active flags but no per-lesson publication status. Daily planning and study sessions use the full bundled Vocabulary, Grammar, and Expressions catalogues and filter by level and progress where supported; there is no 298-record Vocabulary or 107-record Expressions fallback. Authentication throttling uses an atomic PostgreSQL table in production and retains an in-memory backend only for local/test use.
 
 ## Known limitations
 

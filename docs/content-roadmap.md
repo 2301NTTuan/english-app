@@ -1,14 +1,20 @@
 # Content roadmap
 
-Current baseline: the vocabulary master inventory is **COMPLETE** at 6,000 units, core enrichment is **COMPLETE** at 6,000 records, and machine QA is **COMPLETE** at 6,000 records with no unresolved critical, major, or minor findings. The grammar curriculum and production-detail lessons are **COMPLETE** at 138/138 (A1 24, A2 24, B1 26, B2 25, C1 24, C2 15). Grammar machine/content QA is **PASS**, the deterministic semantic sample is **PASS** at 60/60, and source, seed, database, server query/API, browser, and planner/session integration is **PASS**. The Expressions production engineering baseline is **COMPLETE** at 1,621 validated records: 303 idioms, 310 phrasal verbs, 1,001 collocations, and 7 common expressions. Expressions structural/content QA, the deterministic 220/220 semantic sample, and source-to-seed/database/API/browser/planner/session integration are **PASS** on the validated-preview release channel. Independent educator/native-speaker/Vietnamese editorial review and production publication remain pending for Expressions. The Placement production engineering baseline is **COMPLETE** at 612 validated items (vocabulary 210, grammar 200, context/use 120, reading 82) and 22 passages. Placement structural/content QA, the deterministic 140/140 semantic sample, A1–C2/uneven/noisy/boundary adaptive simulations, and source-to-seed/database/API/browser integration are **PASS**. Independent educator review, empirical learner calibration, psychometric validation, and production publication remain pending for Placement. Independent educator/Vietnamese grammar review and publication approval also remain pending.
+## Completed engineering milestones
 
-1. Add provenance fields, editorial workflow, reviewer sign-off, and versioned release notes.
-2. Complete independent educator/Vietnamese review and publication approval for vocabulary; improve optional IPA, richer senses, high-confidence relations, word families, collocations, and learner-feedback-driven content without reopening completed core enrichment.
-3. Complete independent educator and Vietnamese editorial review of the grammar corpus, then add per-lesson lifecycle metadata and approval workflow without changing stable IDs.
-4. Complete independent educator review, learner piloting, calibration, reliability/fairness analysis, and publication approval for the 612-item Placement bank without changing stable item IDs.
-5. Complete independent educator/native-speaker and Vietnamese editorial review of the Expressions corpus, resolve the documented taxonomy/register flags, and approve eligible records for publication without changing stable IDs.
-6. Add multiple unambiguous templates per learning item and balance recall, production, listening, and context outside the completed Placement bank.
-7. Reassess source-backed and editorial CEFR/frequency metadata against real learner evidence with consent/privacy review.
-8. Add content deprecation redirects so published IDs never silently orphan history.
+| Corpus | Status | Verified engineering baseline |
+| --- | --- | --- |
+| Vocabulary | **COMPLETE** | 6,000 master units; 6,000 enriched and machine-QA-complete records |
+| Grammar | **COMPLETE** | 138/138 production-detail lessons; semantic sample 60/60 PASS; runtime integration PASS |
+| Placement | **COMPLETE** | 612 validated items and 22 passages; semantic sample 140/140 PASS; adaptive/runtime verification PASS |
+| Expressions | **COMPLETE** | 1,621 validated records; semantic sample 220/220 PASS; runtime integration PASS |
+
+## Remaining release work
+
+1. Complete independent educator/native-speaker and Vietnamese editorial review, resolve documented flags, and record reviewer sign-off without changing stable IDs.
+2. Add or complete lifecycle metadata where absent, promote only approved records, publish versioned release notes, and preserve deprecation redirects.
+3. Pilot Placement with learners; perform empirical difficulty/discrimination calibration, reliability/fairness analysis, and qualified psychometric review. Current simulations are not empirical validation or CEFR certification.
+4. Complete production deployment configuration, verified email delivery, monitoring/alert routing, backup retention, and a fresh staging restore rehearsal against the current migrations.
+5. Use learner feedback and accessibility review to improve exercise variety, richer vocabulary senses, and optional metadata without reopening completed count gates.
 
 Every release requires schema/duplicate/reference validation, answer uniqueness, prerequisite-cycle checks, educator and translator review, accessibility review, provenance approval, and a migration rehearsal.

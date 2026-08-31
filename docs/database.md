@@ -2,7 +2,7 @@
 
 ## Schema and migrations
 
-PostgreSQL 17+ is the local and deployment target. Drizzle schema is in `src/db/schema.ts`; six generated immutable SQL migrations are in `drizzle/`. The migrations create five enums and 31 tables, database checks, the email-verification token lifecycle, and the unique mistake business key used by transactional upserts.
+PostgreSQL 17+ is the local and deployment target. Drizzle schema is in `src/db/schema.ts`; seven generated immutable SQL migrations (`0000` through `0006`) are in `drizzle/`. The migrations create five enums and 34 tables, database checks, content lifecycle/release indexes for Vocabulary, Placement, and Expressions, the email-verification token lifecycle, and the unique mistake business key used by transactional upserts.
 
 ```bash
 docker compose up -d postgres
@@ -11,7 +11,7 @@ npm run db:migrate
 npm run db:seed
 ```
 
-`db:seed` is deterministic and idempotent for stable content IDs. It records a SHA-256 checksum and content version, upserts content, and rebuilds owned child records in one transaction. Set `CONTENT_VERSION` for a release label.
+`db:seed` is deterministic and idempotent for stable content IDs. It records a SHA-256 checksum and content version, upserts content, retires or deactivates removed IDs where supported, and rebuilds owned child records in one transaction. The current verified test seed contains 6,000 Vocabulary records, 138 Grammar topics/lessons, 612 Placement items with 22 passages, and 1,621 Expressions. Set `CONTENT_VERSION` for a release label.
 
 For disposable test databases only, `npm run db:test:migrate` applies migrations and `npm run db:test:seed` loads content into `TEST_DATABASE_URL` explicitly; `npm run db:test:reset` drops both `public` and Drizzle's migration-journal schema. All refuse production mode, a missing test URL, or a database name without `test`; reset additionally verifies the connected database name. Never adapt these commands for production.
 
@@ -37,4 +37,4 @@ For a repeatable local drill against the configured disposable test database, ru
 
 Previous attempt: **FAIL, 28 August 2026**. `pg_dump` completed against the disposable test database, but the configured least-privilege test role could not create the uniquely named restore database (`SQLSTATE 42501: permission denied to create database`). Restoration, checksum comparison, and integration tests against that copy therefore did not run. The temporary `/tmp` dump was removed by the script.
 
-Latest verified drill: **PASS, 29 August 2026**. `npm run db:restore:drill` restored the logical dump into an isolated schema without granting `CREATEDB`; core row counts and content-version checksums matched, all 12 PostgreSQL integration tests passed against the restored schema, and the temporary schema and dump were removed.
+Latest verified drill: **PASS, 29 August 2026**. `npm run db:restore:drill` restored the logical dump into an isolated schema without granting `CREATEDB`; core row counts and content-version checksums matched, all 12 PostgreSQL integration tests present at that time passed against the restored schema, and the temporary schema and dump were removed. This historical drill predates the later Placement and Expressions migrations; a fresh staging restore rehearsal against all seven current migrations remains a production release gate.

@@ -42,6 +42,8 @@ This QA is machine/Codex review, not independent educator, translator, dialect, 
 
 ## Final validation
 
+Phase-completion snapshot: the command and test totals below were recorded when Grammar completed. See [the consolidated validation report](test-report.md) for current repository-wide totals after later Placement and Expressions work.
+
 All final gates passed:
 
 - `npm run validate:content`: 2 files, 10 tests.

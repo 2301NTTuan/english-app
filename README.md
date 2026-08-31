@@ -56,6 +56,9 @@ Key documentation:
 - [Content sources and licensing](docs/content-sources.md)
 - [Vocabulary quality audit](docs/vocabulary-quality-audit.md)
 - [Master vocabulary inventory](docs/master-vocabulary-inventory.md)
+- [Vocabulary final QA](docs/vocabulary-final-qa.md)
+- [Grammar final QA](docs/grammar-final-qa.md)
+- [Placement final QA](docs/placement-final-qa.md)
 - [Expressions final QA](docs/expressions-final-qa.md)
 - [Content roadmap](docs/content-roadmap.md)
 - [Latest test report and production gates](docs/test-report.md)
@@ -64,7 +67,14 @@ Key documentation:
 
 The existing pure TypeScript systems include backlog-first daily planning, a deterministic adapter around maintained `ts-fsrs` (FSRS v6), multidimensional mastery, recurring-mistake practice, a bounded 25–50-question four-domain placement assessment, prerequisite-aware personalized paths, and metadata-driven exercises. Placement selection and scoring remain server-scoped so the browser receives only the active item. Content validation checks stable identifiers, duplicate senses, references, relations, cyclic prerequisites, examples, provenance, item parameters, passage links, and answer ambiguity.
 
-Current bundled lesson content includes a 6,000-unit vocabulary master inventory and 6,000 corresponding enriched vocabulary records, all processed by machine QA; 1,621 validated expressions (303 idioms, 310 phrasal verbs, 1,001 collocations, and 7 common expressions); and a 612-item validated placement bank with 22 authored passages. Expressions meet the repository's production engineering baseline: structural/content QA passes, the deterministic semantic sample passes 220/220, and source-to-seed/database/API/browser/planner/session integration passes on the validated-preview release channel. They are not independently educator/native-speaker/Vietnamese-reviewed or production-published. Placement meets the repository's production engineering baseline with 210 vocabulary, 200 grammar, 120 context/use, and 82 reading items; structural/content QA, a deterministic 140/140 semantic sample, adaptive simulations, and source-to-seed/database/API/browser integration pass. It is not psychometrically validated, independently educator-reviewed, or production-published. The grammar curriculum is complete at 138/138 topics and 138/138 lessons meeting the repository's strict production-detail rubric. Grammar machine/content QA passes, its deterministic semantic sample passes 60/60, and source-to-seed/database/API/browser/planner runtime integration passes. Independent educator/Vietnamese review and production publication approval remain pending for grammar; vocabulary also still requires independent review and approval. Run `npm run content:stats` for exact coverage and release gates.
+Current verified content baseline:
+
+- Vocabulary: 6,000 master units, 6,000 enriched records, and 6,000/6,000 machine-QA complete.
+- Grammar: 138/138 curriculum topics and 138/138 production-detail lessons; deterministic semantic sample 60/60 PASS.
+- Placement: 612 validated scored items (210 vocabulary, 200 grammar, 120 context/use, and 82 reading) plus 22 validated passages; deterministic semantic sample 140/140 PASS.
+- Expressions: 1,621 validated records (303 idioms, 310 phrasal verbs, 1,001 collocations, and 7 common expressions); deterministic semantic sample 220/220 PASS.
+
+All four corpora meet their documented engineering/content-machine QA baselines, including their verified runtime paths. That does not mean independent approval: educator/native-speaker and Vietnamese editorial review remain pending where documented, Placement has not received empirical psychometric calibration, and production publication approval remains pending. Vocabulary, Placement, and Expressions contain zero `published` records; Grammar has no per-lesson publication lifecycle. Run `npm run content:stats` for exact coverage and release gates.
 
 ## Operational notes
 

@@ -42,6 +42,8 @@ These simulations are regression evidence for the authored heuristic. They are n
 
 ## Runtime verification
 
+Phase-completion snapshot: the command and test totals below were recorded when Placement completed. See [the consolidated validation report](test-report.md) for current repository-wide totals after the later Expressions work.
+
 - Source validation and content statistics: pass at 612 items and 22 passages.
 - ESLint, TypeScript, and unit suites: pass (105/105 unit tests across 25 files; 11/11 content tests).
 - Development PostgreSQL reseed: 612 validated items, 22 validated passages, 82 validated reading items.
