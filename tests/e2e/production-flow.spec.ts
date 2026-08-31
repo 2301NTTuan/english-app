@@ -73,17 +73,21 @@ test.describe.serial("production acceptance", () => {
     const firstQuestionResponse = page.waitForResponse((response) => response.url().includes("/api/placement/question") && response.request().method() === "POST");
     await page.getByRole("button", { name: /Begin test/ }).click();
     const firstQuestionBody = await (await firstQuestionResponse).json();
+    expect(firstQuestionBody.bankSize).toBe(612);
     expect(firstQuestionBody.question.answer).toBeUndefined();
     expect(firstQuestionBody.question.explanation).toBeUndefined();
     expect(firstQuestionBody.question.options).toHaveLength(4);
     const placementResult = page.getByRole("heading", { name: /Estimated learning level:/ });
+    let sawReadingPassage = await page.locator("article").isVisible();
     for (let index = 0; index < 50; index += 1) {
       if (await placementResult.isVisible()) break;
       const answers = page.locator(".answer-option");
       await expect(answers.first()).toBeVisible();
       await answers.nth(index % 4).click();
+      sawReadingPassage ||= await page.locator("article").isVisible();
     }
     await expect(placementResult).toBeVisible();
+    expect(sawReadingPassage).toBe(true);
     await page.getByRole("link", { name: /View learning path/ }).click();
     await expect(page.getByRole("heading", { name: /learning path/ })).toBeVisible();
 

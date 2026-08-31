@@ -13,7 +13,7 @@
 | Grammar path | unmet prerequisite | dependent topic locked | unit tests |
 | Review | Again/Hard/Good/Easy | ordered, distinct scheduling behavior | unit tests |
 | Placement | strong/foundation/uneven/random evidence | bounded multidomain estimate and calibrated confidence | simulations and Playwright |
-| Placement delivery | active attempt | one server-selected item; no corpus or answer key | Playwright production flow |
+| Placement delivery | active attempt | one PostgreSQL-backed server-selected item; `bankSize` 612; no corpus or answer key; reading passage rendered | integration and Playwright production flow |
 | Session answer | correct and incorrect | unambiguous feedback, mistake/relearning, FSRS and mastery update | unit, integration, and Playwright |
 | Import | malformed or over 1 MB | rejected without state change | schema unit and Playwright |
 | Delete account | password plus `DELETE` | account and owned rows removed | cascade integration and Playwright |
@@ -36,4 +36,4 @@ Automate these with Playwright against an isolated migrated database before rele
 9. Health returns 200/`ok` with PostgreSQL and 503/`degraded` against a deliberately unreachable endpoint, with no topology or stack diagnostics.
 10. Keyboard navigation reaches the skip link, labeled forms, errors, menu, core learning controls, and legal links; layouts remain usable under zoom.
 
-The 29 August 2026 Playwright run covers registration, email verification, adaptive placement, correct and incorrect learning answers, mistake/FSRS persistence, logout/login persistence, wrong/unknown credentials, forged/expired/revoked sessions, cross-account scope, hostile origin, wrong media type, malformed JSON, oversized JSON, password reset, and account deletion. Duplicate and stale session submissions are covered by PostgreSQL integration tests. The most recent execution evidence and environment details are in `docs/test-report.md`.
+The 31 August 2026 Playwright run covers registration, email verification, PostgreSQL-backed adaptive placement over the 612-item bank, reading-passage rendering, correct and incorrect learning answers, mistake/FSRS persistence, logout/login persistence, wrong/unknown credentials, forged/expired/revoked sessions, cross-account scope, hostile origin, wrong media type, malformed JSON, oversized JSON, password reset, and account deletion. Duplicate and stale session submissions are covered by PostgreSQL integration tests. The most recent execution evidence and environment details are in `docs/test-report.md`.

@@ -9,6 +9,7 @@ import { vocabulary } from "@/data/vocabulary";
 import { normalizeVocabularyItem } from "./vocabulary";
 import { validateLearningContent } from "./validate";
 import { auditGrammarLessons, grammarLessonIssues } from "./grammar-quality";
+import { auditPlacementBank } from "./placement-quality";
 
 describe("learning content pipeline", () => {
   it("normalizes whitespace and duplicate relations while preserving IDs", () => {
@@ -46,5 +47,15 @@ describe("learning content pipeline", () => {
     const item = { ...placementQuestions[0], explanation: `“${placementQuestions[0].answer}” is the only option that correctly completes the task.` };
     const errors = validateLearningContent({ vocabulary: [], grammar: [], expressions: [], exercises: [], placement: [item], provenance: contentProvenanceBatches });
     expect(errors.some((error) => error.includes("explanation is generic rather than instructional"))).toBe(true);
+  });
+
+  it("meets the production engineering baseline for the placement bank", () => {
+    const report = auditPlacementBank(placementQuestions, readingPassages);
+    expect(report.total).toBeGreaterThanOrEqual(600);
+    expect(report.byDomain).toMatchObject({ vocabulary: 210, grammar: 200, context: 120, reading: 82 });
+    expect(report.passages).toBe(22);
+    expect(Math.min(...Object.values(report.byLevel))).toBeGreaterThanOrEqual(60);
+    expect(report.answerPositions).toEqual([153, 153, 153, 153]);
+    expect(report.criticalIssues).toEqual([]);
   });
 });

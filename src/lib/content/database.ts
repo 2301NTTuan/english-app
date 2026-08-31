@@ -2,9 +2,9 @@ import "server-only";
 
 import { and, asc, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db/client";
-import { grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
+import { grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, placementItems, placementPassages, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
 import { grammarTopics as curriculumGrammarTopics } from "@/data/grammar";
-import type { CEFRLevel, GrammarTopic } from "@/types/domain";
+import type { CEFRLevel, GrammarTopic, PlacementDimension, PlacementQuestion, ReadingPassage } from "@/types/domain";
 
 export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string; frequencyBand?: "very-common" | "common" | "less-common" | "advanced" }
 
@@ -61,4 +61,42 @@ export async function queryGrammarCatalogue() {
   })).sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
   const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
   return { items, total: items.length, byLevel: Object.fromEntries(levels.map((level) => [level, items.filter((item) => item.level === level).length])) as Record<CEFRLevel, number> };
+}
+
+export async function queryPlacementBank() {
+  const preview = process.env.NODE_ENV !== "production" || process.env.PLACEMENT_CONTENT_CHANNEL === "validated-preview";
+  const statuses = preview ? ["validated", "reviewed", "published"] : ["published"];
+  const db = getDb();
+  const [itemRows, passageRows] = await Promise.all([
+    db.select().from(placementItems).where(inArray(placementItems.status, statuses)).orderBy(asc(placementItems.contentId)),
+    db.select().from(placementPassages).where(inArray(placementPassages.status, statuses)).orderBy(asc(placementPassages.contentId)),
+  ]);
+  const items: PlacementQuestion[] = itemRows.map((row) => ({
+    id: row.contentId,
+    itemId: row.contentId,
+    knowledgeType: row.domain === "grammar" ? "grammar" : "vocabulary",
+    type: row.domain === "context" || row.domain === "reading" ? "context" : "multiple-choice",
+    prompt: row.prompt,
+    options: row.options as string[],
+    answer: row.answer,
+    explanation: row.explanation,
+    level: row.level,
+    dimension: row.domain as PlacementDimension,
+    topic: row.topic,
+    subtopic: row.subtopic,
+    difficulty: row.difficulty,
+    discrimination: row.discrimination,
+    status: row.status as PlacementQuestion["status"],
+    provenanceId: row.provenanceId,
+    passageId: row.passageContentId ?? undefined,
+  }));
+  const passages: ReadingPassage[] = passageRows.map((row) => ({
+    id: row.contentId,
+    title: row.title,
+    text: row.passage,
+    level: row.level,
+    status: row.status as ReadingPassage["status"],
+    provenanceId: row.provenanceId,
+  }));
+  return { items, passages };
 }

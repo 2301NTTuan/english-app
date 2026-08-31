@@ -21,7 +21,7 @@ Grammar currently has an `active` database flag but no per-topic editorial lifec
 - `published` means the reviewed record is approved for production selection.
 - `retired` records remain identifiable for historical attempts but cannot be selected.
 
-Automated validation never promotes a record to `reviewed` or `published`. The current placement pilot is honestly marked `validated`; consequently, the published-production-bank gate remains closed.
+Automated validation never promotes a record to `reviewed` or `published`. All 612 current placement items and 22 passages are honestly marked `validated`; consequently, the published-production-bank gate remains closed even though the engineering baseline is complete.
 
 ## Automated gates
 
@@ -33,7 +33,7 @@ Stable IDs are immutable. A legitimate new sense of an existing word receives it
 
 ## Provenance and licensing decisions
 
-The current pilot passages, prompts, distractors, explanations, and enriched lexical material are repository-authored. Machine-readable batches live in `src/data/content-provenance.ts`. The master inventory uses only suitably licensed third-party headwords, POS labels, CEFR labels, and frequency-list ranks; its source-by-source audit and attribution requirements are in `docs/content-sources.md`.
+The current placement passages, prompts, distractors, explanations, and enriched lexical material are repository-authored. Machine-readable batches live in `src/data/content-provenance.ts`. The master inventory uses only suitably licensed third-party headwords, POS labels, CEFR labels, and frequency-list ranks; its source-by-source audit and attribution requirements are in `docs/content-sources.md`.
 
 Sources evaluated but not used in the master inventory are documented in `docs/content-sources.md`. In particular, no proprietary dictionary definitions or examples, non-commercial CEFRLex data, Wiktionary text, Tatoeba sentences, or `wordfreq` data were imported.
 

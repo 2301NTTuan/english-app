@@ -24,6 +24,7 @@ suite("PostgreSQL migration and ownership", () => {
   let consumeEmailVerification: typeof import("@/lib/auth/recovery")["consumeEmailVerification"];
   let queryVocabularyPage: typeof import("@/lib/content/database")["queryVocabularyPage"];
   let queryGrammarCatalogue: typeof import("@/lib/content/database")["queryGrammarCatalogue"];
+  let queryPlacementBank: typeof import("@/lib/content/database")["queryPlacementBank"];
   let loadLearningState: typeof import("@/lib/learning/state-projection")["loadLearningState"];
   let saveLearningPreferences: typeof import("@/lib/learning/persistence")["saveLearningPreferences"];
   let resetLearningData: typeof import("@/lib/learning/persistence")["resetLearningData"];
@@ -37,7 +38,7 @@ suite("PostgreSQL migration and ownership", () => {
     ({ completeStudySession, completePlacement, importLegacyLearningState, saveLearningPreferences, resetLearningData } = await import("@/lib/learning/persistence"));
     ({ loadLearningState } = await import("@/lib/learning/state-projection"));
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
-    ({ queryVocabularyPage, queryGrammarCatalogue } = await import("@/lib/content/database"));
+    ({ queryVocabularyPage, queryGrammarCatalogue, queryPlacementBank } = await import("@/lib/content/database"));
     ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
   });
   afterAll(async () => {
@@ -267,5 +268,17 @@ suite("PostgreSQL migration and ownership", () => {
       (select count(*)::int from grammar_topics where active) topics,
       (select count(*)::int from grammar_lessons l join grammar_topics t on t.id=l.grammar_topic_id where t.active) lessons`);
     expect(counts.rows[0]).toEqual({ topics: 138, lessons: 138 });
+  });
+
+  it("serves the complete validated placement bank and reading passages from PostgreSQL", async () => {
+    const bank = await queryPlacementBank();
+    expect(bank.items).toHaveLength(612);
+    expect(bank.passages).toHaveLength(22);
+    expect(bank.items.filter((item) => item.dimension === "vocabulary")).toHaveLength(210);
+    expect(bank.items.filter((item) => item.dimension === "grammar")).toHaveLength(200);
+    expect(bank.items.filter((item) => item.dimension === "context")).toHaveLength(120);
+    expect(bank.items.filter((item) => item.dimension === "reading")).toHaveLength(82);
+    expect(bank.items.some((item) => item.id === "placement-reading-c2-metrics-4")).toBe(true);
+    expect(bank.passages.some((passage) => passage.id === "reading-c2-metrics")).toBe(true);
   });
 });

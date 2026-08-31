@@ -27,4 +27,4 @@ HUMAN-REVIEW FLAGS: 3 targeted variety/editorial checks (`a1-prepositions-of-tim
 
 LAST VALIDATION: PASS — `npm run validate:content` (10 tests), `npm run content:stats`, `npm run lint`, `npm run typecheck`, `npm test` (96 tests), `npm run test:integration` (13 tests), `npm run build`, and `npm run test:e2e` (2 tests). Development and test PostgreSQL reseeds both imported 138 topics / 138 lessons; the deterministic semantic sample passed 60/60 after one localized correction and re-review.
 LAST CHECKPOINT COMMIT: Final milestone `Complete production grammar curriculum` (local commit; hash in `git log`)
-NEXT ACTION: Placement assessment overhaul — not started.
+NEXT ACTION: Placement assessment overhaul completed separately; grammar's remaining action is independent educator/Vietnamese review and publication approval.

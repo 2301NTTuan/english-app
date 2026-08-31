@@ -110,16 +110,24 @@ export function selectPlacementQuestion(
   const uncovered = PLACEMENT_DOMAINS.filter((domain) => domainCounts[domain] < MIN_DOMAIN_QUESTIONS && available.some((item) => item.dimension === domain));
   const eligible = uncovered.length ? available.filter((item) => uncovered.includes(item.dimension)) : available;
 
-  return eligible.sort((a, b) => {
-    const score = (question: PlacementQuestion) =>
-      Math.abs(question.difficulty - targetDifficulty) * 24
-      + domainCounts[question.dimension] * 2.5
-      + (topicCounts.get(question.topic) ?? 0) * 1.5
-      + (subtopicCounts.get(question.subtopic) ?? 0) * 2
-      + (previouslySeen.has(question.id) ? 18 : 0)
-      - question.discrimination * 1.5;
-    return score(a) - score(b) || a.id.localeCompare(b.id);
-  })[0];
+  const score = (question: PlacementQuestion) =>
+    Math.abs(question.difficulty - targetDifficulty) * 24
+    + domainCounts[question.dimension] * 2.5
+    + (topicCounts.get(question.topic) ?? 0) * 1.5
+    + (subtopicCounts.get(question.subtopic) ?? 0) * 2
+    + (previouslySeen.has(question.id) ? 18 : 0)
+    - question.discrimination * 1.5;
+  let selected = eligible[0];
+  let selectedScore = score(selected);
+  for (let index = 1; index < eligible.length; index += 1) {
+    const candidate = eligible[index];
+    const candidateScore = score(candidate);
+    if (candidateScore < selectedScore || (candidateScore === selectedScore && candidate.id.localeCompare(selected.id) < 0)) {
+      selected = candidate;
+      selectedScore = candidateScore;
+    }
+  }
+  return selected;
 }
 
 export function answerPlacementQuestion(question: PlacementQuestion, answer: string, responseTimeMs?: number): PlacementAnswer {
@@ -159,7 +167,10 @@ export function scorePlacement(answers: PlacementAnswer[], completedAt = new Dat
   const rawEstimate = estimateAbility(answers);
   const coveredDomainAbilities = PLACEMENT_DOMAINS.map((domain) => domainEstimates[domain]).filter((estimate) => estimate.questions >= MIN_DOMAIN_QUESTIONS).map((estimate) => estimate.ability);
   const weakestDomain = coveredDomainAbilities.length ? Math.min(...coveredDomainAbilities) : rawEstimate.ability;
-  const overallAbility = round(rawEstimate.ability * 0.75 + weakestDomain * 0.25);
+  // A placement level should not hide a major diagnostic gap. The weakest
+  // sufficiently sampled domain therefore carries meaningful, but non-majority,
+  // weight in the overall estimate.
+  const overallAbility = round(rawEstimate.ability * 0.65 + weakestDomain * 0.35);
   const topics = [...new Set(answers.map((answer) => answer.topic))];
   const topicScores = Object.fromEntries(topics.map((topic) => {
     const matching = answers.filter((answer) => answer.topic === topic);
@@ -170,7 +181,9 @@ export function scorePlacement(answers: PlacementAnswer[], completedAt = new Dat
   const fitFactor = clamp((rawEstimate.fit - 0.3) / 0.5, 0, 1);
   const observedCorrectRate = answers.length ? answers.filter((answer) => answer.correct).length / answers.length : 0;
   const aboveChanceEvidence = clamp((observedCorrectRate - 0.25) / 0.35, 0, 1);
-  const confidenceScore = Math.round(100 * (1 - clamp(rawEstimate.standardError / 1.35, 0, 1)) * domainCoverage * (0.7 + fitFactor * 0.3) * (0.6 + aboveChanceEvidence * 0.4));
+  // Near-chance performance can be precise only in the sense that the learner
+  // is likely near the floor; it is not strong evidence for a placement.
+  const confidenceScore = Math.round(100 * (1 - clamp(rawEstimate.standardError / 1.35, 0, 1)) * domainCoverage * (0.7 + fitFactor * 0.3) * (0.5 + aboveChanceEvidence * 0.5));
   const confidenceLabel = confidenceScore >= 80 ? "high" : confidenceScore >= 60 ? "moderate" : confidenceScore >= 35 ? "developing" : "low";
   return {
     completedAt: completedAt.toISOString(),

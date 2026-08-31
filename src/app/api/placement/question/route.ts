@@ -4,14 +4,13 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db/client";
 import { placementAnswers, placementAttempts } from "@/db/schema";
-import { placementQuestions, publishedPlacementQuestions } from "@/data/placement";
-import { readingPassagesById } from "@/data/placement-reading";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { currentUser } from "@/lib/auth/server";
 import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { SESSION_COOKIE } from "@/lib/auth/session";
+import { queryPlacementBank } from "@/lib/content/database";
 import { answerPlacementQuestion, placementShouldStop, scorePlacement, selectPlacementQuestion } from "@/lib/learning/placement";
-import type { PlacementAnswer, PlacementQuestion } from "@/types/domain";
+import type { PlacementAnswer, PlacementQuestion, ReadingPassage } from "@/types/domain";
 
 const requestSchema = z.object({ token: z.string().max(100_000).optional(), answer: z.string().max(2_000).optional(), responseTimeMs: z.number().int().nonnegative().max(3_600_000).optional() })
   .refine((value) => Boolean(value.token) === Boolean(value.answer), { message: "Token and answer must be supplied together." });
@@ -31,8 +30,8 @@ function decode(token: string, secret: string): AttemptToken | undefined {
   } catch { return undefined; }
 }
 
-function publicQuestion(question: PlacementQuestion) {
-  const passage = question.passageId ? readingPassagesById.get(question.passageId) : undefined;
+function publicQuestion(question: PlacementQuestion, passages: Map<string, ReadingPassage>) {
+  const passage = question.passageId ? passages.get(question.passageId) : undefined;
   return { id: question.id, prompt: question.prompt, options: question.options ?? [], level: question.level, dimension: question.dimension, passage: passage ? { title: passage.title, text: passage.text } : undefined };
 }
 
@@ -47,8 +46,9 @@ export async function POST(request: Request) {
     if (!sessionSecret) return jsonError("Authentication required.", 401);
     const parsed = requestSchema.safeParse(await readJson(request, 120_000));
     if (!parsed.success) return jsonError("Invalid placement request.", 400);
-    const preview = process.env.NODE_ENV !== "production" || process.env.PLACEMENT_CONTENT_CHANNEL === "validated-preview";
-    const bank = preview ? placementQuestions : publishedPlacementQuestions;
+    const placementBank = await queryPlacementBank();
+    const bank = placementBank.items;
+    const passages = new Map(placementBank.passages.map((passage) => [passage.id, passage]));
     if (!bank.length) return jsonError("The reviewed placement bank is not published yet.", 503);
 
     let state: AttemptToken;
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       const first = selectPlacementQuestion(bank, [], { previouslySeenQuestionIds });
       if (!first) return jsonError("No eligible placement question is available.", 503);
       state = { issuedAt: Date.now(), currentQuestionId: first.id, answers: [], previouslySeenQuestionIds };
-      return Response.json({ token: encode(state, sessionSecret), question: publicQuestion(first), answeredCount: 0 });
+      return Response.json({ token: encode(state, sessionSecret), question: publicQuestion(first, passages), answeredCount: 0, bankSize: bank.length });
     }
 
     const verified = decode(parsed.data.token, sessionSecret);
@@ -68,10 +68,10 @@ export async function POST(request: Request) {
     if (!current || verified.answers.some((answer) => answer.questionId === current.id)) return jsonError("Placement question is no longer eligible.", 409);
     const answers = [...verified.answers, answerPlacementQuestion(current, parsed.data.answer!, parsed.data.responseTimeMs)];
     const next = selectPlacementQuestion(bank, answers, { previouslySeenQuestionIds: verified.previouslySeenQuestionIds });
-    if (placementShouldStop(answers, Boolean(next))) return Response.json({ result: scorePlacement(answers), answeredCount: answers.length });
+    if (placementShouldStop(answers, Boolean(next))) return Response.json({ result: scorePlacement(answers), answeredCount: answers.length, bankSize: bank.length });
     if (!next) return jsonError("The placement bank cannot satisfy the assessment contract.", 503);
     state = { ...verified, currentQuestionId: next.id, answers };
-    return Response.json({ token: encode(state, sessionSecret), question: publicQuestion(next), answeredCount: answers.length });
+    return Response.json({ token: encode(state, sessionSecret), question: publicQuestion(next, passages), answeredCount: answers.length, bankSize: bank.length });
   } catch (error) {
     const bodyError = bodyErrorResponse(error); if (bodyError) return bodyError;
     return jsonError("Placement questions are temporarily unavailable.", 503);
