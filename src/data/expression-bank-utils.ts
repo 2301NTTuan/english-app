@@ -21,6 +21,16 @@ export type PhrasalVerbSeed = [
   separability: NonNullable<ExpressionItem["separability"]>,
 ];
 
+export type CollocationSeed = [
+  expression: string,
+  meaning: string,
+  vietnameseMeaning: string,
+  cefrLevel: ExpressionItem["cefrLevel"],
+  example: string,
+  pattern: string,
+  tag: string,
+];
+
 const slug = (value: string) => value.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export function buildExpressionBank(kind: Exclude<ExpressionItem["kind"], "phrasal-verb">, prefix: string, seeds: ExpressionSeed[]): ExpressionItem[] {
@@ -51,6 +61,21 @@ export function buildPhrasalVerbBank(seeds: PhrasalVerbSeed[]): ExpressionItem[]
     tags: [tag],
     relatedVerb: expression.split(" ")[0],
     separability,
+    status: "validated",
+  }));
+}
+
+export function buildCollocationBank(seeds: CollocationSeed[]): ExpressionItem[] {
+  return seeds.map(([expression, meaning, vietnameseMeaning, cefrLevel, example, pattern, tag]) => ({
+    id: `collocation-${slug(expression)}`,
+    expression,
+    kind: "collocation",
+    meaning,
+    vietnameseMeaning,
+    cefrLevel,
+    examples: [example],
+    usageNotes: `${pattern} collocation. Learn and use “${expression}” as a natural lexical unit.`,
+    tags: [tag, pattern.toLowerCase().replaceAll(" ", "-")],
     status: "validated",
   }));
 }
