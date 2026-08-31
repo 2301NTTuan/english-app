@@ -76,6 +76,8 @@ Current verified content baseline:
 
 All four corpora meet their documented engineering/content-machine QA baselines, including their verified runtime paths. That does not mean independent approval: educator/native-speaker and Vietnamese editorial review remain pending where documented, Placement has not received empirical psychometric calibration, and production publication approval remains pending. Vocabulary, Placement, and Expressions contain zero `published` records; Grammar has no per-lesson publication lifecycle. Run `npm run content:stats` for exact coverage and release gates.
 
+Vocabulary cards and answer-revealed vocabulary session feedback offer UK (`en-GB`) and US (`en-US`) pronunciation through the browser Speech Synthesis API. No audio files or provider credentials are required; available voices and audio quality depend on the learner's browser and device, and unavailable regional voices are reported without substituting the opposite accent.
+
 ## Operational notes
 
 - Secrets belong in the deployment environment, never in Git. `.env*` is ignored except `.env.example`.

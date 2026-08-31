@@ -5,6 +5,8 @@ import { CheckCircle2, ChevronRight, Clock3, RotateCcw, XCircle } from "lucide-r
 import { useRef, useState } from "react";
 import { useAppState } from "@/components/app-provider";
 import { ProgressBar } from "@/components/ui";
+import { VocabularyPronunciation } from "@/components/vocabulary-pronunciation";
+import { vocabulary } from "@/data/vocabulary";
 import { scheduleReview } from "@/lib/fsrs/scheduler";
 import { buildStudySession } from "@/lib/learning/session";
 import { updateMastery } from "@/lib/learning/mastery";
@@ -27,6 +29,7 @@ const sourceLabel: Record<SessionExercise["source"], string> = {
   weakVocabulary: "Weak vocabulary", weakGrammar: "Weak grammar", mistakes: "Mistake review", newVocabulary: "New vocabulary", newGrammar: "New grammar",
   newExpressions: "New expression", mixedPractice: "Mixed practice",
 };
+const vocabularyById = new Map(vocabulary.map((item) => [item.id, item]));
 
 function initialReview(): ReviewState {
   return { difficulty: 5, stability: 1, state: "new", nextReview: new Date().toISOString(), scheduledDays: 0, elapsedDays: 0, reviewCount: 0, correctCount: 0, incorrectCount: 0, lapses: 0 };
@@ -65,6 +68,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
   const [saveError, setSaveError] = useState("");
   const [completionPayload, setCompletionPayload] = useState<CompletionPayload | null>(null);
   const item = session[index];
+  const vocabularyItem = item?.knowledgeType === "vocabulary" ? vocabularyById.get(item.itemId) : undefined;
 
   const applyState = (update: (current: AppState) => AppState) => {
     const next = update(stateRef.current);
@@ -176,6 +180,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
           })}
         </div>
         <div aria-live="polite">{checked && <div className={`mt-5 rounded-xl p-4 ${isCorrect ? "bg-emerald-50 text-emerald-900" : "bg-red-50 text-red-900"}`}><b>{isCorrect ? "Correct — well done." : `Not quite. The answer is “${item.answer}”.`}</b>{item.explanation && <p className="mt-1 text-sm opacity-80">{item.explanation}</p>}</div>}</div>
+        {checked && vocabularyItem && <div className="mt-4 rounded-xl border border-[#dce6e1] bg-[#f8faf9] p-4"><p className="text-sm font-bold">Pronunciation: {vocabularyItem.word}</p><VocabularyPronunciation key={item.id} word={vocabularyItem.lemma ?? vocabularyItem.word}/></div>}
         {!checked ? <div className="mt-6 flex items-center justify-between"><button className="muted flex items-center gap-1 text-xs disabled:opacity-30" disabled={!selected} onClick={() => setSelected("")}><RotateCcw size={13}/>Clear</button><button className="btn-primary disabled:cursor-not-allowed disabled:opacity-40" disabled={!selected} onClick={submit}>Check answer <ChevronRight size={18}/></button></div> : <div className="mt-6"><p className="muted mb-2 text-center text-xs font-bold">How difficult was this to recall?</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["again", "hard", "good", "easy"] as Rating[]).map((rating) => <button key={rating} disabled={saving || Boolean(completionPayload)} onClick={() => void rate(rating)} className={`min-h-12 rounded-xl border px-3 py-2 text-xs font-extrabold capitalize transition disabled:cursor-wait disabled:opacity-50 ${ratingStyle[rating]}`}>{rating}<span className="mt-0.5 block text-[9px] font-medium opacity-70">{{ again: "< 10 min", hard: "~ 1 day", good: "~ 3 days", easy: "~ 1 week" }[rating]}</span></button>)}</div>{saving && <p className="muted mt-3 text-center text-sm" role="status">Recording your session…</p>}{saveError && completionPayload && <div className="mt-3 rounded-xl bg-red-50 p-3 text-center text-sm text-red-900" role="alert">{saveError}<button className="btn-secondary mt-3" onClick={() => void saveCompletion(completionPayload)}>Retry save</button></div>}</div>}
       </div>
     </section>

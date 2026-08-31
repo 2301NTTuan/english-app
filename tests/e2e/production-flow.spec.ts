@@ -119,6 +119,20 @@ test.describe.serial("production acceptance", () => {
     await expect(page.getByRole("heading", { name: "legally binding" })).toBeVisible();
     await expect(page.getByText("1–1 of 1")).toBeVisible();
 
+    await page.goto("/vocabulary");
+    await expect(page.getByRole("heading", { name: "Vocabulary" })).toBeVisible();
+    await expect(page.locator("article").first()).toBeVisible();
+    const levelFilter = page.getByLabel("CEFR");
+    for (const level of ["A1", "A2", "B1", "B2", "C1", "C2"]) {
+      const responsePromise = page.waitForResponse((response) => response.url().includes("/api/content/vocabulary?") && response.status() === 200);
+      await levelFilter.selectOption(level);
+      const vocabularyResponse = await (await responsePromise).json() as { items: { word: string; lemma: string | null }[] };
+      const spokenWord = vocabularyResponse.items[0]?.lemma ?? vocabularyResponse.items[0]?.word;
+      expect(spokenWord, `No ${level} vocabulary record was returned`).toBeTruthy();
+      await expect(page.getByRole("button", { name: `Play British pronunciation of ${spokenWord}`, exact: true }).first()).toBeVisible();
+      await expect(page.getByRole("button", { name: `Play American pronunciation of ${spokenWord}`, exact: true }).first()).toBeVisible();
+    }
+
     const stateResponse = await page.evaluate(async () => {
       const response = await fetch("/api/state");
       return { status: response.status, body: await response.json() };
