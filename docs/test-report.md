@@ -1,18 +1,18 @@
 # Validation report
 
-Latest repository verification date: 30 August 2026. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) for commit `be3d4b1` (`Fix full-corpus E2E validation`) passed the complete configured workflow, including the production build and Playwright browser E2E.
+Latest full local repository verification date: 31 August 2026. Commit `ca13892` (`Complete production grammar curriculum`) records all final gates passing, including the production build and Playwright browser E2E. The latest CI evidence documented here remains [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) for the earlier commit `be3d4b1` (`Fix full-corpus E2E validation`), which also passed the complete configured workflow.
 
 ## Automated results
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Content validation | PASS | 9/9 tests across the enriched content and master inventory suites |
+| Content validation | PASS | 10/10 tests across the enriched content and master inventory suites |
 | ESLint | PASS | zero errors/warnings |
 | TypeScript | PASS | `tsc --noEmit` |
-| Unit tests | PASS | 94/94 tests across 25 files, including full-corpus identity and terminal-entry study-session selection |
-| PostgreSQL integration | PASS | 12/12 tests against the freshly seeded disposable test database; 6,000 active vocabulary rows and search beyond the original 298 records verified |
-| Browser E2E | PASS | 2/2 Chromium tests against the production server and disposable test database |
-| Production build | PASS | Next.js 16.3.2 Webpack build; all application and API routes compiled and prerendered as expected |
+| Unit tests | PASS | 96/96 tests across 25 files, including full-corpus identity and terminal-entry study-session selection |
+| PostgreSQL integration | PASS | 13/13 tests against the freshly seeded disposable test database; 6,000 active vocabulary rows and the complete 138-topic grammar catalogue verified |
+| Browser E2E | PASS | 2/2 Chromium tests against the production server and disposable test database, including the authenticated grammar API and complete C2 browser catalogue |
+| Production build | PASS | Next.js 16.3.2 Webpack build; application and API routes compiled, including the dynamic grammar page and API route |
 | Runtime smoke | PASS | login/attribution 200, anonymous root 307, anonymous vocabulary API 401, health 200/ok with DB and 503/degraded against a deliberately unreachable DB, security headers present |
 | Production dependency audit | PASS | zero production vulnerabilities |
 | Full dependency audit | FAIL | four moderate development-only esbuild advisories through Drizzle Kit; available automatic change is breaking and was not forced |
@@ -35,7 +35,7 @@ The configured disposable PostgreSQL database is reachable and all integration t
 - Content provenance: pass for repository-authored placement/enriched vocabulary batches and the licensed master vocabulary inventory; educator review and production publication: fail.
 - Bounded server-side vocabulary browse/search/filter retrieval: pass over all 6,000 seeded enriched records in local/test and `validated-preview`; search reaches `master-zoology-noun`, outside the original 298-record set. Default production filtering still exposes only `published` records, currently zero, so validated content is not silently promoted.
 - User-visible audited-source attribution: pass. Privacy/Terms operator identity and jurisdiction configuration: fail.
-- Structured request/error/health/auth-abuse logging and request correlation: pass. External monitoring backend, alert routing, and backup retention remain deployment configuration. Restore drill: pass using an isolated disposable schema without granting `CREATEDB`; row counts, content checksum, users, progress, reviews, and 12 integration tests matched the source backup.
+- Structured request/error/health/auth-abuse logging and request correlation: pass. External monitoring backend, alert routing, and backup retention remain deployment configuration. The 29 August restore drill passed using an isolated disposable schema without granting `CREATEDB`; row counts, content checksums, users, progress, reviews, and all 12 integration tests present at the time matched the source backup.
 
 Result: **not production-ready**. The repository is a coherent production foundation with explicit launch blockers.
 
