@@ -2,8 +2,9 @@ import "server-only";
 
 import { and, asc, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db/client";
-import { vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
-import type { CEFRLevel } from "@/types/domain";
+import { grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
+import { grammarTopics as curriculumGrammarTopics } from "@/data/grammar";
+import type { CEFRLevel, GrammarTopic } from "@/types/domain";
 
 export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string; frequencyBand?: "very-common" | "common" | "less-common" | "advanced" }
 
@@ -32,4 +33,32 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
     .leftJoin(vocabularyExamples, and(eq(vocabularyExamples.vocabularyId, vocabularyContent.id), eq(vocabularyExamples.position, 0)))
     .where(where).orderBy(asc(vocabularyContent.frequencyRank), asc(vocabularyContent.word)).limit(pageSize).offset((page - 1) * pageSize);
   return { items, page, pageSize, total, pageCount: Math.max(1, Math.ceil(total / pageSize)), filters: { level: input.level ?? null, search: search ?? null, topic: input.topic ?? null, partOfSpeech: input.partOfSpeech ?? null, frequencyBand: input.frequencyBand ?? null } };
+}
+
+export async function queryGrammarCatalogue() {
+  const db = getDb();
+  const rows = await db.select({
+    databaseId: grammarTopicsTable.id, id: grammarTopicsTable.contentId, title: grammarTopicsTable.title,
+    level: grammarTopicsTable.level, category: grammarTopicsTable.category, description: grammarTopicsTable.description,
+    explanation: grammarLessons.englishExplanation, structures: grammarLessons.structures,
+    examples: grammarLessons.examples, commonMistakes: grammarLessons.commonMistakes,
+  }).from(grammarTopicsTable).innerJoin(grammarLessons, eq(grammarLessons.grammarTopicId, grammarTopicsTable.id)).where(eq(grammarTopicsTable.active, true));
+  const databaseIds = rows.map((row) => row.databaseId);
+  const subtopicRows = databaseIds.length ? await db.select({
+    grammarTopicId: grammarSubtopics.grammarTopicId, id: grammarSubtopics.contentId, title: grammarSubtopics.title, position: grammarSubtopics.position,
+  }).from(grammarSubtopics).where(inArray(grammarSubtopics.grammarTopicId, databaseIds)).orderBy(asc(grammarSubtopics.position)) : [];
+  const prerequisiteRows = databaseIds.length ? await db.select({
+    grammarTopicId: grammarPrerequisites.grammarTopicId, prerequisiteTopicId: grammarPrerequisites.prerequisiteTopicId,
+  }).from(grammarPrerequisites).where(inArray(grammarPrerequisites.grammarTopicId, databaseIds)) : [];
+  const contentIdByDatabaseId = new Map(rows.map((row) => [row.databaseId, row.id]));
+  const order = new Map(curriculumGrammarTopics.map((topic, index) => [topic.id, index]));
+  const items: GrammarTopic[] = rows.map((row) => ({
+    id: row.id, title: row.title, level: row.level, category: row.category, description: row.description,
+    explanation: row.explanation, structures: row.structures,
+    examples: row.examples as GrammarTopic["examples"], commonMistakes: row.commonMistakes as GrammarTopic["commonMistakes"],
+    prerequisites: prerequisiteRows.filter((item) => item.grammarTopicId === row.databaseId).map((item) => contentIdByDatabaseId.get(item.prerequisiteTopicId)).filter((id): id is string => Boolean(id)),
+    subtopics: subtopicRows.filter((item) => item.grammarTopicId === row.databaseId).map(({ id, title }) => ({ id, title })),
+  })).sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
+  const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  return { items, total: items.length, byLevel: Object.fromEntries(levels.map((level) => [level, items.filter((item) => item.level === level).length])) as Record<CEFRLevel, number> };
 }

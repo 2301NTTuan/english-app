@@ -8,11 +8,13 @@ The core 6,000-record vocabulary enrichment and machine-QA targets are complete.
 
 The master inventory is documented in `docs/master-vocabulary-inventory.md`; the original 298-record audit remains as a historical record in `docs/vocabulary-quality-audit.md`; and the completed corpus is summarized in `docs/vocabulary-final-qa.md`. Master rows contain inclusion metadata, while every master ID now maps to an enriched record with original definition, Vietnamese meaning, and example. CEFR and frequency bases continue to distinguish source-backed values from editorial estimates.
 
-The grammar statistics distinguish 35 records previously labelled detailed from lessons that meet the stricter production rubric. Under the automated structural rubric (multiple specific examples and mistakes, substantial phenomenon-specific explanation, and no shared generic explanation tail), zero current lessons qualify. This is an honest production gate failure, not a reason to manufacture templated lesson text.
+All 138 grammar topics now have lessons that meet the automated production-detail rubric: multiple specific examples and explained mistakes, substantial phenomenon-specific explanation, Vietnamese support, form coverage, and no generic placeholder copy. This machine/Codex gate does not replace independent educator or Vietnamese editorial review.
 
 ## Lifecycle
 
 Content uses `draft → validated → reviewed → published → retired`.
+
+Grammar currently has an `active` database flag but no per-topic editorial lifecycle field. Its 138 completed lessons are machine-validated bundled content, not educator-reviewed or production-published records; adding that lifecycle without changing stable IDs remains a release task.
 
 - `validated` means automated structural and consistency checks pass.
 - `reviewed` means a qualified educator has reviewed language, level, distractors, and explanation.

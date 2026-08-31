@@ -42,10 +42,11 @@ async function main() {
       if (relations.length) await tx.insert(vocabularyRelations).values(relations.map((relation) => ({ sourceVocabularyId, targetWord: relation.word, targetVocabularyId: vocabulary.find((candidate) => candidate.word.toLowerCase() === relation.word.toLowerCase()) ? vocabularyIds.get(vocabulary.find((candidate) => candidate.word.toLowerCase() === relation.word.toLowerCase())!.id) : undefined, relationType: relation.relationType, strength: Math.round(relation.strength), register: relation.register, usageNote: relation.usage ?? relation.notes })));
     }
 
+    await tx.update(grammarTopicsTable).set({ active: false, updatedAt: new Date() }).where(notInArray(grammarTopicsTable.contentId, grammarTopics.map((item) => item.id)));
     const grammarIds = new Map<string, string>();
     for (const topic of grammarTopics) {
       const [row] = await tx.insert(grammarTopicsTable).values({ contentId: topic.id, title: topic.title, level: topic.level, category: topic.category, description: topic.description })
-        .onConflictDoUpdate({ target: grammarTopicsTable.contentId, set: { title: topic.title, level: topic.level, category: topic.category, description: topic.description, updatedAt: new Date() } }).returning({ id: grammarTopicsTable.id });
+        .onConflictDoUpdate({ target: grammarTopicsTable.contentId, set: { title: topic.title, level: topic.level, category: topic.category, description: topic.description, active: true, updatedAt: new Date() } }).returning({ id: grammarTopicsTable.id });
       grammarIds.set(topic.id, row.id);
       await tx.delete(grammarSubtopics).where(eq(grammarSubtopics.grammarTopicId, row.id));
       if (topic.subtopics.length) await tx.insert(grammarSubtopics).values(topic.subtopics.map((subtopic, position) => ({ grammarTopicId: row.id, contentId: subtopic.id, title: subtopic.title, position })));

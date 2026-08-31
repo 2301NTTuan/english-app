@@ -88,6 +88,6 @@ const catalogueTopics = Object.entries(curriculumOutline).flatMap(([level, title
   return topic(id, title, level as GrammarTopic["level"], `Build accurate control of ${title.toLowerCase()} in meaningful English.`, prerequisiteByTitle[title] ?? [], ["Study the core form and its common variations"], `This example demonstrates ${title.toLowerCase()}.`, ["A common learner form.", "A natural corrected form.", "Check the form, meaning, and context together."], ["form", "meaning", "usage"]);
 }));
 
-/** Full A1–C2 catalogue; selected high-value topics above contain richer authored lessons. */
+/** Full authored A1–C2 catalogue in stable curriculum order. */
 export const grammarTopics: GrammarTopic[] = [...catalogueTopics, ...detailedTopics.filter((item) => !catalogueTopics.some((topicItem) => topicItem.id === item.id))];
 export const detailedGrammarTopics = detailedTopics;

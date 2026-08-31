@@ -87,6 +87,19 @@ test.describe.serial("production acceptance", () => {
     await page.getByRole("link", { name: /View learning path/ }).click();
     await expect(page.getByRole("heading", { name: /learning path/ })).toBeVisible();
 
+    const grammarCatalogue = await page.evaluate(async () => {
+      const response = await fetch("/api/content/grammar");
+      return { status: response.status, body: await response.json() };
+    });
+    expect(grammarCatalogue.status).toBe(200);
+    expect(grammarCatalogue.body.total).toBe(138);
+    expect(grammarCatalogue.body.byLevel).toEqual({ A1: 24, A2: 24, B1: 26, B2: 25, C1: 24, C2: 15 });
+    expect(grammarCatalogue.body.items.some((item: { id: string }) => item.id === "advanced-cohesive-devices")).toBe(true);
+    await page.goto("/grammar");
+    await page.getByRole("button", { name: /^C2/ }).click();
+    await expect(page.getByText("15 topics", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Advanced cohesive devices" })).toBeVisible();
+
     const stateResponse = await page.evaluate(async () => {
       const response = await fetch("/api/state");
       return { status: response.status, body: await response.json() };

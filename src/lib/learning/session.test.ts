@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
+import { grammarTopics } from "@/data/grammar";
 import { buildStudySession } from "./session";
 import { createInitialState } from "@/lib/storage/app-repository";
 
@@ -43,5 +44,23 @@ describe("buildStudySession", () => {
     expect(vocabulary).toHaveLength(6_000);
     expect(session).toHaveLength(1);
     expect(session[0]).toMatchObject({ itemId: "master-zoology-noun", source: "newVocabulary" });
+  });
+
+  it("can select grammar from beyond the former detailed subset", () => {
+    const state = createInitialState();
+    const review = state.grammarProgress[0].review;
+    state.settings = { ...state.settings, currentLevel: "C2", dailyTarget: 4, maxNewWordsPerDay: 0, maxNewGrammarTopicsPerDay: 1 };
+    state.vocabularyProgress = [];
+    state.grammarProgress = grammarTopics.filter((topic) => topic.id !== "advanced-cohesive-devices").map((topic) => ({
+      topicId: topic.id, mastery: 100, subtopicMastery: Object.fromEntries(topic.subtopics.map((subtopic) => [subtopic.id, 100])),
+      review: { ...review, nextReview: "2099-01-01T00:00:00.000Z" },
+    }));
+    state.mistakes = [];
+
+    const session = buildStudySession(state, new Date("2026-08-30T12:00:00.000Z"));
+
+    expect(grammarTopics).toHaveLength(138);
+    expect(session).toHaveLength(1);
+    expect(session[0]).toMatchObject({ itemId: "advanced-cohesive-devices", knowledgeType: "grammar", source: "newGrammar" });
   });
 });

@@ -23,6 +23,7 @@ suite("PostgreSQL migration and ownership", () => {
   let issueEmailVerification: typeof import("@/lib/auth/recovery")["issueEmailVerification"];
   let consumeEmailVerification: typeof import("@/lib/auth/recovery")["consumeEmailVerification"];
   let queryVocabularyPage: typeof import("@/lib/content/database")["queryVocabularyPage"];
+  let queryGrammarCatalogue: typeof import("@/lib/content/database")["queryGrammarCatalogue"];
   let loadLearningState: typeof import("@/lib/learning/state-projection")["loadLearningState"];
   let saveLearningPreferences: typeof import("@/lib/learning/persistence")["saveLearningPreferences"];
   let resetLearningData: typeof import("@/lib/learning/persistence")["resetLearningData"];
@@ -36,7 +37,7 @@ suite("PostgreSQL migration and ownership", () => {
     ({ completeStudySession, completePlacement, importLegacyLearningState, saveLearningPreferences, resetLearningData } = await import("@/lib/learning/persistence"));
     ({ loadLearningState } = await import("@/lib/learning/state-projection"));
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
-    ({ queryVocabularyPage } = await import("@/lib/content/database"));
+    ({ queryVocabularyPage, queryGrammarCatalogue } = await import("@/lib/content/database"));
     ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
   });
   afterAll(async () => {
@@ -253,5 +254,18 @@ suite("PostgreSQL migration and ownership", () => {
     expect(frequency.filters.frequencyBand).toBe("very-common");
     const metadata = await client.query("select count(*) filter (where frequency_rank is not null)::int exact_ranks, count(*) filter (where status = 'validated')::int validated, count(*) filter (where active)::int active, count(*) filter (where provenance_id = 'vocabulary-core-2026-08')::int core, count(*) filter (where provenance_id = 'vocabulary-foundations-001-2026-08')::int foundations, (select published_at from content_versions where version = 'bundled-v1') published_at from vocabulary_content");
     expect(metadata.rows[0]).toEqual({ exact_ranks: 4_130, validated: 6_000, active: 6_000, core: 192, foundations: 106, published_at: null });
+  });
+
+  it("serves the complete seeded grammar catalogue outside the former detailed subset", async () => {
+    const catalogue = await queryGrammarCatalogue();
+    expect(catalogue.total).toBe(138);
+    expect(catalogue.byLevel).toEqual({ A1: 24, A2: 24, B1: 26, B2: 25, C1: 24, C2: 15 });
+    expect(catalogue.items.map((item) => item.id)).toEqual(grammarTopics.map((item) => item.id));
+    expect(catalogue.items.find((item) => item.id === "advanced-cohesive-devices")).toMatchObject({ id: "advanced-cohesive-devices", level: "C2" });
+    expect(catalogue.items.find((item) => item.id === "advanced-cohesive-devices")?.examples).toHaveLength(3);
+    const counts = await client.query(`select
+      (select count(*)::int from grammar_topics where active) topics,
+      (select count(*)::int from grammar_lessons l join grammar_topics t on t.id=l.grammar_topic_id where t.active) lessons`);
+    expect(counts.rows[0]).toEqual({ topics: 138, lessons: 138 });
   });
 });
