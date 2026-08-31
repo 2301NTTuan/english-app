@@ -48,6 +48,6 @@ Result: **not production-ready**. The repository is a coherent production founda
 - Core vocabulary enrichment: **PASS** (6,000/6,000 master IDs mapped to learner-facing records).
 - Machine validation and QA: **PASS** (6,000/6,000 processed; zero unresolved critical, major, or minor findings).
 - Independent educator/Vietnamese review: **EXTERNAL / NOT COMPLETE**.
-- Production publication approval: **NOT COMPLETE** (zero vocabulary records are `published`). Grammar and placement release gates remain unchanged.
+- Production publication approval: **NOT COMPLETE** (zero vocabulary records are `published`). Grammar is complete at 138/138 production-detail lessons: machine/content QA, the deterministic 60/60 semantic sample, and source-to-seed/database/API/browser/planner runtime integration all pass. Its three targeted human-review flags (`a1-prepositions-of-time`, `a2-already-yet-just`, and `c2-register-dependent-grammar`) and independent educator/Vietnamese review remain pending.
 
 See [the final vocabulary QA summary](vocabulary-final-qa.md), [the historical master vocabulary inventory report](master-vocabulary-inventory.md), [the historical 298-record vocabulary audit](vocabulary-quality-audit.md), and [representative placement items](placement-assessment.md#representative-validated-pilot-items) for inspectable evidence and exact limitations.
