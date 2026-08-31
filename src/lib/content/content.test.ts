@@ -25,8 +25,8 @@ describe("learning content pipeline", () => {
     expect(grammarTopics.filter((topic) => topic.level === "A1").flatMap(grammarLessonIssues)).toEqual([]);
     expect(grammarTopics.filter((topic) => topic.level === "A2").flatMap(grammarLessonIssues)).toEqual([]);
     expect(grammarTopics.filter((topic) => topic.level === "B1").flatMap(grammarLessonIssues)).toEqual([]);
-    expect(grammarTopics.filter((topic) => topic.level === "B2").slice(0, 12).flatMap(grammarLessonIssues)).toEqual([]);
-    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(86);
+    expect(grammarTopics.filter((topic) => topic.level === "B2").flatMap(grammarLessonIssues)).toEqual([]);
+    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(99);
   });
 
   it("reports duplicate IDs, self-relations, broken prerequisites, and ambiguous choices", () => {
