@@ -1,6 +1,6 @@
 # Validation report
 
-Latest full local repository verification date: 31 August 2026, at commit `1cf1e16` (`Complete production expressions corpus`). It covers the completed Vocabulary, Grammar, Placement, and Expressions engineering baselines, a freshly migrated/seeded disposable test database, production build, and Playwright browser E2E. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) is retained only as historical CI evidence for earlier commit `be3d4b1`; it does not verify the current content head.
+Latest full local repository verification date: 31 August 2026, against the current documentation HEAD. The latest content/executable commit is `1cf1e16` (`Complete production expressions corpus`); subsequent changes are documentation-only. The fresh verification covers the completed Vocabulary, Grammar, Placement, and Expressions engineering baselines, a migrated/seeded disposable test database, production build, and Playwright browser E2E. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) is retained only as historical CI evidence for earlier commit `be3d4b1`; it does not verify the current content head.
 
 ## Automated results
 
