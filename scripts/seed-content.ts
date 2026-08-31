@@ -16,7 +16,7 @@ loadEnvConfig(process.cwd());
 
 const version = process.env.CONTENT_VERSION ?? "bundled-v1";
 const checksum = createHash("sha256").update(JSON.stringify({ vocabulary, grammarTopics, expressionData, placementQuestions, readingPassages })).digest("hex");
-const hasPublishedContent = vocabulary.some((item) => item.status === "published") || placementQuestions.some((item) => item.status === "published") || readingPassages.some((item) => item.status === "published");
+const hasPublishedContent = vocabulary.some((item) => item.status === "published") || expressionData.some((item) => item.status === "published") || placementQuestions.some((item) => item.status === "published") || readingPassages.some((item) => item.status === "published");
 
 async function main() {
   assertValidLearningContent({ vocabulary, grammar: grammarTopics, expressions: expressionData, exercises, placement: placementQuestions, readingPassages, provenance: contentProvenanceBatches });
@@ -59,10 +59,13 @@ async function main() {
       if (prerequisites.length) await tx.insert(grammarPrerequisites).values(prerequisites.map((prerequisiteTopicId) => ({ grammarTopicId: sourceId, prerequisiteTopicId })));
     }
 
-    for (const item of expressionData) await tx.insert(expressions).values({ contentId: item.id, kind: item.kind, expression: item.expression, baseVerb: item.relatedVerb, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, level: item.cefrLevel, examples: item.examples, usageNotes: item.usageNotes, separability: item.separability, topics: item.tags })
-      .onConflictDoUpdate({ target: expressions.contentId, set: { kind: item.kind, expression: item.expression, baseVerb: item.relatedVerb, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, level: item.cefrLevel, examples: item.examples, usageNotes: item.usageNotes, separability: item.separability, topics: item.tags, updatedAt: new Date() } });
-    for (const item of expressionData.filter((item) => item.kind === "collocation")) await tx.insert(collocations).values({ contentId: item.id, phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags })
-      .onConflictDoUpdate({ target: collocations.contentId, set: { phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags, updatedAt: new Date() } });
+    await tx.update(expressions).set({ active: false, updatedAt: new Date() }).where(notInArray(expressions.contentId, expressionData.map((item) => item.id)));
+    const collocationData = expressionData.filter((item) => item.kind === "collocation");
+    await tx.update(collocations).set({ active: false, updatedAt: new Date() }).where(notInArray(collocations.contentId, collocationData.map((item) => item.id)));
+    for (const item of expressionData) await tx.insert(expressions).values({ contentId: item.id, kind: item.kind, expression: item.expression, baseVerb: item.relatedVerb, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, level: item.cefrLevel, examples: item.examples, usageNotes: item.usageNotes, separability: item.separability, topics: item.tags, status: item.status, active: item.status !== "retired" })
+      .onConflictDoUpdate({ target: expressions.contentId, set: { kind: item.kind, expression: item.expression, baseVerb: item.relatedVerb, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, level: item.cefrLevel, examples: item.examples, usageNotes: item.usageNotes, separability: item.separability, topics: item.tags, status: item.status, active: item.status !== "retired", updatedAt: new Date() } });
+    for (const item of collocationData) await tx.insert(collocations).values({ contentId: item.id, phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags, status: item.status, active: item.status !== "retired" })
+      .onConflictDoUpdate({ target: collocations.contentId, set: { phrase: item.expression, level: item.cefrLevel, meaning: item.meaning, vietnameseMeaning: item.vietnameseMeaning, example: item.examples[0], topics: item.tags, status: item.status, active: item.status !== "retired", updatedAt: new Date() } });
     await tx.update(placementPassages).set({ status: "retired", updatedAt: new Date() }).where(notInArray(placementPassages.contentId, readingPassages.map((passage) => passage.id)));
     await tx.update(placementItems).set({ status: "retired", updatedAt: new Date() }).where(notInArray(placementItems.contentId, placementQuestions.map((item) => item.id)));
     for (const passage of readingPassages) await tx.insert(placementPassages).values({ contentId: passage.id, title: passage.title, passage: passage.text, level: passage.level, status: passage.status, provenanceId: passage.provenanceId, contentVersionId: contentVersion.id })

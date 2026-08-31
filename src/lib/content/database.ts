@@ -2,11 +2,12 @@ import "server-only";
 
 import { and, asc, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db/client";
-import { grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, placementItems, placementPassages, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
+import { expressions, grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, placementItems, placementPassages, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
 import { grammarTopics as curriculumGrammarTopics } from "@/data/grammar";
-import type { CEFRLevel, GrammarTopic, PlacementDimension, PlacementQuestion, ReadingPassage } from "@/types/domain";
+import type { CEFRLevel, ExpressionItem, GrammarTopic, PlacementDimension, PlacementQuestion, ReadingPassage } from "@/types/domain";
 
 export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string; frequencyBand?: "very-common" | "common" | "less-common" | "advanced" }
+export interface ExpressionPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; kind?: ExpressionItem["kind"] }
 
 export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const page = Math.max(1, Math.trunc(input.page ?? 1));
@@ -61,6 +62,31 @@ export async function queryGrammarCatalogue() {
   })).sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
   const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
   return { items, total: items.length, byLevel: Object.fromEntries(levels.map((level) => [level, items.filter((item) => item.level === level).length])) as Record<CEFRLevel, number> };
+}
+
+export async function queryExpressionsPage(input: ExpressionPageQuery) {
+  const page = Math.max(1, Math.trunc(input.page ?? 1));
+  const pageSize = Math.max(1, Math.min(48, Math.trunc(input.pageSize ?? 24)));
+  const search = input.search?.trim();
+  const preview = process.env.NODE_ENV !== "production" || process.env.CONTENT_RELEASE_CHANNEL === "validated-preview";
+  const releaseConditions = [eq(expressions.active, true), preview ? inArray(expressions.status, ["validated", "reviewed", "published"]) : eq(expressions.status, "published")];
+  const conditions = [...releaseConditions];
+  if (input.level) conditions.push(eq(expressions.level, input.level));
+  if (input.kind) conditions.push(eq(expressions.kind, input.kind));
+  if (input.topic) conditions.push(sql`${input.topic} = any(${expressions.topics})`);
+  if (search) conditions.push(or(ilike(expressions.expression, `%${search}%`), ilike(expressions.meaning, `%${search}%`), ilike(expressions.vietnameseMeaning, `%${search}%`))!);
+  const db = getDb();
+  const where = and(...conditions);
+  const [{ total }] = await db.select({ total: count() }).from(expressions).where(where);
+  const items = await db.select({ id: expressions.contentId, expression: expressions.expression, kind: expressions.kind, meaning: expressions.meaning, vietnameseMeaning: expressions.vietnameseMeaning, cefrLevel: expressions.level, examples: expressions.examples, usageNotes: expressions.usageNotes, tags: expressions.topics, status: expressions.status, relatedVerb: expressions.baseVerb, separability: expressions.separability })
+    .from(expressions).where(where).orderBy(asc(expressions.expression), asc(expressions.contentId)).limit(pageSize).offset((page - 1) * pageSize);
+  const [corpusCount, kindCounts, levelCounts, topicRows] = await Promise.all([
+    db.select({ total: count() }).from(expressions).where(and(...releaseConditions)),
+    db.select({ value: expressions.kind, total: count() }).from(expressions).where(and(...releaseConditions)).groupBy(expressions.kind),
+    db.select({ value: expressions.level, total: count() }).from(expressions).where(and(...releaseConditions)).groupBy(expressions.level),
+    db.select({ topics: expressions.topics }).from(expressions).where(and(...releaseConditions)),
+  ]);
+  return { items: items.map((item) => ({ ...item, vietnameseMeaning: item.vietnameseMeaning ?? "", usageNotes: item.usageNotes ?? "", status: item.status as ExpressionItem["status"], relatedVerb: item.relatedVerb ?? undefined, separability: item.separability as ExpressionItem["separability"] })), page, pageSize, total, pageCount: Math.max(1, Math.ceil(total / pageSize)), filters: { level: input.level ?? null, search: search ?? null, topic: input.topic ?? null, kind: input.kind ?? null }, corpus: { total: corpusCount[0].total, byKind: Object.fromEntries(kindCounts.map((row) => [row.value, row.total])), byLevel: Object.fromEntries(levelCounts.map((row) => [row.value, row.total])), topics: [...new Set(topicRows.flatMap((row) => row.topics))].sort() } };
 }
 
 export async function queryPlacementBank() {

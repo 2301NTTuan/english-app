@@ -21,6 +21,36 @@ export interface ExpressionQualityReport {
   criticalIssues: string[];
 }
 
+const stableScore = (value: string) => [...value].reduce((score, character, index) => (score + character.charCodeAt(0) * (index + 17)) % 2_147_483_647, 0);
+
+export function deterministicExpressionSample(items: ExpressionItem[], kind: ExpressionItem["kind"], size: number): ExpressionItem[] {
+  const buckets = levels.map((level) => items.filter((item) => item.kind === kind && item.cefrLevel === level).sort((a, b) => stableScore(a.id) - stableScore(b.id) || a.id.localeCompare(b.id))).filter((bucket) => bucket.length);
+  if (buckets.reduce((sum, bucket) => sum + bucket.length, 0) < size) throw new Error(`Cannot sample ${size} ${kind} records.`);
+  const result: ExpressionItem[] = [];
+  let round = 0;
+  while (result.length < size) {
+    let added = false;
+    for (const bucket of buckets) {
+      if (bucket[round] && result.length < size) { result.push(bucket[round]); added = true; }
+    }
+    if (!added) break;
+    round += 1;
+  }
+  return result;
+}
+
+export function expressionSemanticRubricIssues(item: ExpressionItem): string[] {
+  const issues: string[] = [];
+  if (item.meaning.trim().length < 3) issues.push("meaning is not learner-explanatory");
+  if (item.vietnameseMeaning.trim().length < 2) issues.push("Vietnamese meaning is empty or unnatural-looking");
+  if (!item.examples.length || item.examples.some((example) => example.trim().length < 12 || !/[.!?]$/.test(example.trim()))) issues.push("example is incomplete");
+  if (!levels.includes(item.cefrLevel)) issues.push("CEFR is invalid");
+  if (!item.tags.length || !item.usageNotes.trim()) issues.push("usage metadata is missing");
+  if (item.status !== "validated" && item.status !== "reviewed" && item.status !== "published") issues.push("lifecycle is not production-eligible");
+  if (item.kind === "phrasal-verb" && (!item.relatedVerb || !item.separability)) issues.push("phrasal metadata is incomplete");
+  return issues.map((issue) => `${item.id}: ${issue}`);
+}
+
 export function auditExpressions(items: ExpressionItem[]): ExpressionQualityReport {
   const duplicateIds = duplicateValues(items.map((item) => item.id));
   const duplicateExpressions = duplicateValues(items.map((item) => normalize(item.expression)));

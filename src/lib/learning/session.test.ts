@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
 import { grammarTopics } from "@/data/grammar";
-import { buildStudySession } from "./session";
+import { buildStudySession, selectExpressionCandidates } from "./session";
 import { createInitialState } from "@/lib/storage/app-repository";
 
 describe("buildStudySession", () => {
@@ -49,7 +49,7 @@ describe("buildStudySession", () => {
   it("can select grammar from beyond the former detailed subset", () => {
     const state = createInitialState();
     const review = state.grammarProgress[0].review;
-    state.settings = { ...state.settings, currentLevel: "C2", dailyTarget: 4, maxNewWordsPerDay: 0, maxNewGrammarTopicsPerDay: 1 };
+    state.settings = { ...state.settings, currentLevel: "C2", dailyTarget: 1, maxNewWordsPerDay: 0, maxNewGrammarTopicsPerDay: 1 };
     state.vocabularyProgress = [];
     state.grammarProgress = grammarTopics.filter((topic) => topic.id !== "advanced-cohesive-devices").map((topic) => ({
       topicId: topic.id, mastery: 100, subtopicMastery: Object.fromEntries(topic.subtopics.map((subtopic) => [subtopic.id, 100])),
@@ -62,5 +62,19 @@ describe("buildStudySession", () => {
     expect(grammarTopics).toHaveLength(138);
     expect(session).toHaveLength(1);
     expect(session[0]).toMatchObject({ itemId: "advanced-cohesive-devices", knowledgeType: "grammar", source: "newGrammar" });
+  });
+
+  it("uses the complete Expressions corpus as study-session candidates", () => {
+    const candidates = selectExpressionCandidates("C2", 0);
+    expect(candidates).toHaveLength(1_621);
+    expect(selectExpressionCandidates("C2", candidates.length - 1)[0]).toMatchObject({ id: "collocation-legally-binding", expression: "legally binding" });
+
+    const state = createInitialState();
+    state.settings = { ...state.settings, currentLevel: "C2", dailyTarget: 1, maxNewWordsPerDay: 0, maxNewGrammarTopicsPerDay: 0 };
+    state.vocabularyProgress = []; state.grammarProgress = []; state.mistakes = [];
+    const session = buildStudySession(state, new Date("2026-08-30T12:00:00.000Z"));
+    expect(session).toHaveLength(1);
+    expect(session[0]).toMatchObject({ knowledgeType: "expression", source: "newExpressions" });
+    expect(session[0].options).toContain(session[0].answer);
   });
 });

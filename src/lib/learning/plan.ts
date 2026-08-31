@@ -1,6 +1,6 @@
 import type { DailyPlan, LearningInventory, PlanAllocation, PlanCategory, UserSettings } from "@/types/domain";
 
-const minutes: Record<PlanCategory, number> = { overdueVocabulary: 0.7, overdueGrammar: 1.5, dueVocabulary: 0.7, dueGrammar: 1.5, mistakes: 1.2, weakVocabulary: 1, weakGrammar: 2, newVocabulary: 1.2, newGrammar: 4, mixedPractice: 1 };
+const minutes: Record<PlanCategory, number> = { overdueVocabulary: 0.7, overdueGrammar: 1.5, dueVocabulary: 0.7, dueGrammar: 1.5, mistakes: 1.2, weakVocabulary: 1, weakGrammar: 2, newVocabulary: 1.2, newGrammar: 4, newExpressions: 1.2, mixedPractice: 1 };
 
 export function buildDailyPlan(inventory: LearningInventory, settings: UserSettings): DailyPlan {
   const allocations: PlanAllocation[] = [];
@@ -23,6 +23,7 @@ export function buildDailyPlan(inventory: LearningInventory, settings: UserSetti
   const adaptiveNewLimit = reviewBacklog >= dailyTarget ? 0 : Math.min(settings.maxNewWordsPerDay, capacity);
   add("newVocabulary", inventory.newVocabulary, adaptiveNewLimit);
   add("newGrammar", inventory.newGrammar, settings.maxNewGrammarTopicsPerDay);
+  add("newExpressions", inventory.newExpressions, 1);
 
   const totalItems = allocations.reduce((sum, item) => sum + item.count, 0);
   return { allocations, totalItems, reviewBacklog, newWords: allocations.find((item) => item.category === "newVocabulary")?.count ?? 0, estimatedMinutes: Math.ceil(allocations.reduce((sum, item) => sum + item.count * item.minutesPerItem, 0)) };

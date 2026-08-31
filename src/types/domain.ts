@@ -44,8 +44,8 @@ export interface Exercise { id: string; knowledgeType: KnowledgeType; itemId: st
 export interface SessionExercise extends Exercise { source: PlanCategory; targetDimension?: keyof Omit<MasteryDimensions, "overall"> }
 export interface MistakeRecord { id: string; itemId: string; subtopicId?: string; label: string; knowledgeType: KnowledgeType; exerciseType: string; wrongAnswer: string; correctAnswer: string; timestamp: string; repeatedCount: number; resolved: boolean }
 export interface UserSettings { currentLevel: CEFRLevel; dailyTarget: number; maxNewWordsPerDay: number; maxNewGrammarTopicsPerDay: number; desiredRetention: number; interfaceLanguage: "en" | "vi"; showVietnamese: boolean }
-export interface LearningInventory { overdueVocabulary: number; dueVocabulary: number; overdueGrammar: number; dueGrammar: number; weakVocabulary: number; weakGrammar: number; mistakes: number; newVocabulary: number; newGrammar: number }
-export type PlanCategory = "overdueVocabulary" | "overdueGrammar" | "dueVocabulary" | "dueGrammar" | "mistakes" | "weakVocabulary" | "weakGrammar" | "newVocabulary" | "newGrammar" | "mixedPractice";
+export interface LearningInventory { overdueVocabulary: number; dueVocabulary: number; overdueGrammar: number; dueGrammar: number; weakVocabulary: number; weakGrammar: number; mistakes: number; newVocabulary: number; newGrammar: number; newExpressions: number }
+export type PlanCategory = "overdueVocabulary" | "overdueGrammar" | "dueVocabulary" | "dueGrammar" | "mistakes" | "weakVocabulary" | "weakGrammar" | "newVocabulary" | "newGrammar" | "newExpressions" | "mixedPractice";
 export interface PlanAllocation { category: PlanCategory; count: number; minutesPerItem: number }
 export interface DailyPlan { allocations: PlanAllocation[]; totalItems: number; estimatedMinutes: number; reviewBacklog: number; newWords: number }
 export interface Activity { id: string; date: string; label: string; correct: number; total: number; minutes?: number; masteryDelta?: number }

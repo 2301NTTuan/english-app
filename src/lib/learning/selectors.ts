@@ -1,5 +1,6 @@
 import { grammarTopics } from "@/data/grammar";
 import { vocabulary } from "@/data/vocabulary";
+import { expressions } from "@/data/expressions";
 import { buildDailyPlan } from "@/lib/learning/plan";
 import { recommendableTopics } from "@/lib/learning/prerequisites";
 import type { AppState, CEFRLevel, LearningInventory } from "@/types/domain";
@@ -21,6 +22,7 @@ export function selectInventory(state: AppState, now = new Date()): LearningInve
     mistakes: state.mistakes.filter((item) => !item.resolved).length,
     newVocabulary: vocabulary.filter((item) => atOrBelow(item.cefrLevel, state.settings.currentLevel) && !state.vocabularyProgress.some((progress) => progress.itemId === item.id)).length,
     newGrammar: recommendableTopics(grammarTopics, state.grammarProgress).filter((item) => atOrBelow(item.level, state.settings.currentLevel) && !state.grammarProgress.some((progress) => progress.topicId === item.id)).length,
+    newExpressions: expressions.filter((item) => item.status !== "retired" && atOrBelow(item.cefrLevel, state.settings.currentLevel)).length,
   };
 }
 

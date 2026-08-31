@@ -10,7 +10,7 @@ import { normalizeVocabularyItem } from "./vocabulary";
 import { validateLearningContent } from "./validate";
 import { auditGrammarLessons, grammarLessonIssues } from "./grammar-quality";
 import { auditPlacementBank } from "./placement-quality";
-import { auditExpressions } from "./expression-quality";
+import { auditExpressions, deterministicExpressionSample, expressionSemanticRubricIssues } from "./expression-quality";
 
 describe("learning content pipeline", () => {
   it("normalizes whitespace and duplicate relations while preserving IDs", () => {
@@ -64,5 +64,20 @@ describe("learning content pipeline", () => {
     const report = auditExpressions(expressions);
     expect(report.criticalIssues).toEqual([]);
     expect(report.suspiciousNearDuplicates).toEqual([]);
+  });
+
+  it("meets the Expressions count gate and deterministic 220-record semantic sample", () => {
+    const report = auditExpressions(expressions);
+    expect(report.byKind).toMatchObject({ idiom: 303, "phrasal-verb": 310, collocation: 1001, "common-expression": 7 });
+    const idioms = deterministicExpressionSample(expressions, "idiom", 60);
+    const phrasalVerbs = deterministicExpressionSample(expressions, "phrasal-verb", 60);
+    const collocations = deterministicExpressionSample(expressions, "collocation", 100);
+    const sample = [...idioms, ...phrasalVerbs, ...collocations];
+    expect({ idioms: idioms.length, phrasalVerbs: phrasalVerbs.length, collocations: collocations.length, total: sample.length }).toEqual({ idioms: 60, phrasalVerbs: 60, collocations: 100, total: 220 });
+    expect(new Set(sample.map((item) => item.id)).size).toBe(220);
+    expect(new Set(idioms.map((item) => item.cefrLevel)).size).toBeGreaterThanOrEqual(5);
+    expect(new Set(phrasalVerbs.map((item) => item.cefrLevel)).size).toBeGreaterThanOrEqual(5);
+    expect(new Set(collocations.map((item) => item.cefrLevel)).size).toBeGreaterThanOrEqual(5);
+    expect(sample.flatMap(expressionSemanticRubricIssues)).toEqual([]);
   });
 });

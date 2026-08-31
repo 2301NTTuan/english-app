@@ -1,18 +1,26 @@
 import { exercises as seedExercises } from "@/data/exercises";
 import { grammarTopics } from "@/data/grammar";
 import { vocabulary } from "@/data/vocabulary";
+import { expressions } from "@/data/expressions";
 import { selectDailyPlan } from "@/lib/learning/selectors";
 import { weakestDimension } from "@/lib/learning/mastery";
 import { recommendableTopics } from "@/lib/learning/prerequisites";
 import { prioritizeMistakes } from "@/lib/learning/mistakes";
 import { rankNewVocabulary } from "@/lib/learning/vocabulary-selection";
-import { generateGrammarExercise, generateVocabularyExercise } from "@/lib/learning/exercises";
+import { generateExpressionExercise, generateGrammarExercise, generateVocabularyExercise } from "@/lib/learning/exercises";
 import { buildLearningPath } from "@/lib/learning/path";
 import type { AppState, Exercise, PlanCategory, SessionExercise, VocabularyItem } from "@/types/domain";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const levels = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const atOrBelow = (level: VocabularyItem["cefrLevel"], target: VocabularyItem["cefrLevel"]) => levels.indexOf(level) <= levels.indexOf(target);
+
+export function selectExpressionCandidates(target: VocabularyItem["cefrLevel"], offset = 0) {
+  const candidates = expressions.filter((item) => item.status !== "retired" && atOrBelow(item.cefrLevel, target));
+  if (!candidates.length) return candidates;
+  const start = ((Math.trunc(offset) % candidates.length) + candidates.length) % candidates.length;
+  return candidates.map((_, index) => candidates[(start + index) % candidates.length]);
+}
 
 function mistakeExercise(state: AppState, index: number): SessionExercise | undefined {
   const active = prioritizeMistakes(state.mistakes);
@@ -46,6 +54,7 @@ export function buildStudySession(state: AppState, now = new Date()): SessionExe
       return (aPriority < 0 ? Number.MAX_SAFE_INTEGER : aPriority) - (bPriority < 0 ? Number.MAX_SAFE_INTEGER : bPriority);
     }).map((item) => item.id),
   };
+  const expressionCandidates = selectExpressionCandidates(state.settings.currentLevel, Math.floor(now.getTime() / 86_400_000));
 
   const result: SessionExercise[] = [];
   for (const allocation of plan.allocations) {
@@ -61,7 +70,8 @@ export function buildStudySession(state: AppState, now = new Date()): SessionExe
         continue;
       }
       const topics = grammarBySource[allocation.category];
-      if (topics?.length) { const exercise = generateGrammarExercise(topics[index % topics.length], allocation.category); if (exercise) result.push(exercise); }
+      if (topics?.length) { const exercise = generateGrammarExercise(topics[index % topics.length], allocation.category); if (exercise) result.push(exercise); continue; }
+      if (allocation.category === "newExpressions" && expressionCandidates.length) result.push(generateExpressionExercise(expressionCandidates[index % expressionCandidates.length], expressions, state.settings.showVietnamese));
     }
   }
   return result.length ? result : seedExercises.slice(0, 5).map((exercise) => ({ ...exercise, source: "mistakes" }));

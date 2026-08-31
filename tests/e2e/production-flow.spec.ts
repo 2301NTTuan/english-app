@@ -104,6 +104,21 @@ test.describe.serial("production acceptance", () => {
     await expect(page.getByText("15 topics", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Advanced cohesive devices" })).toBeVisible();
 
+    const expressionCatalogue = await page.evaluate(async () => {
+      const response = await fetch("/api/content/expressions?search=legally%20binding");
+      return { status: response.status, body: await response.json() };
+    });
+    expect(expressionCatalogue.status).toBe(200);
+    expect(expressionCatalogue.body.corpus.total).toBe(1_621);
+    expect(expressionCatalogue.body.corpus.byKind).toEqual({ idiom: 303, "phrasal-verb": 310, collocation: 1_001, "common-expression": 7 });
+    expect(expressionCatalogue.body.items[0]).toMatchObject({ id: "collocation-legally-binding", expression: "legally binding" });
+    await page.goto("/expressions");
+    await expect(page.getByRole("heading", { name: "Expressions" })).toBeVisible();
+    await expect(page.getByText("1–24 of 1621")).toBeVisible();
+    await page.getByLabel("Search").fill("legally binding");
+    await expect(page.getByRole("heading", { name: "legally binding" })).toBeVisible();
+    await expect(page.getByText("1–1 of 1")).toBeVisible();
+
     const stateResponse = await page.evaluate(async () => {
       const response = await fetch("/api/state");
       return { status: response.status, body: await response.json() };

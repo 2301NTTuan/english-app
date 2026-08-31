@@ -1,7 +1,7 @@
 import { exercises as curatedExercises } from "@/data/exercises";
 import { grammarTopics } from "@/data/grammar";
 import { vocabulary } from "@/data/vocabulary";
-import type { CEFRLevel, GrammarTopic, PlanCategory, SessionExercise, VocabularyItem } from "@/types/domain";
+import type { CEFRLevel, ExpressionItem, GrammarTopic, PlanCategory, SessionExercise, VocabularyItem } from "@/types/domain";
 
 const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const unique = <T,>(items: T[]) => [...new Set(items)];
@@ -94,4 +94,12 @@ export function generateGrammarExercise(topicId: string, source: PlanCategory, t
   const options = choices(mistake.correct, distractors, topic.id);
   if (!options) return undefined;
   return { id: `${source}-${topic.id}`, itemId: topic.id, knowledgeType: "grammar", type: topic.title.toLocaleLowerCase().includes(" vs ") ? "grammar-contrast" : "error-correction", source, difficulty: topic.level === "A1" || topic.level === "A2" ? 2 : topic.level === "B1" ? 3 : 4, prompt: `Correct the sentence: “${mistake.incorrect}”`, options, answer: mistake.correct, explanation: mistake.explanation };
+}
+
+export function generateExpressionExercise(item: ExpressionItem, pool: ExpressionItem[], showVietnamese = true): SessionExercise {
+  const distractors = pool.filter((candidate) => candidate.id !== item.id && candidate.kind === item.kind && candidate.cefrLevel === item.cefrLevel)
+    .sort((a, b) => a.id.localeCompare(b.id)).slice(0, 3);
+  const fallback = pool.filter((candidate) => candidate.id !== item.id && !distractors.includes(candidate)).sort((a, b) => a.id.localeCompare(b.id));
+  const options = choices(item.expression, [...distractors, ...fallback].slice(0, 3).map((candidate) => candidate.expression), `${item.id}-expression`)!;
+  return { id: `newExpressions-${item.id}`, itemId: item.id, knowledgeType: "expression", type: item.kind === "collocation" ? "collocation" : "recognition", source: "newExpressions", difficulty: item.cefrLevel === "A1" || item.cefrLevel === "A2" ? 2 : item.cefrLevel === "B1" ? 3 : 4, prompt: `Which expression means “${showVietnamese ? item.vietnameseMeaning : item.meaning}”?`, options, answer: item.expression, explanation: `${item.expression}: ${item.meaning} Example: ${item.examples[0]}` };
 }

@@ -25,7 +25,7 @@ const ratingStyle: Record<Rating, string> = {
 const sourceLabel: Record<SessionExercise["source"], string> = {
   overdueVocabulary: "Overdue vocabulary", overdueGrammar: "Overdue grammar", dueVocabulary: "Due vocabulary", dueGrammar: "Due grammar",
   weakVocabulary: "Weak vocabulary", weakGrammar: "Weak grammar", mistakes: "Mistake review", newVocabulary: "New vocabulary", newGrammar: "New grammar",
-  mixedPractice: "Mixed practice",
+  newExpressions: "New expression", mixedPractice: "Mixed practice",
 };
 
 function initialReview(): ReviewState {

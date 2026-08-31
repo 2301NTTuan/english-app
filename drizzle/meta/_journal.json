@@ -43,6 +43,13 @@
       "when": 1787932513976,
       "tag": "0005_sharp_mac_gargan",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788175243715,
+      "tag": "0006_cool_frightful_four",
+      "breakpoints": true
     }
   ]
 }

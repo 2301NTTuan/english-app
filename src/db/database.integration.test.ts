@@ -23,6 +23,7 @@ suite("PostgreSQL migration and ownership", () => {
   let issueEmailVerification: typeof import("@/lib/auth/recovery")["issueEmailVerification"];
   let consumeEmailVerification: typeof import("@/lib/auth/recovery")["consumeEmailVerification"];
   let queryVocabularyPage: typeof import("@/lib/content/database")["queryVocabularyPage"];
+  let queryExpressionsPage: typeof import("@/lib/content/database")["queryExpressionsPage"];
   let queryGrammarCatalogue: typeof import("@/lib/content/database")["queryGrammarCatalogue"];
   let queryPlacementBank: typeof import("@/lib/content/database")["queryPlacementBank"];
   let loadLearningState: typeof import("@/lib/learning/state-projection")["loadLearningState"];
@@ -38,7 +39,7 @@ suite("PostgreSQL migration and ownership", () => {
     ({ completeStudySession, completePlacement, importLegacyLearningState, saveLearningPreferences, resetLearningData } = await import("@/lib/learning/persistence"));
     ({ loadLearningState } = await import("@/lib/learning/state-projection"));
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
-    ({ queryVocabularyPage, queryGrammarCatalogue, queryPlacementBank } = await import("@/lib/content/database"));
+    ({ queryVocabularyPage, queryExpressionsPage, queryGrammarCatalogue, queryPlacementBank } = await import("@/lib/content/database"));
     ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
   });
   afterAll(async () => {
@@ -268,6 +269,25 @@ suite("PostgreSQL migration and ownership", () => {
       (select count(*)::int from grammar_topics where active) topics,
       (select count(*)::int from grammar_lessons l join grammar_topics t on t.id=l.grammar_topic_id where t.active) lessons`);
     expect(counts.rows[0]).toEqual({ topics: 138, lessons: 138 });
+  });
+
+  it("paginates and searches the complete seeded Expressions corpus", async () => {
+    const first = await queryExpressionsPage({ page: 1, pageSize: 24 });
+    expect(first.items).toHaveLength(24);
+    expect(first.corpus.total).toBe(1_621);
+    expect(first.corpus.byKind).toEqual({ idiom: 303, "phrasal-verb": 310, collocation: 1_001, "common-expression": 7 });
+    expect(first.corpus.byLevel).toEqual({ A1: 115, A2: 245, B1: 414, B2: 573, C1: 268, C2: 6 });
+    const phrasal = await queryExpressionsPage({ kind: "phrasal-verb", level: "C1" });
+    expect(phrasal.items.length).toBeGreaterThan(0);
+    expect(phrasal.items.every((item) => item.kind === "phrasal-verb" && item.cefrLevel === "C1")).toBe(true);
+    const expanded = await queryExpressionsPage({ search: "legally binding" });
+    expect(expanded.items).toHaveLength(1);
+    expect(expanded.items[0]).toMatchObject({ id: "collocation-legally-binding", expression: "legally binding", status: "validated" });
+    const counts = await client.query(`select
+      (select count(*)::int from expressions where active) expressions,
+      (select count(*)::int from expressions where active and status = 'validated') validated,
+      (select count(*)::int from collocations where active) collocations`);
+    expect(counts.rows[0]).toEqual({ expressions: 1_621, validated: 1_621, collocations: 1_001 });
   });
 
   it("serves the complete validated placement bank and reading passages from PostgreSQL", async () => {

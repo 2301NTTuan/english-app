@@ -10,7 +10,7 @@ import { auditGrammarLessons } from "../src/lib/content/grammar-quality";
 import { auditMasterVocabularyInventory } from "../src/lib/content/master-vocabulary";
 import { auditVocabulary } from "../src/lib/content/vocabulary-audit";
 import { auditPlacementBank } from "../src/lib/content/placement-quality";
-import { auditExpressions } from "../src/lib/content/expression-quality";
+import { auditExpressions, deterministicExpressionSample, expressionSemanticRubricIssues } from "../src/lib/content/expression-quality";
 import type { CEFRLevel, PlacementDimension } from "../src/types/domain";
 
 const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -22,6 +22,11 @@ const masterVocabularyAudit = auditMasterVocabularyInventory();
 const grammarAudit = auditGrammarLessons(grammarTopics);
 const placementAudit = auditPlacementBank(placementQuestions, readingPassages);
 const expressionAudit = auditExpressions(expressions);
+const expressionSample = [
+  ...deterministicExpressionSample(expressions, "idiom", 60),
+  ...deterministicExpressionSample(expressions, "phrasal-verb", 60),
+  ...deterministicExpressionSample(expressions, "collocation", 100),
+];
 
 const report = {
   masterVocabulary: {
@@ -61,6 +66,7 @@ const report = {
     byLevel: countBy(expressions, levels, (item) => item.cefrLevel),
     byStatus: countBy(expressions, ["draft", "validated", "reviewed", "published", "retired"], (item) => item.status),
     quality: expressionAudit,
+    semanticSample: { total: expressionSample.length, issues: expressionSample.flatMap(expressionSemanticRubricIssues), pass: expressionSample.flatMap(expressionSemanticRubricIssues).length === 0 },
   },
   placement: {
     items: placementQuestions.length,

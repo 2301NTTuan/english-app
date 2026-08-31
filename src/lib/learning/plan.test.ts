@@ -3,7 +3,7 @@ import { buildDailyPlan } from "./plan";
 import type { LearningInventory, UserSettings } from "@/types/domain";
 
 const settings: UserSettings = { currentLevel: "B1", dailyTarget: 25, maxNewWordsPerDay: 10, maxNewGrammarTopicsPerDay: 1, desiredRetention: 0.9, interfaceLanguage: "en", showVietnamese: true };
-const empty: LearningInventory = { overdueVocabulary: 0, overdueGrammar: 0, dueVocabulary: 0, dueGrammar: 0, weakVocabulary: 0, weakGrammar: 0, mistakes: 0, newVocabulary: 30, newGrammar: 0 };
+const empty: LearningInventory = { overdueVocabulary: 0, overdueGrammar: 0, dueVocabulary: 0, dueGrammar: 0, weakVocabulary: 0, weakGrammar: 0, mistakes: 0, newVocabulary: 30, newGrammar: 0, newExpressions: 0 };
 const count = (inventory: LearningInventory, category: string) => buildDailyPlan(inventory, settings).allocations.find((item) => item.category === category)?.count ?? 0;
 
 describe("buildDailyPlan", () => {
