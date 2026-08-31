@@ -10,6 +10,7 @@ import { normalizeVocabularyItem } from "./vocabulary";
 import { validateLearningContent } from "./validate";
 import { auditGrammarLessons, grammarLessonIssues } from "./grammar-quality";
 import { auditPlacementBank } from "./placement-quality";
+import { auditExpressions } from "./expression-quality";
 
 describe("learning content pipeline", () => {
   it("normalizes whitespace and duplicate relations while preserving IDs", () => {
@@ -57,5 +58,11 @@ describe("learning content pipeline", () => {
     expect(Math.min(...Object.values(report.byLevel))).toBeGreaterThanOrEqual(60);
     expect(report.answerPositions).toEqual([153, 153, 153, 153]);
     expect(report.criticalIssues).toEqual([]);
+  });
+
+  it("rejects structural and duplicate defects in the Expressions corpus", () => {
+    const report = auditExpressions(expressions);
+    expect(report.criticalIssues).toEqual([]);
+    expect(report.suspiciousNearDuplicates).toEqual([]);
   });
 });

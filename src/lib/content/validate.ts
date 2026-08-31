@@ -66,6 +66,16 @@ export function validateLearningContent(content: LearningContent): string[] {
     for (const prerequisite of topic.prerequisites) if (!grammarIds.has(prerequisite)) errors.push(`grammar ${topic.id}: broken prerequisite ${prerequisite}`);
     if (!topic.explanation.trim() || !topic.examples.length || !topic.commonMistakes.length) errors.push(`grammar ${topic.id}: incomplete lesson content`);
   }
+  for (const item of content.expressions) {
+    const key = `expression ${item.id}`;
+    if (!item.expression.trim() || !item.meaning.trim() || !item.vietnameseMeaning.trim()) errors.push(`${key}: missing expression or meaning`);
+    if (!levels.has(item.cefrLevel)) errors.push(`${key}: invalid CEFR ${item.cefrLevel}`);
+    if (!contentStatuses.has(item.status)) errors.push(`${key}: invalid content status ${item.status}`);
+    if (!item.examples.length || item.examples.some((example) => example.trim().length < 8)) errors.push(`${key}: missing or malformed example`);
+    if (!item.usageNotes.trim() || !item.tags.length || item.tags.some((tag) => !tag.trim())) errors.push(`${key}: missing usage metadata`);
+    if (item.kind === "phrasal-verb" && (!item.relatedVerb?.trim() || !item.separability)) errors.push(`${key}: phrasal verb requires base verb and separability`);
+    if (item.kind !== "phrasal-verb" && (item.relatedVerb || item.separability)) errors.push(`${key}: non-phrasal expression has phrasal-verb metadata`);
+  }
   const visiting = new Set<string>(); const visited = new Set<string>();
   const findCycle = (topicId: string, trail: string[]): void => {
     if (visiting.has(topicId)) { errors.push(`grammar prerequisite cycle: ${[...trail, topicId].join(" -> ")}`); return; }

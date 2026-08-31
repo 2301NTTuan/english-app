@@ -10,6 +10,7 @@ import { auditGrammarLessons } from "../src/lib/content/grammar-quality";
 import { auditMasterVocabularyInventory } from "../src/lib/content/master-vocabulary";
 import { auditVocabulary } from "../src/lib/content/vocabulary-audit";
 import { auditPlacementBank } from "../src/lib/content/placement-quality";
+import { auditExpressions } from "../src/lib/content/expression-quality";
 import type { CEFRLevel, PlacementDimension } from "../src/types/domain";
 
 const levels: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -20,6 +21,7 @@ const vocabularyAudit = auditVocabulary(vocabulary);
 const masterVocabularyAudit = auditMasterVocabularyInventory();
 const grammarAudit = auditGrammarLessons(grammarTopics);
 const placementAudit = auditPlacementBank(placementQuestions, readingPassages);
+const expressionAudit = auditExpressions(expressions);
 
 const report = {
   masterVocabulary: {
@@ -57,6 +59,8 @@ const report = {
     total: expressions.length,
     byKind: countBy(expressions, ["idiom", "phrasal-verb", "collocation", "common-expression"], (item) => item.kind),
     byLevel: countBy(expressions, levels, (item) => item.cefrLevel),
+    byStatus: countBy(expressions, ["draft", "validated", "reviewed", "published", "retired"], (item) => item.status),
+    quality: expressionAudit,
   },
   placement: {
     items: placementQuestions.length,
@@ -77,6 +81,7 @@ const report = {
     vocabularyProductionCorpus: vocabulary.filter((item) => item.status === "published").length >= 5_800 && vocabularyAudit.samplingGate && validationErrors.length === 0 && vocabularyAudit.duplicateCandidates.length === 0,
     grammarProductionCorpus: grammarAudit.productionReady >= 110 && grammarAudit.issues.length === 0 && validationErrors.length === 0,
     placementEngineeringBaseline: placementQuestions.length >= 600 && placementAudit.criticalIssues.length === 0 && validationErrors.length === 0,
+    expressionsEngineeringBaseline: expressionAudit.byKind.idiom >= 300 && expressionAudit.byKind["phrasal-verb"] >= 300 && expressionAudit.byKind.collocation >= 1_000 && expressionAudit.criticalIssues.length === 0 && validationErrors.length === 0,
     placementProductionBank: placementQuestions.filter((item) => item.status === "published").length >= 600 && placementAudit.criticalIssues.length === 0 && validationErrors.length === 0,
   },
   validationErrors,

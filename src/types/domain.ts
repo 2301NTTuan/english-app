@@ -37,6 +37,7 @@ export interface GrammarProgress { topicId: string; mastery: number; subtopicMas
 export interface ExpressionItem {
   id: string; expression: string; kind: "idiom" | "phrasal-verb" | "collocation" | "common-expression";
   meaning: string; vietnameseMeaning: string; cefrLevel: CEFRLevel; examples: string[]; usageNotes: string; tags: string[];
+  status: ContentStatus;
   relatedVerb?: string; separability?: "separable" | "inseparable" | "both";
 }
 export interface Exercise { id: string; knowledgeType: KnowledgeType; itemId: string; type: ExerciseType | GrammarExerciseType; prompt: string; options?: string[]; answer: string; explanation?: string; difficulty?: number }
