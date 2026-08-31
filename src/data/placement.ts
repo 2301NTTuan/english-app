@@ -1,6 +1,7 @@
 import type { CEFRLevel, PlacementDimension, PlacementQuestion } from "@/types/domain";
 import { readingPlacementQuestions } from "@/data/placement-reading";
 import { expandedPlacementQuestions } from "@/data/placement-expanded";
+import { vocabularyPlacementQuestions } from "@/data/placement-vocabulary-bank";
 
 type Seed = [CEFRLevel, PlacementDimension, string, string, string[], string, string];
 const seeds: Seed[] = [
@@ -16,7 +17,7 @@ const seeds: Seed[] = [
   ["A2", "grammar", "past-simple", "We ___ Hue last summer.", ["visited", "have visited", "visit", "are visiting"], "visited", "“Last summer” is a finished past time, so the past-simple form “visited” is required."],
   ["A2", "grammar", "comparatives", "This exercise is ___ than the last one.", ["easier", "more easy", "easiest", "easy"], "easier", "The comparative form of the short adjective “easy” is “easier,” followed here by “than.”"],
   ["A2", "context", "requests", "Choose the most natural polite request.", ["Could you open the window?", "You open the window.", "Open you the window?", "Do opening the window."], "Could you open the window?", "“Could you …?” is a conventional polite form for asking another person to do something."],
-  ["A2", "context", "collocations", "Choose the natural combination.", ["make a mistake", "do a mistake", "build a mistake", "perform a mistake"], "make a mistake", "English conventionally uses the verb “make” with the noun “mistake.”"],
+  ["A2", "context", "collocations", "Which phrase uses “mistake” naturally?", ["make a mistake", "do a mistake", "build a mistake", "perform a mistake"], "make a mistake", "English conventionally uses the verb “make” with the noun “mistake.”"],
 
   ["B1", "vocabulary", "communication", "To “clarify” something means to ___.", ["make it clearer", "make it longer", "hide it", "repeat it loudly"], "make it clearer", "To clarify information is to remove uncertainty by making its meaning clearer."],
   ["B1", "vocabulary", "work", "Choose the opposite of “flexible”.", ["rigid", "reliable", "frequent", "natural"], "rigid", "Rigid describes something that cannot readily change, the relevant opposite of flexible."],
@@ -30,7 +31,7 @@ const seeds: Seed[] = [
   ["B2", "grammar", "third-conditional", "If she ___ earlier, she would have caught the train.", ["had left", "left", "would leave", "has left"], "had left", "The third conditional uses past perfect in the if-clause for an unreal past condition."],
   ["B2", "grammar", "modal-perfect", "He isn't here. He ___ the earlier bus.", ["might have taken", "might took", "must taking", "can have take"], "might have taken", "“Might have” plus a past participle expresses an uncertain possibility about a completed past action."],
   ["B2", "context", "register", "Choose the most appropriate sentence for a formal report.", ["The results indicate a significant change.", "The results are, like, a huge change.", "Results kinda changed loads.", "The result thing got big."], "The results indicate a significant change.", "“Indicate a significant change” is precise and suitably formal; the other choices use conversational or ungrammatical wording."],
-  ["B2", "context", "collocations", "Choose the natural combination.", ["draw a conclusion", "paint a conclusion", "do a conclusion", "build a conclusion"], "draw a conclusion", "English uses the established collocation “draw a conclusion” for reaching a judgment from evidence."],
+  ["B2", "context", "collocations", "Which phrase naturally describes reaching a judgment from evidence?", ["draw a conclusion", "paint a conclusion", "do a conclusion", "build a conclusion"], "draw a conclusion", "English uses the established collocation “draw a conclusion” for reaching a judgment from evidence."],
 
   ["C1", "vocabulary", "academic", "A “tentative” conclusion is ___.", ["not yet fully certain", "completely proven", "deliberately irrelevant", "widely celebrated"], "not yet fully certain", "Tentative marks a conclusion as provisional or uncertain rather than firmly established."],
   ["C1", "vocabulary", "communication", "Which word best describes a small but meaningful difference?", ["nuance", "routine", "benefit", "sequence"], "nuance", "A nuance is a subtle distinction in meaning, expression, or tone."],
@@ -61,6 +62,17 @@ const corePlacementQuestions: PlacementQuestion[] = seeds.map(([level, dimension
   provenanceId: "placement-core-2026-08",
 }));
 
+const authoredPlacementQuestions = [...corePlacementQuestions, ...expandedPlacementQuestions, ...readingPlacementQuestions, ...vocabularyPlacementQuestions];
+
+/**
+ * Rotate authored choices across A–D without changing their wording or answer key.
+ * This removes answer-position leakage while keeping stable question IDs.
+ */
+export const placementQuestions: PlacementQuestion[] = authoredPlacementQuestions.map((question, index) => {
+  const options = question.options ?? [];
+  const offset = index % options.length;
+  return { ...question, options: [...options.slice(offset), ...options.slice(0, offset)] };
+});
+
 /** Validated pre-launch bank. Published-only filtering is the production release gate. */
-export const placementQuestions: PlacementQuestion[] = [...corePlacementQuestions, ...expandedPlacementQuestions, ...readingPlacementQuestions];
 export const publishedPlacementQuestions = placementQuestions.filter((question) => question.status === "published");
