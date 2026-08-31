@@ -2,6 +2,7 @@ import type { CEFRLevel, PlacementDimension, PlacementQuestion } from "@/types/d
 import { readingPlacementQuestions } from "@/data/placement-reading";
 import { expandedPlacementQuestions } from "@/data/placement-expanded";
 import { vocabularyPlacementQuestions } from "@/data/placement-vocabulary-bank";
+import { grammarPlacementQuestions } from "@/data/placement-grammar-bank";
 
 type Seed = [CEFRLevel, PlacementDimension, string, string, string[], string, string];
 const seeds: Seed[] = [
@@ -62,7 +63,7 @@ const corePlacementQuestions: PlacementQuestion[] = seeds.map(([level, dimension
   provenanceId: "placement-core-2026-08",
 }));
 
-const authoredPlacementQuestions = [...corePlacementQuestions, ...expandedPlacementQuestions, ...readingPlacementQuestions, ...vocabularyPlacementQuestions];
+const authoredPlacementQuestions = [...corePlacementQuestions, ...expandedPlacementQuestions, ...readingPlacementQuestions, ...vocabularyPlacementQuestions, ...grammarPlacementQuestions];
 
 /**
  * Rotate authored choices across A–D without changing their wording or answer key.
