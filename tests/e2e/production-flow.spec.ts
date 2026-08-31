@@ -115,7 +115,7 @@ test.describe.serial("production acceptance", () => {
     await page.goto("/expressions");
     await expect(page.getByRole("heading", { name: "Expressions" })).toBeVisible();
     await expect(page.getByText("1–24 of 1621")).toBeVisible();
-    await page.getByLabel("Search").fill("legally binding");
+    await page.getByRole("textbox", { name: "Search", exact: true }).fill("legally binding");
     await expect(page.getByRole("heading", { name: "legally binding" })).toBeVisible();
     await expect(page.getByText("1–1 of 1")).toBeVisible();
 
