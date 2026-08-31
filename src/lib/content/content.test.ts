@@ -23,8 +23,8 @@ describe("learning content pipeline", () => {
   it("recognizes completed grammar enrichment batches and audits the whole catalogue", () => {
     expect(grammarTopics).toHaveLength(138);
     expect(grammarTopics.filter((topic) => topic.level === "A1").flatMap(grammarLessonIssues)).toEqual([]);
-    expect(grammarTopics.filter((topic) => topic.level === "A2").slice(0, 12).flatMap(grammarLessonIssues)).toEqual([]);
-    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(36);
+    expect(grammarTopics.filter((topic) => topic.level === "A2").flatMap(grammarLessonIssues)).toEqual([]);
+    expect(auditGrammarLessons(grammarTopics).productionReady).toBe(48);
   });
 
   it("reports duplicate IDs, self-relations, broken prerequisites, and ambiguous choices", () => {
