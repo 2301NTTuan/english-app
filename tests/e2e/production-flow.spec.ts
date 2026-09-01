@@ -46,9 +46,9 @@ async function register(page: Page, user: typeof userA, checkPasswordFeedback = 
   await page.getByLabel("Confirm password").fill(user.password);
   await expect(page.getByText("Passwords match")).toBeVisible();
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Account created" })).toBeVisible();
   await expect(page.getByText(user.email, { exact: true })).toBeVisible();
-  await expect(page.getByText(/account was created, but we could not send the verification email/i)).toBeVisible();
+  await expect(page.getByText(/account was created, but we couldn't send the verification email/i)).toBeVisible();
   const verificationToken = await installOneTimeToken(user.email, "email_verification_tokens");
   const verificationUrl = `/verify-email?token=${verificationToken}`;
   expect((await page.context().cookies()).some((cookie) => cookie.name === "english_mastery_session")).toBe(false);

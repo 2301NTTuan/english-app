@@ -38,7 +38,8 @@ export interface RegisterApiPayload {
   fieldErrors?: RegisterFieldErrors;
   email?: string;
   verificationRequired?: boolean;
-  deliveryStatus?: "sent" | "failed";
+  verificationEmailSent?: boolean;
+  deliveryStatus?: "sent" | "failed" | "development";
   developmentVerificationUrl?: string;
 }
 
@@ -65,7 +66,7 @@ export function registerErrorMessage(code: RegisterErrorCode, retryAfter?: numbe
     case "RATE_LIMITED": return retryAfter && retryAfter > 0
       ? `Too many sign-up attempts. Please wait ${retryAfter} seconds and try again.`
       : "Too many sign-up attempts. Please wait a moment and try again.";
-    case "VERIFICATION_DELIVERY_FAILED": return "Your account was created, but we could not send the verification email. Use Resend verification to try again.";
+    case "VERIFICATION_DELIVERY_FAILED": return "Your account was created, but we couldn't send the verification email. Use Resend verification to try again.";
     case "SERVICE_UNAVAILABLE": return "Sign up is temporarily unavailable. Please try again later.";
   }
 }

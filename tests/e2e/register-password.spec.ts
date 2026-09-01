@@ -19,7 +19,7 @@ test("checks sign-up passwords in real time without sending confirmation", async
       body: JSON.stringify({
         ok: true,
         email: "password-ux@test.invalid",
-        message: "Check your email to continue.",
+        verificationEmailSent: true,
         deliveryStatus: "sent",
       }),
     });
@@ -157,6 +157,7 @@ test("shows an accurate recoverable state when verification delivery fails", asy
       ok: true,
       code: "VERIFICATION_DELIVERY_FAILED",
       verificationRequired: true,
+      verificationEmailSent: false,
       email: "delivery-failed@example.test",
       deliveryStatus: "failed",
     }),
@@ -164,11 +165,35 @@ test("shows an accurate recoverable state when verification delivery fails", asy
   await page.goto("/register");
   await fillValidRegistration(page, " Delivery-Failed@Example.Test ");
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Account created" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Check your email" })).toHaveCount(0);
   await expect(page.getByText("delivery-failed@example.test", { exact: true })).toBeVisible();
-  await expect(page.getByText(/account was created, but we could not send the verification email/i)).toBeVisible();
+  await expect(page.getByText(/account was created, but we couldn't send the verification email/i)).toBeVisible();
   await expect(page.getByRole("button", { name: "Resend verification email" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Back to sign in" })).toBeVisible();
+});
+
+test("shows a development-only verification path without claiming email delivery", async ({ page }) => {
+  await page.route("**/api/auth/register", (route) => route.fulfill({
+    status: 201,
+    contentType: "application/json",
+    body: JSON.stringify({
+      ok: true,
+      code: "VERIFICATION_DELIVERY_FAILED",
+      verificationRequired: true,
+      verificationEmailSent: false,
+      email: "local-verification@example.test",
+      deliveryStatus: "development",
+      developmentVerificationUrl: "/verify-email?token=development-token",
+    }),
+  }));
+  await page.goto("/register");
+  await fillValidRegistration(page, "local-verification@example.test");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByRole("heading", { name: "Verify locally" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Check your email" })).toHaveCount(0);
+  await expect(page.getByText(/Email delivery is in development mode/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open local verification link" })).toBeVisible();
 });
 
 test("prevents simultaneous registration submissions", async ({ page }) => {
@@ -181,7 +206,7 @@ test("prevents simultaneous registration submissions", async ({ page }) => {
     await route.fulfill({
       status: 201,
       contentType: "application/json",
-      body: JSON.stringify({ ok: true, verificationRequired: true, email: "double-submit@test.invalid", deliveryStatus: "sent" }),
+      body: JSON.stringify({ ok: true, verificationRequired: true, verificationEmailSent: true, email: "double-submit@test.invalid", deliveryStatus: "sent" }),
     });
   });
   await page.goto("/register");

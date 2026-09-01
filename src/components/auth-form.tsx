@@ -18,7 +18,7 @@ import {
 interface VerificationState {
   email: string;
   message: string;
-  deliveryStatus: "sent" | "failed" | "unknown";
+  deliveryStatus: "sent" | "failed" | "development" | "unknown";
   developmentVerificationUrl?: string;
 }
 
@@ -124,11 +124,15 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       }
       if (registering) {
         const normalizedEmail = payload.email ?? email.trim().toLowerCase();
-        const deliveryFailed = payload.code === "VERIFICATION_DELIVERY_FAILED" || payload.deliveryStatus === "failed";
+        const developmentDelivery = payload.deliveryStatus === "development";
+        const deliverySent = payload.verificationEmailSent === true || payload.deliveryStatus === "sent";
+        const deliveryFailed = !developmentDelivery && !deliverySent;
         setVerification({
           email: normalizedEmail,
-          message: deliveryFailed ? registerErrorMessage("VERIFICATION_DELIVERY_FAILED") : `We've sent a verification link to ${normalizedEmail}.`,
-          deliveryStatus: deliveryFailed ? "failed" : "sent",
+          message: developmentDelivery
+            ? "Email delivery is in development mode. Use the local verification link below."
+            : deliveryFailed ? registerErrorMessage("VERIFICATION_DELIVERY_FAILED") : `We've sent a verification link to ${normalizedEmail}.`,
+          deliveryStatus: developmentDelivery ? "development" : deliveryFailed ? "failed" : "sent",
           developmentVerificationUrl: payload.developmentVerificationUrl,
         });
         setPassword("");
@@ -165,13 +169,15 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   }
 
   if (verification) {
+    const deliveryFailed = verification.deliveryStatus === "failed";
+    const developmentDelivery = verification.deliveryStatus === "development";
     return <AuthScaffold><div className="text-center">
       <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[var(--brand-soft)] text-[var(--brand-ink)]"><MailCheck aria-hidden="true"/></span>
       <div className="eyebrow mt-5">Email verification</div>
-      <h1 className="mt-2 text-3xl font-[860] tracking-[-.035em] text-[var(--ink-strong)]">Check your email</h1>
+      <h1 className="mt-2 text-3xl font-[860] tracking-[-.035em] text-[var(--ink-strong)]">{deliveryFailed ? "Account created" : developmentDelivery ? "Verify locally" : "Check your email"}</h1>
       <p className="muted mt-3 text-sm leading-relaxed">{verification.message}</p>
       <p className="mt-2 break-all text-sm font-bold text-[var(--ink)]">{verification.email}</p>
-      {verification.deliveryStatus === "failed" && <p role="status" className="feedback feedback-warning mt-5 text-left text-sm">No message was sent during registration. Use Resend verification after checking your email configuration.</p>}
+      {deliveryFailed && <p role="status" className="feedback feedback-warning mt-5 text-left text-sm">No message was sent during registration. Use Resend verification after checking your email configuration.</p>}
       <div className="mt-6 space-y-3">
         {verification.developmentVerificationUrl && <Link className="btn-primary w-full" href={verification.developmentVerificationUrl}>Open local verification link</Link>}
         <button type="button" disabled={resendPending} className="btn-secondary w-full disabled:opacity-60" onClick={() => void resendVerification(verification.email)}>{resendPending ? "Requesting…" : "Resend verification email"}</button>

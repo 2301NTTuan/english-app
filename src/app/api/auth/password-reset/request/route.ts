@@ -3,7 +3,7 @@ import { z } from "zod";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { issuePasswordReset } from "@/lib/auth/recovery";
-import { sendPasswordResetEmail } from "@/lib/email/delivery";
+import { emailDeliveryLogMetadata, sendPasswordResetEmail } from "@/lib/email/delivery";
 import { logEvent } from "@/lib/observability/logger";
 
 const requestSchema = z.object({ email: z.string().trim().email().max(254) });
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     let developmentResetUrl: string | undefined;
     if (token) {
       try { developmentResetUrl = (await sendPasswordResetEmail(parsed.data.email, token, request.url)).developmentUrl; }
-      catch { logEvent("error", "email.password_reset_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
+      catch (error) { logEvent("error", "email.password_reset_delivery_failed", { requestId: request.headers.get("x-request-id"), ...emailDeliveryLogMetadata(error) }); }
     }
     return NextResponse.json({ ok: true, message: genericMessage, ...(developmentResetUrl ? { developmentResetUrl } : {}) });
   } catch (error) {

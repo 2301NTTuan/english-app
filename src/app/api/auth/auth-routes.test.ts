@@ -3,22 +3,28 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/auth/rate-limit", () => ({
   consumeRateLimit: vi.fn(async () => ({ allowed: true, retryAfter: 0 })),
   rateLimitKey: vi.fn(() => "test-rate-key"),
+  rateLimitSubjectKey: vi.fn(() => "test-subject-key"),
 }));
-vi.mock("@/lib/auth/account", () => ({ registerAccount: vi.fn(), verifyCredentials: vi.fn() }));
+vi.mock("@/lib/auth/account", () => ({ registerAccount: vi.fn(), verifyCredentials: vi.fn(), prepareVerificationResend: vi.fn() }));
 vi.mock("@/lib/auth/server", () => ({ createDatabaseSession: vi.fn() }));
-vi.mock("@/lib/email/delivery", () => ({ sendVerificationEmail: vi.fn() }));
+vi.mock("@/lib/email/delivery", () => ({
+  sendVerificationEmail: vi.fn(),
+  emailDeliveryLogMetadata: vi.fn(() => ({ failureReason: "provider_rejected", provider: "resend", providerStatus: 403 })),
+}));
 vi.mock("@/db/client", () => ({ getDb: vi.fn(() => ({ insert: vi.fn(() => ({ values: vi.fn(async () => undefined) })) })) }));
 vi.mock("@/lib/observability/logger", () => ({ logEvent: vi.fn() }));
 
-import { registerAccount, verifyCredentials } from "@/lib/auth/account";
+import { prepareVerificationResend, registerAccount, verifyCredentials } from "@/lib/auth/account";
 import { createDatabaseSession } from "@/lib/auth/server";
 import { sendVerificationEmail } from "@/lib/email/delivery";
 import { consumeRateLimit } from "@/lib/auth/rate-limit";
 import { logEvent } from "@/lib/observability/logger";
 import { POST as register } from "./register/route";
 import { POST as login } from "./login/route";
+import { POST as resendVerification } from "./email-verification/request/route";
 
 const registerAccountMock = vi.mocked(registerAccount);
+const prepareVerificationResendMock = vi.mocked(prepareVerificationResend);
 const verifyCredentialsMock = vi.mocked(verifyCredentials);
 const createDatabaseSessionMock = vi.mocked(createDatabaseSession);
 const sendVerificationEmailMock = vi.mocked(sendVerificationEmail);
@@ -32,6 +38,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   consumeRateLimitMock.mockResolvedValue({ allowed: true, retryAfter: 0 });
   registerAccountMock.mockResolvedValue({ userId: "user-1", email: "learner@example.test", verificationToken: "secret-verification-token" });
+  prepareVerificationResendMock.mockResolvedValue({ email: "learner@example.test", token: "secret-resend-token" });
   sendVerificationEmailMock.mockResolvedValue({ status: "delivered" });
 });
 
@@ -45,6 +52,7 @@ describe("registration route", () => {
     expect(await response.json()).toEqual({
       ok: true,
       verificationRequired: true,
+      verificationEmailSent: true,
       email: "learner@example.test",
       deliveryStatus: "sent",
     });
@@ -54,8 +62,29 @@ describe("registration route", () => {
     sendVerificationEmailMock.mockResolvedValue({ status: "disabled" });
     const response = await register(request("/api/auth/register", body));
     expect(response.status).toBe(201);
-    expect(await response.json()).toMatchObject({ ok: true, code: "VERIFICATION_DELIVERY_FAILED", verificationRequired: true, deliveryStatus: "failed" });
+    expect(await response.json()).toMatchObject({ ok: true, code: "VERIFICATION_DELIVERY_FAILED", verificationRequired: true, verificationEmailSent: false, deliveryStatus: "failed" });
     expect(registerAccountMock).toHaveBeenCalledOnce();
+  });
+
+  it("reports provider rejection safely after account creation", async () => {
+    sendVerificationEmailMock.mockRejectedValue(new Error("re_secret_key secret-verification-token provider detail"));
+    const response = await register(request("/api/auth/register", body));
+    expect(response.status).toBe(201);
+    const payload = await response.json();
+    expect(payload).toMatchObject({ code: "VERIFICATION_DELIVERY_FAILED", verificationEmailSent: false, deliveryStatus: "failed" });
+    expect(JSON.stringify(payload)).not.toMatch(/re_secret_key|secret-verification-token|provider detail/);
+    expect(JSON.stringify(vi.mocked(logEvent).mock.calls)).not.toMatch(/re_secret_key|secret-verification-token|provider detail/);
+  });
+
+  it("reports development verification without claiming an email was sent", async () => {
+    sendVerificationEmailMock.mockResolvedValue({ status: "development", developmentUrl: "https://app.test/verify-email?token=local-token" });
+    const response = await register(request("/api/auth/register", body));
+    expect(await response.json()).toMatchObject({
+      code: "VERIFICATION_DELIVERY_FAILED",
+      verificationEmailSent: false,
+      deliveryStatus: "development",
+      developmentVerificationUrl: "https://app.test/verify-email?token=local-token",
+    });
   });
 
   it("retains server-side password enforcement when client validation is bypassed", async () => {
@@ -120,6 +149,36 @@ describe("registration route", () => {
     const payload = await databaseFailure.json();
     expect(payload).toEqual({ error: "Sign up is temporarily unavailable. Please try again later.", code: "SERVICE_UNAVAILABLE" });
     expect(JSON.stringify(payload)).not.toContain("raw database error");
+  });
+});
+
+describe("verification resend route", () => {
+  const generic = { ok: true, message: "If an unverified account exists for that email, we'll send a new verification link." };
+
+  it("uses the same delivery adapter for an unverified account", async () => {
+    const response = await resendVerification(request("/api/auth/email-verification/request", { email: " Learner@Example.test " }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(generic);
+    expect(prepareVerificationResendMock).toHaveBeenCalledWith("learner@example.test");
+    expect(sendVerificationEmailMock).toHaveBeenCalledWith("learner@example.test", "secret-resend-token", "https://app.test/api/auth/email-verification/request");
+  });
+
+  it("logs safe provider failure while preserving the enumeration-safe response", async () => {
+    sendVerificationEmailMock.mockRejectedValue(new Error("re_secret_key secret-resend-token provider detail"));
+    const response = await resendVerification(request("/api/auth/email-verification/request", { email: "learner@example.test" }));
+    const payload = await response.json();
+    expect(response.status).toBe(200);
+    expect(payload).toEqual(generic);
+    expect(JSON.stringify(payload)).not.toMatch(/re_secret_key|secret-resend-token|provider detail/);
+    expect(JSON.stringify(vi.mocked(logEvent).mock.calls)).not.toMatch(/re_secret_key|secret-resend-token|provider detail/);
+    expect(vi.mocked(logEvent)).toHaveBeenCalledWith("error", "email.verification_resend_failed", expect.objectContaining({ failureReason: "provider_rejected", providerStatus: 403 }));
+  });
+
+  it("does not reveal whether the requested account exists", async () => {
+    prepareVerificationResendMock.mockResolvedValue(null);
+    const response = await resendVerification(request("/api/auth/email-verification/request", { email: "unknown@example.test" }));
+    expect(await response.json()).toEqual(generic);
+    expect(sendVerificationEmailMock).not.toHaveBeenCalled();
   });
 });
 

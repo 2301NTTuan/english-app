@@ -4,7 +4,7 @@ import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { logEvent } from "@/lib/observability/logger";
 import { registerAccount } from "@/lib/auth/account";
-import { sendVerificationEmail } from "@/lib/email/delivery";
+import { emailDeliveryLogMetadata, sendVerificationEmail } from "@/lib/email/delivery";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403, undefined, { code: "VALIDATION_ERROR" });
@@ -24,14 +24,25 @@ export async function POST(request: Request) {
     }
     const account = await registerAccount(parsed.data);
     let developmentVerificationUrl: string | undefined;
-    let deliveryStatus: "sent" | "failed" = "failed";
+    let deliveryStatus: "sent" | "failed" | "development" = "failed";
     try {
       const result = await sendVerificationEmail(account.email, account.verificationToken, request.url);
       developmentVerificationUrl = result.developmentUrl;
-      deliveryStatus = result.status === "disabled" ? "failed" : "sent";
-    } catch { logEvent("error", "email.verification_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
+      deliveryStatus = result.status === "delivered" ? "sent" : result.status === "development" ? "development" : "failed";
+      if (result.status === "disabled") logEvent("warn", "email.verification_delivery_disabled", { requestId: request.headers.get("x-request-id"), provider: "disabled" });
+    } catch (error) {
+      logEvent("error", "email.verification_delivery_failed", { requestId: request.headers.get("x-request-id"), ...emailDeliveryLogMetadata(error) });
+    }
     const code = deliveryStatus === "sent" ? undefined : "VERIFICATION_DELIVERY_FAILED";
-    return NextResponse.json({ ok: true, verificationRequired: true, email: account.email, deliveryStatus, ...(code ? { code } : {}), ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}) }, { status: 201 });
+    return NextResponse.json({
+      ok: true,
+      verificationRequired: true,
+      verificationEmailSent: deliveryStatus === "sent",
+      email: account.email,
+      deliveryStatus,
+      ...(code ? { code } : {}),
+      ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}),
+    }, { status: 201 });
   } catch (error) {
     const bodyError = bodyErrorResponse(error, "VALIDATION_ERROR"); if (bodyError) return bodyError;
     if (isEmailUniqueViolation(error)) {

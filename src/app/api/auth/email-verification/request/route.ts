@@ -3,7 +3,7 @@ import { prepareVerificationResend } from "@/lib/auth/account";
 import { normalizeEmail } from "@/lib/auth/password";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { consumeRateLimit, rateLimitKey, rateLimitSubjectKey } from "@/lib/auth/rate-limit";
-import { sendVerificationEmail } from "@/lib/email/delivery";
+import { emailDeliveryLogMetadata, sendVerificationEmail } from "@/lib/email/delivery";
 import { logEvent } from "@/lib/observability/logger";
 
 const schema = z.object({ email: z.string().trim().email().max(254) });
@@ -24,8 +24,13 @@ export async function POST(request: Request) {
     const candidate = await prepareVerificationResend(email);
     let developmentVerificationUrl: string | undefined;
     if (candidate) {
-      try { developmentVerificationUrl = (await sendVerificationEmail(candidate.email, candidate.token, request.url)).developmentUrl; }
-      catch { logEvent("error", "email.verification_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
+      try {
+        const delivery = await sendVerificationEmail(candidate.email, candidate.token, request.url);
+        developmentVerificationUrl = delivery.developmentUrl;
+        if (delivery.status === "disabled") logEvent("warn", "email.verification_resend_disabled", { requestId: request.headers.get("x-request-id"), provider: "disabled" });
+      } catch (error) {
+        logEvent("error", "email.verification_resend_failed", { requestId: request.headers.get("x-request-id"), ...emailDeliveryLogMetadata(error) });
+      }
     }
     return Response.json({ ok: true, message: genericMessage, ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}) });
   } catch (error) {
