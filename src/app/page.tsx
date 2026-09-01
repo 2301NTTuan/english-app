@@ -106,7 +106,7 @@ export default function Dashboard() {
           ["Vocabulary recognition", dimensions.recognition, "var(--brand)"],
           ["Vocabulary recall", dimensions.recall, "var(--warning)"],
           ["Grammar", dimensions.grammar, "var(--info)"],
-          ["Context use", dimensions.context, "#a566d1"],
+          ["Context use", dimensions.context, "var(--accent)"],
         ].map(([label, value, color]) => <div key={String(label)}>
           <div className="mb-1.5 flex justify-between text-sm"><b>{label}</b><span className="muted">{value}%</span></div>
           <ProgressBar value={Number(value)} label={String(label)} color={String(color)}/>

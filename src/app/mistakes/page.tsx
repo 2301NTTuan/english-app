@@ -4,18 +4,40 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, History } from "lucide-react";
 import { useAppState } from "@/components/app-provider";
-import { PageHeader } from "@/components/ui";
+import { Badge, EmptyState, ErrorState, PageHeader } from "@/components/ui";
 
 export default function MistakesPage() {
-  const { state, setState } = useAppState(); const [pending, setPending] = useState(""); const [error, setError] = useState("");
+  const { state, setState } = useAppState();
+  const [pending, setPending] = useState("");
+  const [error, setError] = useState("");
   const sorted = state.mistakes.filter((item) => !item.resolved).sort((a, b) => b.repeatedCount - a.repeatedCount);
+
   async function resolve(mistakeId: string) {
-    setPending(mistakeId); setError("");
+    setPending(mistakeId);
+    setError("");
     try {
       const response = await fetch("/api/mistakes/resolve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mistakeId }) });
       if (!response.ok) throw new Error();
       setState((current) => ({ ...current, mistakes: current.mistakes.map((mistake) => mistake.id === mistakeId ? { ...mistake, resolved: true } : mistake) }));
-    } catch { setError("The mistake could not be resolved. Your progress was not changed."); } finally { setPending(""); }
+    } catch {
+      setError("The mistake could not be resolved. Your progress was not changed.");
+    } finally {
+      setPending("");
+    }
   }
-  return <><PageHeader eyebrow="Turn errors into memory" title="Mistake bank" description="Wrong answers are grouped and returned to future sessions until the underlying knowledge becomes reliable." action={<Link href="/learn" className="btn-primary">Practice mistakes <ArrowRight size={17}/></Link>}/>{error && <p role="alert" className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-900">{error}</p>}<section className="card overflow-hidden"><div className="border-b border-[#e2eae6] p-5"><div className="flex items-center justify-between"><h2 className="font-extrabold">Frequent mistakes</h2><span className="badge">{sorted.length} patterns</span></div></div><div className="divide-y divide-[#e2eae6]">{sorted.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"><div><b className="text-sm">{item.label}</b><div className="muted mt-1 text-xs"><span className="capitalize">{item.knowledgeType}</span> · {item.exerciseType.replaceAll("-", " ")} · last seen {new Date(item.timestamp).toLocaleDateString()}</div></div><div className="text-sm"><span className="text-red-700 line-through">{item.wrongAnswer}</span><span className="mx-2">→</span><b className="text-emerald-700">{item.correctAnswer}</b></div><div className="flex w-fit items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-xs font-extrabold text-red-700"><History size={13}/>{item.repeatedCount}×</div><button disabled={pending === item.id} className="btn-secondary text-xs disabled:opacity-60" onClick={() => void resolve(item.id)} aria-label={`Mark ${item.label} resolved`}>{pending === item.id ? "Saving…" : "Resolve"}</button></div>)}{sorted.length === 0 && <div className="p-10 text-center"><b>No active mistakes</b><p className="muted mt-1 text-sm">Incorrect answers will appear here automatically.</p></div>}</div></section></>;
+
+  return <>
+    <PageHeader eyebrow="Turn errors into memory" title="Mistake bank" description="Wrong answers are grouped and returned to future sessions until the underlying knowledge becomes reliable." action={<Link href="/learn" className="btn-primary">Practice mistakes <ArrowRight size={17} aria-hidden="true"/></Link>}/>
+    {error && <div className="mb-4"><ErrorState description={error}/></div>}
+    <section className="card overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[var(--line)] bg-[var(--surface-muted)] p-5"><div><h2 className="font-[820] text-[var(--ink-strong)]">Frequent mistakes</h2><p className="muted mt-1 text-xs">Most repeated patterns appear first.</p></div><Badge tone={sorted.length ? "danger" : "success"}>{sorted.length} patterns</Badge></div>
+      <div className="divide-y divide-[var(--line)]">{sorted.map((item) => <div key={item.id} className="grid gap-3 p-4 transition-colors hover:bg-[var(--surface-hover)] sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] sm:items-center sm:px-5">
+        <div><b className="text-sm text-[var(--ink-strong)]">{item.label}</b><div className="muted mt-1 text-xs"><span className="capitalize">{item.knowledgeType}</span> · {item.exerciseType.replaceAll("-", " ")} · last seen {new Date(item.timestamp).toLocaleDateString()}</div></div>
+        <div className="rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm"><span className="text-[var(--danger)] line-through">{item.wrongAnswer}</span><span className="mx-2">→</span><b className="text-[var(--success)]">{item.correctAnswer}</b></div>
+        <Badge tone="danger" className="w-fit"><History size={13} aria-hidden="true"/>{item.repeatedCount}×</Badge>
+        <button disabled={pending === item.id} className="btn-secondary text-xs disabled:opacity-60" onClick={() => void resolve(item.id)} aria-label={`Mark ${item.label} resolved`}>{pending === item.id ? "Saving…" : "Resolve"}</button>
+      </div>)}</div>
+      {sorted.length === 0 && <div className="p-4"><EmptyState title="No active mistakes" description="Incorrect answers will appear here automatically and return to future study sessions."/></div>}
+    </section>
+  </>;
 }

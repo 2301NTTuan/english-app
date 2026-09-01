@@ -26,6 +26,7 @@
   --danger-soft: #fff0f2;
   --info: #2d6fc2;
   --info-soft: #edf5ff;
+  --accent: #a566d1;
   --shadow-sm: 0 1px 2px rgb(20 25 45 / .05), 0 4px 14px rgb(20 25 45 / .035);
   --shadow-md: 0 16px 45px rgb(33 38 70 / .09);
   --shadow-lg: 0 28px 80px rgb(33 38 70 / .14);
@@ -66,6 +67,7 @@ html[data-theme="dark"] {
   --danger-soft: #48232b;
   --info: #7eb8ff;
   --info-soft: #1e324d;
+  --accent: #d59aff;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / .2), 0 5px 18px rgb(0 0 0 / .14);
   --shadow-md: 0 18px 50px rgb(0 0 0 / .28);
   --shadow-lg: 0 30px 90px rgb(0 0 0 / .38);
