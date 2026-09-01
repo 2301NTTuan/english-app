@@ -144,7 +144,7 @@ export function playVocabularyPronunciation(word: string, locale: PronunciationL
   }
 }
 
-export function VocabularyPronunciation({ word }: { word: string }) {
+export function VocabularyPronunciation({ word, compact = false }: { word: string; compact?: boolean }) {
   const statusId = useId();
   const [support, setSupport] = useState<"checking" | "loading" | "ready" | "unsupported">("checking");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -225,7 +225,7 @@ export function VocabularyPronunciation({ word }: { word: string }) {
     if (result.status !== "spoken") releaseRequest();
   };
 
-  return <div className="mt-3">
+  return <div className={compact ? "" : "mt-3"}>
     <div className="flex flex-wrap gap-2" aria-label={`Pronunciation of ${word}`}>
       {(["en-GB", "en-US"] as PronunciationLocale[]).map((locale) => {
         const label = localeLabel[locale];
@@ -233,7 +233,7 @@ export function VocabularyPronunciation({ word }: { word: string }) {
         return <button
           key={locale}
           type="button"
-          className="btn-secondary min-h-11 gap-1.5 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          className={`btn-secondary gap-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 ${compact ? "min-h-9 px-2.5 py-1" : "min-h-11 px-3"}`}
           aria-label={`Play ${label.accent} pronunciation of ${word}`}
           aria-describedby={statusMessage ? statusId : undefined}
           title={support === "ready" && !voiceByLocale[locale] ? `${label.button} voice is not available on this device.` : undefined}

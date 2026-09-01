@@ -1,15 +1,15 @@
 # UI redesign progress
 
 STATUS: IN_PROGRESS
-CURRENT PHASE: Phase 3 — Dashboard
-LAST COMPLETED: Built the semantic light/dark design system, reusable UI primitives, persisted theme toggle, grouped desktop navigation, responsive mobile header, and five-action bottom navigation.
-NEXT ACTION: Redesign the dashboard around a clear daily goal, primary study action, progress hierarchy, and responsive supporting insights.
+CURRENT PHASE: Phase 5 — Study + review
+LAST COMPLETED: Reframed the dashboard around the daily goal and primary session CTA; rebuilt Vocabulary as a paginated scan list with quick UK/US audio and a responsive selected-word detail panel.
+NEXT ACTION: Redesign the session player and review queue with focused practice layouts, clear progress, keyboard-friendly answers, and strong feedback states.
 
 COMPLETED:
 - [x] Design system
 - [x] App shell
-- [ ] Dashboard
-- [ ] Vocabulary
+- [x] Dashboard
+- [x] Vocabulary
 - [ ] Study session
 - [ ] Grammar
 - [ ] Expressions
@@ -21,5 +21,5 @@ COMPLETED:
 - [ ] Accessibility
 - [ ] Final visual QA
 
-LAST VALIDATION: `npm run lint` PASS; `npm run typecheck` PASS after phases 1–2.
-LAST CHECKPOINT COMMIT: Phase 1–2 checkpoint — `Build premium design system and app shell`.
+LAST VALIDATION: `npm run lint` PASS; `npm run typecheck` PASS after phases 3–4.
+LAST CHECKPOINT COMMIT: Phase 3–4 checkpoint — `Redesign dashboard and vocabulary experience`.
