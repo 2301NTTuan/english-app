@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, isNotNull } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { getDb } from "@/db/client";
 import { authSessions, users } from "@/db/schema";
@@ -15,10 +15,17 @@ export async function createDatabaseSession(userId: string) {
 
 export async function currentUser(): Promise<AuthenticatedUser | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!token) return null;
+  return token ? verifiedUserForSessionToken(token) : null;
+}
+
+export async function verifiedUserForSessionToken(token: string): Promise<AuthenticatedUser | null> {
   const [row] = await getDb().select({ id: users.id, name: users.name, email: users.email })
     .from(authSessions).innerJoin(users, eq(authSessions.userId, users.id))
-    .where(and(eq(authSessions.tokenHash, hashSessionToken(token)), gt(authSessions.expiresAt, new Date()))).limit(1);
+    .where(and(
+      eq(authSessions.tokenHash, hashSessionToken(token)),
+      gt(authSessions.expiresAt, new Date()),
+      isNotNull(users.emailVerifiedAt),
+    )).limit(1);
   return row ?? null;
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import type { AppState } from "@/types/domain";
 import { createEmptyAccountState, localAppRepository } from "@/lib/storage/app-repository";
 import { loadRemoteState, saveRemoteState } from "@/lib/storage/remote-app-repository";
@@ -8,13 +9,20 @@ import { loadRemoteState, saveRemoteState } from "@/lib/storage/remote-app-repos
 type SyncStatus = "loading" | "synced" | "saving" | "offline" | "local";
 interface AppContextValue { state: AppState; setState: React.Dispatch<React.SetStateAction<AppState>>; hydrated: boolean; syncStatus: SyncStatus }
 const AppContext = createContext<AppContextValue | null>(null);
+const publicPaths = new Set(["/login", "/register", "/forgot-password", "/reset-password", "/verify-email", "/privacy", "/terms", "/attribution"]);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const publicPage = publicPaths.has(usePathname());
   const [state, setState] = useState<AppState>(createEmptyAccountState);
   const [hydrated, setHydrated] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("loading");
   const remote = useRef(false); const skipFirstSave = useRef(true);
   useEffect(() => {
+    if (publicPage) {
+      remote.current = false;
+      return;
+    }
+    skipFirstSave.current = true;
     const controller = new AbortController();
     void loadRemoteState(controller.signal).then((result) => {
       remote.current = result.authenticated;
@@ -22,7 +30,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSyncStatus(result.authenticated ? "synced" : "local"); setHydrated(true);
     }).catch(() => { setState(localAppRepository.load()); setSyncStatus("offline"); setHydrated(true); });
     return () => controller.abort();
-  }, []);
+  }, [publicPage]);
   useEffect(() => {
     if (!hydrated) return;
     if (skipFirstSave.current) { skipFirstSave.current = false; return; }

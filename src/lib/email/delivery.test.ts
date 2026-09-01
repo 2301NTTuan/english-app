@@ -14,6 +14,15 @@ describe("outbound email delivery", () => {
     expect(verification).toEqual({ status: "development", developmentUrl: "http://localhost:3000/verify-email?token=verification-token-value" });
   });
 
+  it("uses the trusted application base URL instead of request headers", async () => {
+    vi.stubEnv("NODE_ENV", "test"); vi.stubEnv("EMAIL_DELIVERY_PROVIDER", "development"); vi.stubEnv("APP_BASE_URL", "https://learn.example.test/base");
+    const { sendVerificationEmail } = await import("./delivery");
+    await expect(sendVerificationEmail("learner@example.test", "secret-token", "https://attacker.example/request")).resolves.toEqual({
+      status: "development",
+      developmentUrl: "https://learn.example.test/verify-email?token=secret-token",
+    });
+  });
+
   it("does not expose a link when delivery is disabled", async () => {
     vi.stubEnv("NODE_ENV", "production"); vi.stubEnv("EMAIL_DELIVERY_PROVIDER", "disabled"); vi.stubEnv("APP_BASE_URL", "");
     const { sendPasswordResetEmail } = await import("./delivery");
@@ -24,5 +33,13 @@ describe("outbound email delivery", () => {
     vi.stubEnv("NODE_ENV", "production"); vi.stubEnv("EMAIL_DELIVERY_PROVIDER", "development"); vi.stubEnv("APP_BASE_URL", "https://learn.example.test");
     const { sendVerificationEmail } = await import("./delivery");
     await expect(sendVerificationEmail("learner@example.test", "secret-token", "https://untrusted.test/request")).rejects.toThrow("forbidden in production");
+  });
+
+  it("requires trusted production URL and Resend credentials", async () => {
+    vi.stubEnv("NODE_ENV", "production"); vi.stubEnv("EMAIL_DELIVERY_PROVIDER", "resend"); vi.stubEnv("APP_BASE_URL", ""); vi.stubEnv("RESEND_API_KEY", ""); vi.stubEnv("EMAIL_FROM", "");
+    const { sendVerificationEmail } = await import("./delivery");
+    await expect(sendVerificationEmail("learner@example.test", "secret-token", "https://untrusted.test/request")).rejects.toThrow("APP_BASE_URL");
+    vi.stubEnv("APP_BASE_URL", "https://learn.example.test");
+    await expect(sendVerificationEmail("learner@example.test", "secret-token", "https://untrusted.test/request")).rejects.toThrow("RESEND_API_KEY and EMAIL_FROM");
   });
 });

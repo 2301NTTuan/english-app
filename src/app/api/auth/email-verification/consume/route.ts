@@ -13,8 +13,11 @@ export async function POST(request: Request) {
   try {
     const parsed = schema.safeParse(await readJson(request, 2_048));
     if (!parsed.success) return jsonError("This verification link is invalid or has expired.", 400);
-    if (!await consumeEmailVerification(parsed.data.token)) return jsonError("This verification link is invalid or has expired.", 400);
-    return Response.json({ ok: true });
+    const result = await consumeEmailVerification(parsed.data.token);
+    if (result === "invalid") return Response.json({ error: "This verification link is invalid.", code: "INVALID_TOKEN" }, { status: 400 });
+    if (result === "expired") return Response.json({ error: "This verification link has expired.", code: "EXPIRED_TOKEN" }, { status: 400 });
+    if (result === "already-verified") return Response.json({ ok: true, status: "already-verified" });
+    return Response.json({ ok: true, status: "verified" });
   } catch (error) {
     const bodyError = bodyErrorResponse(error); if (bodyError) return bodyError;
     logEvent("error", "auth.email_verification_unavailable", { requestId: request.headers.get("x-request-id") });

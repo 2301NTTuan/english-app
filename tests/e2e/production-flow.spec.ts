@@ -8,6 +8,7 @@ import type { AppState, SessionExercise } from "../../src/types/domain";
 const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const userA = { name: "Production Flow A", email: `flow-a-${nonce}@test.invalid`, password: "ProductionFlow1234" };
 const userB = { name: "Production Flow B", email: `flow-b-${nonce}@test.invalid`, password: "ProductionFlow5678" };
+const userC = { name: "Production Flow C", email: `flow-c-${nonce}@test.invalid`, password: "ProductionFlow9012" };
 
 function sessionAnswerMap(session: SessionExercise[]) {
   const answers = new Map<string, string>();
@@ -23,14 +24,64 @@ function sessionAnswerMap(session: SessionExercise[]) {
   return answers;
 }
 
-async function register(page: Page, user: typeof userA) {
+async function register(page: Page, user: typeof userA, checkPasswordFeedback = false) {
   await page.goto("/register");
+  if (checkPasswordFeedback) await expect(page.getByText(/Requirements and strength will update as you type/)).toBeVisible();
   await page.getByLabel("Name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
+  if (checkPasswordFeedback) {
+    let registerRequests = 0;
+    page.on("request", (request) => { if (request.url().endsWith("/api/auth/register") && request.method() === "POST") registerRequests += 1; });
+    await page.getByLabel("Password", { exact: true }).fill("ShortPass1");
+    await expect(page.getByText("At least 12 characters")).toBeVisible();
+    await expect(page.getByText("Weak", { exact: true })).toBeVisible();
+    await page.getByLabel("Confirm password").fill("DifferentPass1");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "Password requirement not met" })).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeFocused();
+    expect(registerRequests).toBe(0);
+  }
   await page.getByLabel("Password", { exact: true }).fill(user.password);
   await page.getByLabel("Confirm password").fill(user.password);
+  await expect(page.getByText("Passwords match")).toBeVisible();
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/placement$/);
+  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+  await expect(page.getByText(user.email, { exact: true })).toBeVisible();
+  await expect(page.getByText(/account was created, but we could not send the verification email/i)).toBeVisible();
+  const verificationToken = await installOneTimeToken(user.email, "email_verification_tokens");
+  const verificationUrl = `/verify-email?token=${verificationToken}`;
+  expect((await page.context().cookies()).some((cookie) => cookie.name === "english_mastery_session")).toBe(false);
+  expect(await page.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
+
+  if (checkPasswordFeedback) {
+    await page.goto("/login?next=/placement");
+    await page.getByLabel("Email").fill(user.email);
+    await page.getByLabel("Password", { exact: true }).fill(user.password);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+    await expect(page.getByText("Your email address hasn't been verified yet.")).toBeVisible();
+    expect((await page.context().cookies()).some((cookie) => cookie.name === "english_mastery_session")).toBe(false);
+  }
+
+  await page.goto("/placement");
+  await expect(page).toHaveURL(/\/login\?next=%2Fplacement$/);
+  await page.goto(verificationUrl);
+  await expect(page.getByText("Your email is verified.")).toBeVisible();
+  await page.getByRole("link", { name: "Continue to sign in" }).click();
+  await page.getByLabel("Email").fill(user.email);
+  await page.getByLabel("Password", { exact: true }).fill(user.password);
+  const loginResponse = page.waitForResponse((response) => response.url().endsWith("/api/auth/login") && response.request().method() === "POST");
+  const signedIn = page.waitForURL(/\/placement$/, { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Sign in" }).click();
+  expect((await loginResponse).status()).toBe(200);
+  await signedIn;
+  await page.waitForLoadState("networkidle");
+  expect((await page.context().cookies()).some((cookie) => cookie.name === "english_mastery_session")).toBe(true);
+  await expect.poll(async () => {
+    try { return await page.evaluate(async () => (await fetch("/api/auth/me")).status); }
+    catch { return 0; }
+  }).toBe(200);
 }
 
 async function deleteAccount(page: Page, password: string) {
@@ -61,13 +112,24 @@ async function installOneTimeToken(email: string, table: "email_verification_tok
 test.describe.serial("production acceptance", () => {
   test("persists the full placement, learning, mistake, review, and relogin flow", async ({ page }) => {
     const consoleErrors: string[] = []; const failedRequests: string[] = [];
-    await register(page, userA);
+    await register(page, userA, true);
+    const duplicateResults = await page.evaluate(async ({ exactEmail, caseVariant, password }) => {
+      const registerAgain = async (email: string) => {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Duplicate Attempt", email, password }),
+        });
+        return { status: response.status, body: await response.json() };
+      };
+      return [await registerAgain(exactEmail), await registerAgain(caseVariant)];
+    }, { exactEmail: userA.email, caseVariant: `  ${userA.email.toUpperCase()}  `, password: userA.password });
+    expect(duplicateResults).toEqual([
+      { status: 409, body: { error: "This email is already registered.", code: "EMAIL_ALREADY_REGISTERED" } },
+      { status: 409, body: { error: "This email is already registered.", code: "EMAIL_ALREADY_REGISTERED" } },
+    ]);
     page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
     page.on("requestfailed", (request) => failedRequests.push(`${request.failure()?.errorText ?? "failed"} ${request.url()}`));
-    const verificationToken = await installOneTimeToken(userA.email, "email_verification_tokens");
-    await page.goto(`/verify-email?token=${verificationToken}`);
-    await expect(page.getByText("Your email is verified.")).toBeVisible();
-    await page.getByRole("link", { name: "Continue to placement" }).click();
     await assertNoSeriousAccessibilityViolations(page);
 
     const firstQuestionResponse = page.waitForResponse((response) => response.url().includes("/api/placement/question") && response.request().method() === "POST");
@@ -185,7 +247,7 @@ test.describe.serial("production acceptance", () => {
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.getByLabel("Email").fill(userA.email);
-    await page.getByLabel("Password").fill(userA.password);
+    await page.getByLabel("Password", { exact: true }).fill(userA.password);
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/$/);
     const stateAfterLogin = await page.evaluate(async () => (await fetch("/api/state")).json());
@@ -195,10 +257,46 @@ test.describe.serial("production acceptance", () => {
   test("keeps user state server-scoped and rejects unsafe API requests", async ({ browser, page, request }) => {
     const anonymous = await request.get("/api/state");
     expect(anonymous.status()).toBe(401);
+    const loginHeaders = { Origin: "http://127.0.0.1:3100", "Content-Type": "application/json" };
+
+    const unverifiedRegistration = await request.post("/api/auth/register", { headers: loginHeaders, data: { ...userC, confirmation: userC.password } });
+    expect(unverifiedRegistration.status()).toBe(201);
+    expect((await unverifiedRegistration.json()).verificationRequired).toBe(true);
+    const staleToken = randomBytes(32).toString("base64url");
+    const staleSessionDatabase = new Client({ connectionString: process.env.DATABASE_URL }); await staleSessionDatabase.connect();
+    const contextC = await browser.newContext();
+    try {
+      const registered = await staleSessionDatabase.query<{ id: string }>("select id from users where email = $1", [userC.email]);
+      const userId = registered.rows[0]?.id; expect(userId).toBeTruthy();
+      await staleSessionDatabase.query("insert into auth_sessions (token_hash,user_id,expires_at) values ($1,$2,now() + interval '1 day')", [createHash("sha256").update(staleToken).digest("hex"), userId]);
+      await contextC.addCookies([{ name: "english_mastery_session", value: staleToken, url: "http://127.0.0.1:3100" }]);
+      const pageC = await contextC.newPage();
+      await pageC.goto("/placement");
+      await expect(pageC).toHaveURL(/\/login\?next=%2Fplacement$/);
+      expect((await contextC.cookies()).some((cookie) => cookie.name === "english_mastery_session")).toBe(false);
+      expect(await pageC.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
+      await staleSessionDatabase.query("delete from users where id = $1", [userId]);
+    } finally {
+      await contextC.close();
+      await staleSessionDatabase.end();
+    }
+
+    await page.goto("/verify-email?token=not-a-valid-verification-token-value");
+    await expect(page.getByText(/verification link is invalid/)).toBeVisible();
+
+    const resendBodies: Array<{ error?: string; message?: string }> = [];
+    for (const email of [userA.email, `unknown-${nonce}@test.invalid`, `unknown-${nonce}@test.invalid`, `unknown-${nonce}@test.invalid`]) {
+      const response = await request.post("/api/auth/email-verification/request", { headers: loginHeaders, data: { email } });
+      expect(response.status()).toBe(200);
+      resendBodies.push(await response.json());
+    }
+    expect(new Set(resendBodies.map((body) => body.message)).size).toBe(1);
+    const throttledResend = await request.post("/api/auth/email-verification/request", { headers: loginHeaders, data: { email: `unknown-${nonce}@test.invalid` } });
+    expect(throttledResend.status()).toBe(429);
 
     await page.goto("/login?next=//example.com/escape");
     await page.getByLabel("Email").fill(userA.email);
-    await page.getByLabel("Password").fill(userA.password);
+    await page.getByLabel("Password", { exact: true }).fill(userA.password);
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/127\.0\.0\.1:3100\/$/);
     const userAIdentity = await page.evaluate(async () => (await fetch("/api/auth/me")).json());
@@ -214,11 +312,12 @@ test.describe.serial("production acceptance", () => {
     expect(forged.body.state.activities).toEqual([]);
     expect(forged.body.state.placement).toBeUndefined();
 
-    const loginHeaders = { Origin: "http://127.0.0.1:3100", "Content-Type": "application/json" };
     const wrongCredentials = await request.post("/api/auth/login", { headers: loginHeaders, data: { email: userA.email, password: "WrongPassword1234" } });
     const unknownCredentials = await request.post("/api/auth/login", { headers: loginHeaders, data: { email: `unknown-${nonce}@test.invalid`, password: "WrongPassword1234" } });
     expect({ status: wrongCredentials.status(), body: await wrongCredentials.json() }).toEqual({ status: 401, body: { error: "Invalid email or password." } });
     expect({ status: unknownCredentials.status(), body: await unknownCredentials.json() }).toEqual({ status: 401, body: { error: "Invalid email or password." } });
+    const limiterDatabase = new Client({ connectionString: process.env.DATABASE_URL }); await limiterDatabase.connect();
+    try { await limiterDatabase.query("delete from auth_rate_limits where key_hash = $1", [createHash("sha256").update("login:untrusted-client").digest("hex")]); } finally { await limiterDatabase.end(); }
     const forgedSession = await request.get("/api/state", { headers: { Cookie: "english_mastery_session=forged-session-token" } });
     expect(forgedSession.status()).toBe(401);
 
@@ -226,12 +325,12 @@ test.describe.serial("production acceptance", () => {
     const database = new Client({ connectionString: process.env.DATABASE_URL }); await database.connect();
     try { await database.query("update auth_sessions set expires_at = now() - interval '1 minute' where user_id = $1", [userBIdentity.user.id]); } finally { await database.end(); }
     expect(await pageB.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
-    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password").fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
+    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password", { exact: true }).fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
     const liveSession = (await contextB.cookies()).find((cookie) => cookie.name === "english_mastery_session"); expect(liveSession).toBeTruthy();
     await pageB.evaluate(async () => { await fetch("/api/auth/logout", { method: "POST" }); });
     await contextB.addCookies([liveSession!]);
     expect(await pageB.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
-    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password").fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
+    await pageB.goto("/login"); await pageB.getByLabel("Email").fill(userB.email); await pageB.getByLabel("Password", { exact: true }).fill(userB.password); await pageB.getByRole("button", { name: "Sign in" }).click(); await expect(pageB).toHaveURL(/\/$/);
 
     const maliciousOrigin = await request.put("/api/state", {
       data: {},
@@ -252,17 +351,22 @@ test.describe.serial("production acceptance", () => {
     await page.goto("/forgot-password");
     await page.getByLabel("Email").fill(userA.email);
     await page.getByRole("button", { name: "Request reset" }).click();
-    await expect(page.getByRole("status")).toContainText("If an account matches that email");
-    const resetToken = await installOneTimeToken(userA.email, "password_reset_tokens");
+    await expect(page.getByRole("status")).toContainText("If an account exists for that email");
     const newPassword = "ProductionFlow9012";
+    const resetToken = await installOneTimeToken(userA.email, "password_reset_tokens");
     await page.goto(`/reset-password?token=${resetToken}`);
+    await expect(page.getByText(/Requirements and strength will update as you type/)).toBeVisible();
     await page.getByLabel("New password").fill(newPassword);
+    await expect(page.getByText(/Password meets the registration requirements/)).toBeVisible();
+    await page.getByLabel("Confirm password").fill("DifferentPass1234");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
     await page.getByLabel("Confirm password").fill(newPassword);
     await page.getByRole("button", { name: "Update password" }).click();
     await expect(page.getByText(/password has been updated/)).toBeVisible();
+    expect(await page.evaluate(async () => (await fetch("/api/state")).status)).toBe(401);
     await page.getByRole("link", { name: /Sign in with new password/ }).click();
     await page.getByLabel("Email").fill(userA.email);
-    await page.getByLabel("Password").fill(newPassword);
+    await page.getByLabel("Password", { exact: true }).fill(newPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/$/);
     await deleteAccount(page, newPassword);

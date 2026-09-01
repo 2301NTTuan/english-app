@@ -1,45 +1,44 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/db/client";
-import { auditLogs, authSessions, learningPreferences, users, userStateSnapshots } from "@/db/schema";
-import { createEmptyAccountState } from "@/lib/storage/app-repository";
-import { hashPassword, normalizeEmail, registrationSchema } from "@/lib/auth/password";
+import { isEmailUniqueViolation, registrationSchema, registerErrorMessage, type RegisterFieldErrors } from "@/lib/auth/registration";
 import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
-import { createSessionToken, hashSessionToken, SESSION_COOKIE, sessionCookieOptions, sessionExpiresAt } from "@/lib/auth/session";
 import { logEvent } from "@/lib/observability/logger";
-import { issueEmailVerification } from "@/lib/auth/recovery";
+import { registerAccount } from "@/lib/auth/account";
 import { sendVerificationEmail } from "@/lib/email/delivery";
 
 export async function POST(request: Request) {
-  if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
+  if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403, undefined, { code: "VALIDATION_ERROR" });
   const limit = await consumeRateLimit(rateLimitKey(request, "register"), 5);
-  if (!limit.allowed) return jsonError("Too many attempts. Try again later.", 429, { "Retry-After": String(limit.retryAfter) });
+  if (limit.unavailable) return jsonError(registerErrorMessage("SERVICE_UNAVAILABLE"), 503, undefined, { code: "SERVICE_UNAVAILABLE" });
+  if (!limit.allowed) return jsonError(registerErrorMessage("RATE_LIMITED"), 429, { "Retry-After": String(limit.retryAfter) }, { code: "RATE_LIMITED" });
   try {
     const parsed = registrationSchema.safeParse(await readJson(request, 16_384));
-    if (!parsed.success) return jsonError(parsed.error.issues[0]?.message ?? "Invalid registration details.", 400);
-    const email = normalizeEmail(parsed.data.email);
-    const passwordHash = await hashPassword(parsed.data.password);
-    const token = createSessionToken();
-    const userId = await getDb().transaction(async (tx) => {
-      const [user] = await tx.insert(users).values({ name: parsed.data.name, email, passwordHash }).returning({ id: users.id });
-      await tx.insert(learningPreferences).values({ userId: user.id });
-      await tx.insert(userStateSnapshots).values({ userId: user.id, schemaVersion: 1, state: createEmptyAccountState() });
-      await tx.insert(authSessions).values({ tokenHash: hashSessionToken(token), userId: user.id, expiresAt: sessionExpiresAt() });
-      await tx.insert(auditLogs).values({ userId: user.id, action: "account.registered", entityType: "user", entityId: user.id });
-      return user.id;
-    });
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten().fieldErrors;
+      const fieldErrors: RegisterFieldErrors = {
+        ...(flattened.name?.length ? { name: flattened.name } : {}),
+        ...(flattened.email?.length ? { email: flattened.email } : {}),
+        ...(flattened.password?.length ? { password: flattened.password } : {}),
+      };
+      return jsonError(registerErrorMessage("VALIDATION_ERROR"), 400, undefined, { code: "VALIDATION_ERROR", fieldErrors });
+    }
+    const account = await registerAccount(parsed.data);
     let developmentVerificationUrl: string | undefined;
+    let deliveryStatus: "sent" | "failed" = "failed";
     try {
-      const verificationToken = await issueEmailVerification(userId);
-      developmentVerificationUrl = (await sendVerificationEmail(email, verificationToken, request.url)).developmentUrl;
+      const result = await sendVerificationEmail(account.email, account.verificationToken, request.url);
+      developmentVerificationUrl = result.developmentUrl;
+      deliveryStatus = result.status === "disabled" ? "failed" : "sent";
     } catch { logEvent("error", "email.verification_delivery_failed", { requestId: request.headers.get("x-request-id") }); }
-    const response = NextResponse.json({ ok: true, ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}) }, { status: 201 });
-    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
-    return response;
+    const code = deliveryStatus === "sent" ? undefined : "VERIFICATION_DELIVERY_FAILED";
+    return NextResponse.json({ ok: true, verificationRequired: true, email: account.email, deliveryStatus, ...(code ? { code } : {}), ...(developmentVerificationUrl ? { developmentVerificationUrl } : {}) }, { status: 201 });
   } catch (error) {
-    const bodyError = bodyErrorResponse(error); if (bodyError) return bodyError;
-    if (typeof error === "object" && error && "code" in error && error.code === "23505") { logEvent("warn", "auth.registration_duplicate"); return jsonError("An account with that email already exists.", 409); }
-    logEvent("error", "auth.registration_unavailable");
-    return jsonError("Registration is temporarily unavailable.", 503);
+    const bodyError = bodyErrorResponse(error, "VALIDATION_ERROR"); if (bodyError) return bodyError;
+    if (isEmailUniqueViolation(error)) {
+      logEvent("warn", "auth.registration_duplicate", { requestId: request.headers.get("x-request-id") });
+      return jsonError(registerErrorMessage("EMAIL_ALREADY_REGISTERED"), 409, undefined, { code: "EMAIL_ALREADY_REGISTERED" });
+    }
+    logEvent("error", "auth.registration_unavailable", { requestId: request.headers.get("x-request-id"), errorType: error instanceof Error ? error.constructor.name : typeof error });
+    return jsonError(registerErrorMessage("SERVICE_UNAVAILABLE"), 503, undefined, { code: "SERVICE_UNAVAILABLE" });
   }
 }

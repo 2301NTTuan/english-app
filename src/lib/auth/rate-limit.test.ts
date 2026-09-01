@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { clearRateLimitsForTests, consumeRateLimit, rateLimitKey } from "./rate-limit";
+import { clearRateLimitsForTests, consumeRateLimit, rateLimitKey, rateLimitSubjectKey } from "./rate-limit";
 
 describe("rate limiting", () => {
   beforeEach(() => { process.env.RATE_LIMIT_BACKEND = "memory"; delete process.env.TRUST_PROXY; clearRateLimitsForTests(); });
@@ -22,8 +22,14 @@ describe("rate limiting", () => {
     expect(rateLimitKey(request, "login")).toBe("login:203.0.113.8");
   });
 
+  it("creates stable per-account buckets without retaining the email address", () => {
+    const key = rateLimitSubjectKey("resend", " Learner@Example.COM ");
+    expect(key).toBe(rateLimitSubjectKey("resend", "learner@example.com"));
+    expect(key).not.toContain("learner@example.com");
+  });
+
   it("refuses the process-local backend in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
-    await expect(consumeRateLimit("login:production", 8, 60_000)).resolves.toEqual({ allowed: false, retryAfter: 60 });
+    await expect(consumeRateLimit("login:production", 8, 60_000)).resolves.toEqual({ allowed: false, retryAfter: 60, unavailable: true });
   });
 });

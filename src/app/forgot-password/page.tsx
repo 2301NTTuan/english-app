@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
       const response = await fetch("/api/auth/password-reset/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
       const payload = await response.json() as { error?: string; message?: string; developmentResetUrl?: string };
       if (!response.ok) { setError(payload.error ?? "Please try again."); return; }
-      setMessage(payload.message ?? "If the account exists, reset instructions will be sent."); setDevelopmentUrl(payload.developmentResetUrl ?? "");
+      setMessage(payload.message ?? "If an account exists for that email, we'll send reset instructions."); setDevelopmentUrl(payload.developmentResetUrl ?? "");
     } catch { setError("The service is unavailable. Please try again."); }
     finally { setPending(false); }
   }

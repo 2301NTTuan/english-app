@@ -1,15 +1,13 @@
-import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db/client";
-import { auditLogs, users } from "@/db/schema";
-import { credentialsSchema, normalizeEmail, verifyPassword } from "@/lib/auth/password";
+import { auditLogs } from "@/db/schema";
+import { credentialsSchema } from "@/lib/auth/password";
 import { consumeRateLimit, rateLimitKey } from "@/lib/auth/rate-limit";
 import { assertSameOrigin, bodyErrorResponse, jsonError, readJson } from "@/lib/auth/request";
 import { createDatabaseSession } from "@/lib/auth/server";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth/session";
 import { logEvent } from "@/lib/observability/logger";
-
-const DUMMY_PASSWORD_HASH = "$2b$12$hHySbpbRtR9436UGn2PhyuDEV1kac/gRti0IdDqLnpPPvekCeBmTO";
+import { verifyCredentials } from "@/lib/auth/account";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
@@ -18,11 +16,14 @@ export async function POST(request: Request) {
   try {
     const parsed = credentialsSchema.safeParse(await readJson(request, 16_384));
     if (!parsed.success) return jsonError("Invalid email or password.", 401);
-    const [user] = await getDb().select({ id: users.id, passwordHash: users.passwordHash }).from(users).where(eq(users.email, normalizeEmail(parsed.data.email))).limit(1);
-    const valid = await verifyPassword(parsed.data.password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
-    if (!user || !valid) { logEvent("warn", "auth.login_rejected"); return jsonError("Invalid email or password.", 401); }
-    const token = await createDatabaseSession(user.id);
-    await getDb().insert(auditLogs).values({ userId: user.id, action: "account.login", entityType: "session" });
+    const credentials = await verifyCredentials(parsed.data.email, parsed.data.password);
+    if (credentials.status === "invalid") { logEvent("warn", "auth.login_rejected"); return jsonError("Invalid email or password.", 401); }
+    if (credentials.status === "unverified") {
+      logEvent("info", "auth.login_verification_required", { userId: credentials.userId });
+      return NextResponse.json({ error: "Your email address hasn't been verified yet.", code: "EMAIL_NOT_VERIFIED" }, { status: 403 });
+    }
+    const token = await createDatabaseSession(credentials.userId);
+    await getDb().insert(auditLogs).values({ userId: credentials.userId, action: "account.login", entityType: "session" });
     const response = NextResponse.json({ ok: true });
     response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
     return response;

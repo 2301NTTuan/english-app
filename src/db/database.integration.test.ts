@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
 import { grammarTopics } from "@/data/grammar";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { isEmailUniqueViolation } from "@/lib/auth/registration";
 import { scorePlacement } from "@/lib/learning/placement";
 import { createEmptyAccountState } from "@/lib/storage/app-repository";
 import type { AppState, ReviewState } from "@/types/domain";
@@ -30,6 +31,11 @@ suite("PostgreSQL migration and ownership", () => {
   let saveLearningPreferences: typeof import("@/lib/learning/persistence")["saveLearningPreferences"];
   let resetLearningData: typeof import("@/lib/learning/persistence")["resetLearningData"];
   let consumeRateLimit: typeof import("@/lib/auth/rate-limit")["consumeRateLimit"];
+  let registerAccount: typeof import("@/lib/auth/account")["registerAccount"];
+  let prepareVerificationResend: typeof import("@/lib/auth/account")["prepareVerificationResend"];
+  let verifyCredentials: typeof import("@/lib/auth/account")["verifyCredentials"];
+  let createDatabaseSession: typeof import("@/lib/auth/server")["createDatabaseSession"];
+  let verifiedUserForSessionToken: typeof import("@/lib/auth/server")["verifiedUserForSessionToken"];
 
   beforeAll(async () => {
     const databaseName = new URL(databaseUrl!).pathname.slice(1);
@@ -41,6 +47,8 @@ suite("PostgreSQL migration and ownership", () => {
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
     ({ queryVocabularyPage, queryExpressionsPage, queryGrammarCatalogue, queryPlacementBank } = await import("@/lib/content/database"));
     ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
+    ({ registerAccount, prepareVerificationResend, verifyCredentials } = await import("@/lib/auth/account"));
+    ({ createDatabaseSession, verifiedUserForSessionToken } = await import("@/lib/auth/server"));
   });
   afterAll(async () => {
     if (userIds.length) await client.query("delete from users where id = any($1::uuid[])", [userIds]);
@@ -215,10 +223,71 @@ suite("PostgreSQL migration and ownership", () => {
     const token = await issueEmailVerification(userId);
     const stored = await client.query("select token_hash from email_verification_tokens where user_id = $1 and used_at is null", [userId]);
     expect(stored.rows[0].token_hash).not.toBe(token);
-    expect(await consumeEmailVerification(token)).toBe(true);
-    expect(await consumeEmailVerification(token)).toBe(false);
+    expect(await consumeEmailVerification(token)).toBe("verified");
+    expect(await consumeEmailVerification(token)).toBe("already-verified");
     const user = await client.query("select email_verified_at from users where id = $1", [userId]);
     expect(user.rows[0].email_verified_at).toBeInstanceOf(Date);
+  });
+
+  it("creates an unverified account and token atomically without a learning session", async () => {
+    const email = `registration-${randomUUID()}@test.invalid`;
+    const password = "RegistrationPass1234";
+    const account = await registerAccount({ name: "  Registration Test  ", email: email.toUpperCase(), password });
+    userIds.push(account.userId);
+
+    const state = await client.query(`select
+      u.name, u.email, u.email_verified_at,
+      (select count(*)::int from learning_preferences where user_id = u.id) preferences,
+      (select count(*)::int from user_state_snapshots where user_id = u.id) snapshots,
+      (select count(*)::int from auth_sessions where user_id = u.id) sessions,
+      (select count(*)::int from email_verification_tokens where user_id = u.id and used_at is null) verification_tokens
+      from users u where u.id = $1`, [account.userId]);
+    expect(state.rows[0]).toEqual({ name: "Registration Test", email, email_verified_at: null, preferences: 1, snapshots: 1, sessions: 0, verification_tokens: 1 });
+    const stored = await client.query("select token_hash from email_verification_tokens where user_id = $1", [account.userId]);
+    expect(stored.rows[0].token_hash).not.toBe(account.verificationToken);
+    expect(await verifyCredentials(email, password)).toEqual({ status: "unverified", userId: account.userId });
+
+    const staleToken = randomUUID();
+    await client.query("insert into auth_sessions (token_hash,user_id,expires_at) values ($1,$2,now() + interval '1 day')", [createHash("sha256").update(staleToken).digest("hex"), account.userId]);
+    expect(await verifiedUserForSessionToken(staleToken)).toBeNull();
+
+    expect(await consumeEmailVerification(account.verificationToken)).toBe("verified");
+    expect(await verifyCredentials(email, password)).toEqual({ status: "verified", userId: account.userId });
+    const liveToken = await createDatabaseSession(account.userId);
+    expect(await verifiedUserForSessionToken(liveToken)).toMatchObject({ id: account.userId, email });
+  });
+
+  it("allows only one normalized account across concurrent case and whitespace variants", async () => {
+    const localPart = `race-${randomUUID()}`;
+    const normalizedEmail = `${localPart}@test.invalid`;
+    const attempts = await Promise.allSettled([
+      registerAccount({ name: "Race One", email: `  ${localPart.toUpperCase()}@TEST.INVALID  `, password: "RegistrationPass1234" }),
+      registerAccount({ name: "Race Two", email: normalizedEmail, password: "RegistrationPass1234" }),
+    ]);
+    const successes = attempts.filter((attempt): attempt is PromiseFulfilledResult<Awaited<ReturnType<typeof registerAccount>>> => attempt.status === "fulfilled");
+    const failures = attempts.filter((attempt): attempt is PromiseRejectedResult => attempt.status === "rejected");
+    expect(successes).toHaveLength(1);
+    expect(failures).toHaveLength(1);
+    expect(isEmailUniqueViolation(failures[0].reason)).toBe(true);
+    userIds.push(successes[0].value.userId);
+
+    const stored = await client.query("select email from users where email = $1", [normalizedEmail]);
+    expect(stored.rows).toEqual([{ email: normalizedEmail }]);
+  });
+
+  it("rejects expired verification links and safely replaces resend tokens", async () => {
+    const userId = await createUser();
+    const email = `${userId}@test.invalid`;
+    const expired = await issueEmailVerification(userId, new Date(Date.now() - 120_000), 60_000);
+    expect(await consumeEmailVerification(expired)).toBe("expired");
+    const first = await prepareVerificationResend(email);
+    const second = await prepareVerificationResend(email);
+    expect(first?.token).toBeTruthy();
+    expect(second?.token).toBeTruthy();
+    expect(await consumeEmailVerification(first!.token)).toBe("invalid");
+    expect(await consumeEmailVerification(second!.token)).toBe("verified");
+    expect(await prepareVerificationResend(email)).toBeNull();
+    expect(await prepareVerificationResend(`unknown-${randomUUID()}@test.invalid`)).toBeNull();
   });
 
   it("imports validated legacy state transactionally without duplicating normalized progress", async () => {

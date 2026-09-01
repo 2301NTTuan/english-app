@@ -22,11 +22,12 @@ export async function readJson(request: Request, maxBytes = MAX_STATE_BYTES): Pr
   try { return JSON.parse(raw) as unknown; } catch { throw new Error("INVALID_JSON"); }
 }
 
-export const jsonError = (message: string, status: number, headers?: HeadersInit) => NextResponse.json({ error: message }, { status, headers });
-export function bodyErrorResponse(error: unknown) {
+export const jsonError = (message: string, status: number, headers?: HeadersInit, details: Record<string, unknown> = {}) => NextResponse.json({ error: message, ...details }, { status, headers });
+export function bodyErrorResponse(error: unknown, code?: string) {
   if (!(error instanceof Error)) return null;
-  if (error.message === "TOO_LARGE") return jsonError("Request body is too large.", 413);
-  if (error.message === "CONTENT_TYPE") return jsonError("Content-Type must be application/json.", 415);
-  if (error.message === "INVALID_JSON") return jsonError("Request body is not valid JSON.", 400);
+  const details = code ? { code } : undefined;
+  if (error.message === "TOO_LARGE") return jsonError("Request body is too large.", 413, undefined, details);
+  if (error.message === "CONTENT_TYPE") return jsonError("Content-Type must be application/json.", 415, undefined, details);
+  if (error.message === "INVALID_JSON") return jsonError("Request body is not valid JSON.", 400, undefined, details);
   return null;
 }

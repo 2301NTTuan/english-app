@@ -7,7 +7,7 @@ import { authRateLimits } from "@/db/schema";
 import { logEvent } from "@/lib/observability/logger";
 
 interface Bucket { count: number; resetAt: number }
-export interface RateLimitResult { allowed: boolean; retryAfter: number }
+export interface RateLimitResult { allowed: boolean; retryAfter: number; unavailable?: boolean }
 
 const buckets = new Map<string, Bucket>();
 let lastCleanup = 0;
@@ -59,7 +59,7 @@ export async function consumeRateLimit(key: string, limit = 8, windowMs = 15 * 6
   if (backend() === "memory") {
     if (process.env.NODE_ENV === "production") {
       logEvent("error", "security.rate_limit_insecure_backend");
-      return { allowed: false, retryAfter: Math.ceil(windowMs / 1000) };
+      return { allowed: false, retryAfter: Math.ceil(windowMs / 1000), unavailable: true };
     }
     return memoryRateLimit(key, limit, windowMs, now);
   }
@@ -67,7 +67,7 @@ export async function consumeRateLimit(key: string, limit = 8, windowMs = 15 * 6
     return await postgresRateLimit(key, limit, windowMs, now);
   } catch {
     logEvent("error", "security.rate_limit_store_unavailable");
-    return { allowed: false, retryAfter: Math.ceil(windowMs / 1000) };
+    return { allowed: false, retryAfter: Math.ceil(windowMs / 1000), unavailable: true };
   }
 }
 
@@ -77,6 +77,11 @@ export function rateLimitKey(request: Request, action: string) {
   const forwarded = trusted ? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() : undefined;
   const realIp = trusted ? request.headers.get("x-real-ip")?.trim() : undefined;
   return `${action}:${forwarded || realIp || "untrusted-client"}`;
+}
+
+/** Adds a privacy-preserving per-account bucket without retaining the raw email address. */
+export function rateLimitSubjectKey(action: string, subject: string) {
+  return `${action}:subject:${hashKey(subject.trim().toLowerCase())}`;
 }
 
 export function clearRateLimitsForTests() { buckets.clear(); lastCleanup = 0; }

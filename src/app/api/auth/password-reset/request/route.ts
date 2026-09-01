@@ -7,7 +7,7 @@ import { sendPasswordResetEmail } from "@/lib/email/delivery";
 import { logEvent } from "@/lib/observability/logger";
 
 const requestSchema = z.object({ email: z.string().trim().email().max(254) });
-const genericMessage = "If an account matches that email, password-reset instructions are available through the configured delivery channel.";
+const genericMessage = "If an account exists for that email, we'll send reset instructions.";
 
 export async function POST(request: Request) {
   if (!assertSameOrigin(request)) return jsonError("Request rejected.", 403);
