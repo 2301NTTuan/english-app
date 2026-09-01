@@ -19,6 +19,8 @@ const labels: Record<string, string> = {
   mistakes: "Mistake reviews",
   newVocabulary: "New words",
   newGrammar: "New grammar topic",
+  newExpressions: "New expression",
+  mixedPractice: "Mixed practice",
 };
 
 const average = (values: number[]) => values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
@@ -69,7 +71,7 @@ export default function Dashboard() {
         <div className="relative">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div><div className="eyebrow">Daily goal</div><h2 className="mt-1 text-2xl font-[850] tracking-[-.025em] text-[var(--ink-strong)] sm:text-3xl">Your adaptive session</h2><p className="muted mt-2 max-w-xl text-sm leading-relaxed">Complete one focused session to move your learning path forward.</p></div>
-            <Badge tone="neutral">{plan.totalItems} activities</Badge>
+            <Badge tone="neutral" className="self-start">{plan.totalItems} activities</Badge>
           </div>
 
           <div className="my-6 grid gap-2 sm:grid-cols-2">
@@ -82,7 +84,7 @@ export default function Dashboard() {
 
           <div className="flex flex-col gap-4 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="muted flex items-center gap-2 text-sm"><Clock3 size={17} aria-hidden="true"/>About <b className="text-[var(--ink)]">{plan.estimatedMinutes} minutes</b></div>
-            <Link href="/learn" className="btn-primary min-w-48">Start today&apos;s session <ArrowRight size={18} aria-hidden="true"/></Link>
+            <Link href="/learn" className="btn-primary min-w-48">Start Today&apos;s Session <ArrowRight size={18} aria-hidden="true"/></Link>
           </div>
         </div>
       </section>

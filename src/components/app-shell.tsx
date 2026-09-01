@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="grid size-10 place-items-center rounded-[.9rem] bg-[var(--brand)] text-white shadow-lg shadow-indigo-950/20"><LibraryBig size={20} aria-hidden="true"/></span>
             <span><b className="block tracking-[-.015em]">English Mastery</b><small className="text-[var(--sidebar-muted)]">Learn with purpose</small></span>
           </Link>
-          <button type="button" className="icon-button text-white hover:border-white/10 hover:bg-white/10 lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)}><X aria-hidden="true"/></button>
+          <button type="button" className="icon-button text-white hover:border-white/10 hover:bg-white/10 lg:!hidden" aria-label="Close menu" onClick={() => setOpen(false)}><X aria-hidden="true"/></button>
         </div>
 
         <nav className="space-y-5">

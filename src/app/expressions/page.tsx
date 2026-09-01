@@ -53,7 +53,7 @@ export default function ExpressionsPage() {
 
     <section className="card mb-5 p-3 sm:p-4" aria-label="Expression filters">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(240px,1fr)_180px_minmax(180px,1fr)_auto]">
-        <SearchInput value={search} onChange={(event) => updateFilter(() => setSearch(event.target.value))} label="Search expressions" placeholder="Expression or meaning…"/>
+        <SearchInput type="text" value={search} onChange={(event) => updateFilter(() => setSearch(event.target.value))} label="Search" placeholder="Expression or meaning…"/>
         <label><span className="sr-only">CEFR level</span><select value={level} onChange={(event) => updateFilter(() => setLevel(event.target.value as CEFRLevel | "All"))} className="select-field text-sm font-bold"><option>All</option>{(["A1", "A2", "B1", "B2", "C1", "C2"] as CEFRLevel[]).map((value) => <option key={value}>{value}</option>)}</select></label>
         <label><span className="sr-only">Topic</span><select value={topic} onChange={(event) => updateFilter(() => setTopic(event.target.value))} className="select-field text-sm font-bold"><option>All</option>{data?.corpus.topics.map((value) => <option key={value}>{value}</option>)}</select></label>
         <div className="flex items-center justify-between gap-3 px-1 text-xs lg:block lg:min-w-32"><b>{data ? `${start}–${end} of ${data.total}` : "Loading…"}</b>{hasFilters && <button type="button" className="text-[var(--brand)] hover:underline lg:mt-1 lg:block" onClick={clearFilters}>Clear filters</button>}</div>

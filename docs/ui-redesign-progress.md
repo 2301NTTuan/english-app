@@ -1,9 +1,9 @@
 # UI redesign progress
 
-STATUS: IN_PROGRESS
-CURRENT PHASE: Phase 10 — Mobile, dark mode, and accessibility QA
-LAST COMPLETED: Redesigned Placement end to end; rebuilt analytics/history, mistakes, learning path, Settings, auth, recovery, and legal screens on the shared semantic theme.
-NEXT ACTION: Run responsive and dark-mode visual QA at 1440px, 768px, and 375px; fix accessibility or layout regressions; then run the complete validation suite.
+STATUS: COMPLETE
+CURRENT PHASE: Complete — final QA
+LAST COMPLETED: Verified the redesigned experience at desktop, tablet, and mobile widths in light and dark themes; completed accessibility and functional regression validation.
+NEXT ACTION: None — the UI redesign milestone is complete.
 
 COMPLETED:
 - [x] Design system
@@ -16,10 +16,10 @@ COMPLETED:
 - [x] Placement
 - [x] Analytics/history
 - [x] Settings/auth
-- [ ] Mobile
-- [ ] Dark mode
-- [ ] Accessibility
-- [ ] Final visual QA
+- [x] Mobile
+- [x] Dark mode
+- [x] Accessibility
+- [x] Final visual QA
 
-LAST VALIDATION: `npm run lint` PASS; `npm run typecheck` PASS after phases 8–9.
-LAST CHECKPOINT COMMIT: Phase 8–9 checkpoint — `Redesign placement insights and account surfaces`.
+LAST VALIDATION: `npm run lint` PASS; `npm run typecheck` PASS; `npm test` PASS (26 files, 121 tests); `npm run test:integration` PASS (1 file, 15 tests); `npm run build` PASS; `npm run test:e2e` PASS (2 tests); responsive visual QA PASS at 1440px, 768px, and 375px in light and dark themes.
+LAST CHECKPOINT COMMIT: Final milestone — `Redesign application learning experience`.
