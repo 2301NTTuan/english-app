@@ -19,10 +19,10 @@ type RecordedAttempt = { knowledgeType: "vocabulary" | "grammar" | "expression";
 type CompletionPayload = { idempotencyKey: string; startedAt: string; completedAt: string; state: AppState; items: RecordedAttempt[] };
 
 const ratingStyle: Record<Rating, string> = {
-  again: "border-red-200 bg-red-50 text-red-800 hover:bg-red-100",
-  hard: "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100",
-  good: "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
-  easy: "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100",
+  again: "border-[color-mix(in_srgb,var(--danger)_30%,var(--line))] bg-[var(--danger-soft)] text-[var(--danger)] hover:border-[var(--danger)]",
+  hard: "border-[color-mix(in_srgb,var(--warning)_30%,var(--line))] bg-[var(--warning-soft)] text-[var(--warning)] hover:border-[var(--warning)]",
+  good: "border-[color-mix(in_srgb,var(--success)_30%,var(--line))] bg-[var(--success-soft)] text-[var(--success)] hover:border-[var(--success)]",
+  easy: "border-[color-mix(in_srgb,var(--info)_30%,var(--line))] bg-[var(--info-soft)] text-[var(--info)] hover:border-[var(--info)]",
 };
 const sourceLabel: Record<SessionExercise["source"], string> = {
   overdueVocabulary: "Overdue vocabulary", overdueGrammar: "Overdue grammar", dueVocabulary: "Due vocabulary", dueGrammar: "Due grammar",
@@ -47,7 +47,7 @@ function updateGrammarProgress(progress: GrammarProgress[], exercise: SessionExe
 
 export function SessionPlayer() {
   const { state, setState, hydrated } = useAppState();
-  if (!hydrated) return <div className="card mx-auto max-w-3xl p-8"><div className="h-2 animate-pulse rounded-full bg-[#dce6e1]"/><div className="mt-8 h-8 w-3/4 animate-pulse rounded-lg bg-[#e8eeeb]"/><div className="mt-8 grid gap-3">{[1, 2, 3, 4].map((value) => <div key={value} className="h-14 animate-pulse rounded-xl bg-[#eef2f0]"/>)}</div><span className="sr-only">Loading your study session</span></div>;
+  if (!hydrated) return <div className="card mx-auto max-w-3xl p-8"><div className="skeleton h-2"/><div className="skeleton mt-8 h-8 w-3/4"/><div className="mt-8 grid gap-3">{[1, 2, 3, 4].map((value) => <div key={value} className="skeleton h-14"/>)}</div><span className="sr-only">Loading your study session</span></div>;
   return <HydratedSession initialState={state} setState={setState}/>;
 }
 
@@ -94,8 +94,8 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
 
   if (!item) {
     const accuracy = session.length ? Math.round(correct / session.length * 100) : 0;
-    return <section className="card mx-auto max-w-2xl p-6 text-center sm:p-10" aria-labelledby="session-complete-title">
-      <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#e8f6f0] text-[#17795b]"><CheckCircle2 size={32}/></span>
+    return <section className="card panel-raised mx-auto max-w-2xl p-6 text-center sm:p-10" aria-labelledby="session-complete-title">
+      <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--success-soft)] text-[var(--success)]"><CheckCircle2 size={32}/></span>
       <div className="eyebrow mt-5">Session complete</div>
       <h1 id="session-complete-title" className="mt-2 text-3xl font-extrabold">Strong work today</h1>
       <p className="muted mt-2">Today&apos;s reviews are recorded and your next intervals have been updated.</p>
@@ -103,7 +103,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
         <SummaryMetric value={`${accuracy}%`} label="Accuracy"/><SummaryMetric value={correct} label="Correct"/><SummaryMetric value={mistakes} label="To revisit"/>
       </div>
       <div className="mb-7 grid gap-2 text-left sm:grid-cols-2"><SummaryLine label="Vocabulary reviewed" value={session.filter((entry) => entry.knowledgeType === "vocabulary" && entry.source !== "newVocabulary").length}/><SummaryLine label="New vocabulary" value={session.filter((entry) => entry.source === "newVocabulary").length}/><SummaryLine label="Grammar exercises" value={session.filter((entry) => entry.knowledgeType === "grammar").length}/><SummaryLine label="Mistakes corrected" value={mistakesCorrected}/></div>
-      {missedPrompts.length > 0 ? <div className="mb-7 rounded-xl bg-amber-50 p-4 text-left"><b className="text-sm text-amber-900">Needs more practice</b><p className="mt-1 text-sm text-amber-800">{missedPrompts.slice(0, 2).join(" · ")}</p></div> : <div className="mb-7 rounded-xl bg-emerald-50 p-4 text-left"><b className="text-sm text-emerald-900">Strong improvement</b><p className="mt-1 text-sm text-emerald-800">You completed the session without an incorrect answer.</p></div>}
+      {missedPrompts.length > 0 ? <div className="feedback feedback-warning mb-7 text-left"><b className="text-sm">Needs more practice</b><p className="mt-1 text-sm">{missedPrompts.slice(0, 2).join(" · ")}</p></div> : <div className="feedback feedback-success mb-7 text-left"><b className="text-sm">Strong improvement</b><p className="mt-1 text-sm">You completed the session without an incorrect answer.</p></div>}
       <div className="flex flex-col justify-center gap-2 sm:flex-row"><Link href="/" className="btn-primary">Back to dashboard</Link><Link href="/progress" className="btn-secondary">View progress</Link></div>
     </section>;
   }
@@ -157,15 +157,15 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
   };
 
   return <div className="mx-auto max-w-3xl">
-    <div className="mb-5 flex items-center gap-3 sm:gap-4" aria-label={`Question ${index + 1} of ${session.length}`}>
-      <span className="muted shrink-0 text-sm font-bold">{index + 1} / {session.length}</span>
+    <div className="mb-5 flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 sm:gap-4 sm:px-4" aria-label={`Question ${index + 1} of ${session.length}`}>
+      <span className="shrink-0 text-sm font-extrabold text-[var(--ink-strong)]">{index + 1}<span className="muted font-semibold"> / {session.length}</span></span>
       <div className="flex-1"><ProgressBar value={index / session.length * 100} label="Session progress"/></div>
       <span className="badge hidden capitalize sm:inline-flex">{item.type.replaceAll("-", " ")}</span>
     </div>
-    <section className="card overflow-hidden" aria-labelledby="exercise-prompt">
-      <header className="border-b border-[#e2eae6] p-5 sm:p-8">
+    <section className="card panel-raised overflow-hidden" aria-labelledby="exercise-prompt">
+      <header className="border-b border-[var(--line)] bg-[var(--surface-muted)] p-5 sm:p-8">
         <div className="flex flex-wrap items-center gap-2"><span className="eyebrow">{sourceLabel[item.source]}</span><span aria-hidden="true" className="muted">·</span><span className="muted text-xs font-bold capitalize">{item.knowledgeType}</span></div>
-        <h1 id="exercise-prompt" className="mt-3 text-2xl font-extrabold leading-snug sm:text-3xl">{item.prompt}</h1>
+        <h1 id="exercise-prompt" className="mt-3 text-2xl font-[850] leading-snug tracking-[-.025em] text-[var(--ink-strong)] sm:text-3xl">{item.prompt}</h1>
       </header>
       <div className="p-5 sm:p-8">
         <div className="grid gap-3" role="radiogroup" aria-label="Answer choices">
@@ -179,9 +179,9 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
             </button>;
           })}
         </div>
-        <div aria-live="polite">{checked && <div className={`mt-5 rounded-xl p-4 ${isCorrect ? "bg-emerald-50 text-emerald-900" : "bg-red-50 text-red-900"}`}><b>{isCorrect ? "Correct — well done." : `Not quite. The answer is “${item.answer}”.`}</b>{item.explanation && <p className="mt-1 text-sm opacity-80">{item.explanation}</p>}</div>}</div>
-        {checked && vocabularyItem && <div className="mt-4 rounded-xl border border-[#dce6e1] bg-[#f8faf9] p-4"><p className="text-sm font-bold">Pronunciation: {vocabularyItem.word}</p><VocabularyPronunciation key={item.id} word={vocabularyItem.lemma ?? vocabularyItem.word}/></div>}
-        {!checked ? <div className="mt-6 flex items-center justify-between"><button className="muted flex items-center gap-1 text-xs disabled:opacity-30" disabled={!selected} onClick={() => setSelected("")}><RotateCcw size={13}/>Clear</button><button className="btn-primary disabled:cursor-not-allowed disabled:opacity-40" disabled={!selected} onClick={submit}>Check answer <ChevronRight size={18}/></button></div> : <div className="mt-6"><p className="muted mb-2 text-center text-xs font-bold">How difficult was this to recall?</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["again", "hard", "good", "easy"] as Rating[]).map((rating) => <button key={rating} disabled={saving || Boolean(completionPayload)} onClick={() => void rate(rating)} className={`min-h-12 rounded-xl border px-3 py-2 text-xs font-extrabold capitalize transition disabled:cursor-wait disabled:opacity-50 ${ratingStyle[rating]}`}>{rating}<span className="mt-0.5 block text-[9px] font-medium opacity-70">{{ again: "< 10 min", hard: "~ 1 day", good: "~ 3 days", easy: "~ 1 week" }[rating]}</span></button>)}</div>{saving && <p className="muted mt-3 text-center text-sm" role="status">Recording your session…</p>}{saveError && completionPayload && <div className="mt-3 rounded-xl bg-red-50 p-3 text-center text-sm text-red-900" role="alert">{saveError}<button className="btn-secondary mt-3" onClick={() => void saveCompletion(completionPayload)}>Retry save</button></div>}</div>}
+        <div aria-live="polite">{checked && <div className={`feedback mt-5 ${isCorrect ? "feedback-success" : "feedback-error"}`}><b>{isCorrect ? "Correct — well done." : `Not quite. The answer is “${item.answer}”.`}</b>{item.explanation && <p className="mt-1 text-sm opacity-85">{item.explanation}</p>}</div>}</div>
+        {checked && vocabularyItem && <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--surface-muted)] p-4"><p className="text-sm font-bold">Pronunciation: {vocabularyItem.word}</p><VocabularyPronunciation key={item.id} word={vocabularyItem.lemma ?? vocabularyItem.word}/></div>}
+        {!checked ? <div className="mt-6 flex items-center justify-between"><button className="btn-quiet min-h-10 gap-1 px-2 text-xs disabled:opacity-30" disabled={!selected} onClick={() => setSelected("")}><RotateCcw size={13}/>Clear</button><button className="btn-primary disabled:cursor-not-allowed disabled:opacity-40" disabled={!selected} onClick={submit}>Check answer <ChevronRight size={18}/></button></div> : <div className="mt-6"><p className="muted mb-2 text-center text-xs font-bold">How difficult was this to recall?</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["again", "hard", "good", "easy"] as Rating[]).map((rating) => <button key={rating} disabled={saving || Boolean(completionPayload)} onClick={() => void rate(rating)} className={`min-h-14 rounded-xl border px-3 py-2 text-xs font-extrabold capitalize transition disabled:cursor-wait disabled:opacity-50 ${ratingStyle[rating]}`}>{rating}<span className="mt-0.5 block text-[9px] font-medium opacity-70">{{ again: "< 10 min", hard: "~ 1 day", good: "~ 3 days", easy: "~ 1 week" }[rating]}</span></button>)}</div>{saving && <p className="muted mt-3 text-center text-sm" role="status">Recording your session…</p>}{saveError && completionPayload && <div className="feedback feedback-error mt-3 text-center text-sm" role="alert">{saveError}<button className="btn-secondary mt-3" onClick={() => void saveCompletion(completionPayload)}>Retry save</button></div>}</div>}
       </div>
     </section>
     <p className="muted mt-4 flex items-center justify-center gap-1 text-xs"><Clock3 size={13}/>Session order follows your live adaptive plan.</p>
@@ -189,7 +189,7 @@ function HydratedSession({ initialState, setState }: { initialState: ReturnType<
 }
 
 function SummaryMetric({ value, label }: { value: string | number; label: string }) {
-  return <div className="rounded-xl bg-[#f5f8f6] p-3"><b className="text-xl">{value}</b><div className="muted text-xs">{label}</div></div>;
+  return <div className="rounded-xl bg-[var(--surface-muted)] p-3"><b className="text-xl">{value}</b><div className="muted text-xs">{label}</div></div>;
 }
 
-function SummaryLine({ value, label }: { value: number; label: string }) { return <div className="flex items-center justify-between rounded-xl bg-[#f5f8f6] px-4 py-3 text-sm"><span className="muted">{label}</span><b>{value}</b></div>; }
+function SummaryLine({ value, label }: { value: number; label: string }) { return <div className="flex items-center justify-between rounded-xl bg-[var(--surface-muted)] px-4 py-3 text-sm"><span className="muted">{label}</span><b>{value}</b></div>; }
