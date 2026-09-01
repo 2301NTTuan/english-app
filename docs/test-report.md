@@ -1,6 +1,6 @@
 # Validation report
 
-Latest full local repository verification date: 31 August 2026, against the current working tree with UK/US browser pronunciation controls. The fresh verification covers the completed Vocabulary, Grammar, Placement, and Expressions engineering baselines, pronunciation logic and accessibility, a migrated/seeded disposable test database, production build, and Playwright browser E2E. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) is retained only as historical CI evidence for earlier commit `be3d4b1`; it does not verify the current content head.
+Latest full local browser verification date: 31 August 2026. It covers the completed Vocabulary, Grammar, Placement, and Expressions engineering baselines, pronunciation controls and accessibility, a migrated/seeded disposable test database, production build, and Playwright browser E2E. A focused pronunciation playback-state regression run on 1 September 2026 passed lint, typecheck, 121/121 unit tests, and the production build; the browser E2E result below remains from the 31 August run and was not rerun for this event-state-only fix. [GitHub CI run #15](https://github.com/2301NTTuan/english-app/actions/runs/33340474000) is retained only as historical CI evidence for earlier commit `be3d4b1`; it does not verify the current content head.
 
 ## Automated results
 
@@ -9,7 +9,7 @@ Latest full local repository verification date: 31 August 2026, against the curr
 | Content validation | PASS | 13/13 tests across two files, including Vocabulary, Grammar, Placement, Expressions, provenance, and master-inventory gates |
 | ESLint | PASS | zero errors/warnings |
 | TypeScript | PASS | `tsc --noEmit` |
-| Unit tests | PASS | 115/115 tests across 26 files, including browser pronunciation voice selection/fallback handling, adaptive Placement simulations, and expanded-corpus planner/session selection |
+| Unit tests | PASS | 121/121 tests across 26 files, including browser pronunciation voice selection, cancellation/stale-event handling, adaptive Placement simulations, and expanded-corpus planner/session selection |
 | PostgreSQL integration | PASS | 15/15 tests against the freshly seeded disposable test database; 6,000 Vocabulary rows, 138 Grammar lessons, 612 Placement items/22 passages, and 1,621 Expressions verified |
 | Browser E2E | PASS | 2/2 Chromium tests against the production server and disposable test database, including accessible UK/US pronunciation controls across representative A1–C2 Vocabulary records, Placement delivery, complete Grammar C2 catalogue, and Expressions retrieval beyond the former 107-record corpus |
 | Production build | PASS | Next.js 16.3.2 Webpack build; application and API routes compiled, including PostgreSQL-backed Placement and Expressions routes |
