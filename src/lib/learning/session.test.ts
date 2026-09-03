@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { vocabulary } from "@/data/vocabulary";
 import { grammarTopics } from "@/data/grammar";
-import { buildStudySession, selectExpressionCandidates } from "./session";
+import { buildStudySession, selectExpressionCandidates, summarizeStudySession } from "./session";
 import { createInitialState } from "@/lib/storage/app-repository";
 
 describe("buildStudySession", () => {
@@ -15,6 +15,27 @@ describe("buildStudySession", () => {
     expect(session[0].source).toBe("overdueVocabulary");
     expect(session.slice(1).every((item) => item.source === "newVocabulary")).toBe(true);
     expect(session.every((item) => item.options?.includes(item.answer))).toBe(true);
+    expect(summarizeStudySession(session)).toMatchObject({
+      total: 5,
+      review: 1,
+      newItems: 4,
+      newVocabulary: 4,
+      newGrammar: 0,
+      newExpressions: 0,
+      vocabulary: 5,
+      grammar: 0,
+      expressions: 0,
+    });
+  });
+
+  it("summarizes the mix and duration shown before a session", () => {
+    const session = buildStudySession(createInitialState(), new Date("2026-08-23T12:00:00.000Z"));
+    const overview = summarizeStudySession(session);
+    expect(overview.total).toBe(session.length);
+    expect(overview.review + overview.mistakeRepair + overview.newItems).toBe(overview.total);
+    expect(overview.vocabulary + overview.grammar + overview.expressions).toBe(overview.total);
+    expect(overview.newVocabulary + overview.newGrammar + overview.newExpressions).toBe(overview.newItems);
+    expect(overview.estimatedMinutes).toBeGreaterThan(0);
   });
 
   it("places recurring mistakes before new material", () => {

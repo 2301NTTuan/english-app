@@ -238,6 +238,9 @@ test.describe.serial("production acceptance", () => {
 
     await page.goto("/");
     await page.getByRole("link", { name: /Start Today's Session/ }).click();
+    await expect(page.getByRole("heading", { name: "Ready for today's practice?" })).toBeVisible();
+    await expect(page.getByText("You will get an explanation immediately after every answer.")).toBeVisible();
+    await page.getByRole("button", { name: "Start session" }).click();
     let sawCorrect = false; let sawIncorrect = false; let answered = 0;
     const completionHeading = page.getByRole("heading", { name: "Strong work today" });
     while (true) {
@@ -257,7 +260,12 @@ test.describe.serial("production acceptance", () => {
       const text = await feedback.innerText();
       sawCorrect ||= text.includes("Correct");
       sawIncorrect ||= text.includes("Not quite");
-      await page.getByRole("button", { name: /good/i }).click();
+      if (selectedIndex === optionTexts.indexOf(authoredAnswer!)) {
+        await page.getByRole("button", { name: /good/i }).click();
+      } else {
+        await expect(page.getByText("Correct answer", { exact: true })).toBeVisible();
+        await page.getByRole("button", { name: /Got it — review again soon/i }).click();
+      }
       answered += 1;
       expect(answered).toBeLessThanOrEqual(60);
     }

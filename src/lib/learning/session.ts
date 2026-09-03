@@ -14,6 +14,43 @@ import type { AppState, Exercise, PlanCategory, SessionExercise, VocabularyItem 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const levels = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const atOrBelow = (level: VocabularyItem["cefrLevel"], target: VocabularyItem["cefrLevel"]) => levels.indexOf(level) <= levels.indexOf(target);
+export interface StudySessionOverview {
+  total: number;
+  review: number;
+  newItems: number;
+  newVocabulary: number;
+  newGrammar: number;
+  newExpressions: number;
+  mistakeRepair: number;
+  vocabulary: number;
+  grammar: number;
+  expressions: number;
+  estimatedMinutes: number;
+}
+
+export function summarizeStudySession(session: SessionExercise[]): StudySessionOverview {
+  const newVocabulary = session.filter((item) => item.source === "newVocabulary").length;
+  const newGrammar = session.filter((item) => item.source === "newGrammar").length;
+  const newExpressions = session.filter((item) => item.source === "newExpressions").length;
+  const newItems = newVocabulary + newGrammar + newExpressions;
+  const mistakeRepair = session.filter((item) => item.source === "mistakes").length;
+  const grammar = session.filter((item) => item.knowledgeType === "grammar").length;
+  const vocabulary = session.filter((item) => item.knowledgeType === "vocabulary").length;
+  const expressions = session.filter((item) => item.knowledgeType === "expression").length;
+  return {
+    total: session.length,
+    review: session.length - newItems - mistakeRepair,
+    newItems,
+    newVocabulary,
+    newGrammar,
+    newExpressions,
+    mistakeRepair,
+    vocabulary,
+    grammar,
+    expressions,
+    estimatedMinutes: Math.max(3, Math.ceil(vocabulary * 0.75 + expressions * 0.75 + grammar * 1.5)),
+  };
+}
 
 export function selectExpressionCandidates(target: VocabularyItem["cefrLevel"], offset = 0) {
   const candidates = expressions.filter((item) => item.status !== "retired" && atOrBelow(item.cefrLevel, target));
