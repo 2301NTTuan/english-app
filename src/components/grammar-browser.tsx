@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Circle, LockKeyhole, Route } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Check, ChevronDown, Circle, LockKeyhole, Route } from "lucide-react";
 import { curriculumOutline } from "@/data/grammar";
 import { useAppState } from "@/components/app-provider";
 import { prerequisitesMet } from "@/lib/learning/prerequisites";
@@ -75,6 +76,12 @@ function GrammarTopicCard({ item, progress, unlocked, topics }: { item: GrammarT
         <div className="mt-5 flex items-center gap-3"><div className="flex-1"><ProgressBar value={progress.mastery} label={`${item.title} mastery`}/></div><b className="text-sm">{progress.mastery}%</b></div>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">{item.subtopics.map((subtopic) => <div key={subtopic.id} className="flex items-center justify-between rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-xs"><span className="min-w-0 truncate pr-2">{subtopic.title}</span><b>{progress.subtopicMastery[subtopic.id] ?? 0}%</b></div>)}</div>
       </> : <div className="muted mt-4 rounded-xl bg-[var(--surface-muted)] px-3 py-2.5 text-xs">{unlocked ? "Ready to begin" : `Requires ${prerequisiteNames}`}</div>}
+    </div>
+
+    <div className="border-t border-[var(--line)] px-5 py-3.5">
+      <Link href={`/grammar/${item.id}`} prefetch={false} aria-label={`${unlocked ? "Study" : "View"} ${item.title} lesson`} className="flex items-center justify-between text-sm font-bold text-[var(--brand)] hover:text-[var(--brand-hover)]">
+        {unlocked ? "Study lesson" : "View lesson"}<ArrowRight size={17} aria-hidden="true"/>
+      </Link>
     </div>
 
     {unlocked && <details className="group border-t border-[var(--line)]">

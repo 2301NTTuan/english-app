@@ -84,7 +84,11 @@ export default function VocabularyPage() {
     <div aria-live="polite" aria-busy={loading}>
       {loading && <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,.85fr)]"><div className="space-y-2">{Array.from({ length: 7 }, (_, index) => <Skeleton key={index} className="h-24"/>)}</div><Skeleton className="h-[520px]"/></div>}
       {error && <ErrorState description={error} action={<button className="btn-secondary" onClick={() => setRetry((value) => value + 1)}>Try again</button>}/>}
-      {!loading && !error && items.length === 0 && <EmptyState title="No matching words" description="Try another search term or remove one of the filters." action={hasFilters ? <button type="button" className="btn-secondary" onClick={clearFilters}>Clear filters</button> : undefined}/>}
+      {!loading && !error && items.length === 0 && <EmptyState
+        title={hasFilters ? "No matching words" : "No vocabulary content available"}
+        description={hasFilters ? "Try another search term or remove one of the filters." : "Vocabulary has not been released to this environment yet."}
+        action={hasFilters ? <button type="button" className="btn-secondary" onClick={clearFilters}>Clear filters</button> : undefined}
+      />}
     </div>
 
     {!loading && !error && selected && <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,.85fr)]">

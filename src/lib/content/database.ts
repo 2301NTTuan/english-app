@@ -4,6 +4,7 @@ import { and, asc, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { expressions, grammarLessons, grammarPrerequisites, grammarSubtopics, grammarTopics as grammarTopicsTable, placementItems, placementPassages, vocabularyContent, vocabularyExamples, vocabularyMeanings } from "@/db/schema";
 import { grammarTopics as curriculumGrammarTopics } from "@/data/grammar";
+import { visibleContentStatuses } from "@/lib/content/release";
 import type { CEFRLevel, ExpressionItem, GrammarTopic, PlacementDimension, PlacementQuestion, ReadingPassage } from "@/types/domain";
 
 export interface VocabularyPageQuery { page?: number; pageSize?: number; level?: CEFRLevel; search?: string; topic?: string; partOfSpeech?: string; frequencyBand?: "very-common" | "common" | "less-common" | "advanced" }
@@ -13,8 +14,7 @@ export async function queryVocabularyPage(input: VocabularyPageQuery) {
   const page = Math.max(1, Math.trunc(input.page ?? 1));
   const pageSize = Math.max(1, Math.min(24, Math.trunc(input.pageSize ?? 24)));
   const search = input.search?.trim();
-  const preview = process.env.NODE_ENV !== "production" || process.env.CONTENT_RELEASE_CHANNEL === "validated-preview";
-  const conditions = [eq(vocabularyContent.active, true), preview ? inArray(vocabularyContent.status, ["validated", "reviewed", "published"]) : eq(vocabularyContent.status, "published")];
+  const conditions = [eq(vocabularyContent.active, true), inArray(vocabularyContent.status, visibleContentStatuses())];
   if (input.level) conditions.push(eq(vocabularyContent.level, input.level));
   if (input.partOfSpeech) conditions.push(eq(vocabularyContent.partOfSpeech, input.partOfSpeech));
   if (input.frequencyBand) conditions.push(eq(vocabularyContent.frequencyBand, input.frequencyBand));
@@ -64,12 +64,16 @@ export async function queryGrammarCatalogue() {
   return { items, total: items.length, byLevel: Object.fromEntries(levels.map((level) => [level, items.filter((item) => item.level === level).length])) as Record<CEFRLevel, number> };
 }
 
+export async function queryGrammarLesson(contentId: string) {
+  const catalogue = await queryGrammarCatalogue();
+  return catalogue.items.find((item) => item.id === contentId);
+}
+
 export async function queryExpressionsPage(input: ExpressionPageQuery) {
   const page = Math.max(1, Math.trunc(input.page ?? 1));
   const pageSize = Math.max(1, Math.min(48, Math.trunc(input.pageSize ?? 24)));
   const search = input.search?.trim();
-  const preview = process.env.NODE_ENV !== "production" || process.env.CONTENT_RELEASE_CHANNEL === "validated-preview";
-  const releaseConditions = [eq(expressions.active, true), preview ? inArray(expressions.status, ["validated", "reviewed", "published"]) : eq(expressions.status, "published")];
+  const releaseConditions = [eq(expressions.active, true), inArray(expressions.status, visibleContentStatuses())];
   const conditions = [...releaseConditions];
   if (input.level) conditions.push(eq(expressions.level, input.level));
   if (input.kind) conditions.push(eq(expressions.kind, input.kind));

@@ -129,7 +129,11 @@ test.describe.serial("production acceptance", () => {
       { status: 409, body: { error: "This email is already registered.", code: "EMAIL_ALREADY_REGISTERED" } },
     ]);
     page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
-    page.on("requestfailed", (request) => failedRequests.push(`${request.failure()?.errorText ?? "failed"} ${request.url()}`));
+    page.on("requestfailed", (request) => {
+      const failure = request.failure()?.errorText ?? "failed";
+      if (failure === "net::ERR_ABORTED" && request.url().includes("_rsc=")) return;
+      failedRequests.push(`${failure} ${request.url()}`);
+    });
     await assertNoSeriousAccessibilityViolations(page);
 
     const firstQuestionResponse = page.waitForResponse((response) => response.url().includes("/api/placement/question") && response.request().method() === "POST");
@@ -165,6 +169,14 @@ test.describe.serial("production acceptance", () => {
     await page.getByRole("button", { name: /^C2/ }).click();
     await expect(page.getByText("15 topics", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Advanced cohesive devices" })).toBeVisible();
+    await page.getByRole("link", { name: /Advanced cohesive devices lesson/ }).click();
+    await expect(page).toHaveURL(/\/grammar\/advanced-cohesive-devices$/);
+    await expect(page.getByRole("heading", { name: "Advanced cohesive devices", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Form and rules" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Examples" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Common mistakes" })).toBeVisible();
+    await page.goto("/grammar/not-a-real-lesson");
+    await expect(page.getByText("404 · Page not found")).toBeVisible();
 
     const expressionCatalogue = await page.evaluate(async () => {
       const response = await fetch("/api/content/expressions?search=legally%20binding");
@@ -184,6 +196,17 @@ test.describe.serial("production acceptance", () => {
     await page.goto("/vocabulary");
     await expect(page.getByRole("heading", { name: "Vocabulary" })).toBeVisible();
     await expect(page.locator("article").first()).toBeVisible();
+    const vocabularyPageOne = await page.evaluate(async () => {
+      const response = await fetch("/api/content/vocabulary?page=1&pageSize=24");
+      return { status: response.status, body: await response.json() };
+    });
+    expect(vocabularyPageOne.status).toBe(200);
+    expect(vocabularyPageOne.body).toMatchObject({ page: 1, pageSize: 24, total: 6_000, pageCount: 250 });
+    expect(vocabularyPageOne.body.items).toHaveLength(24);
+    const firstPageId = vocabularyPageOne.body.items[0].id;
+    const vocabularyPageTwo = await page.evaluate(async () => (await fetch("/api/content/vocabulary?page=2&pageSize=24")).json());
+    expect(vocabularyPageTwo.items).toHaveLength(24);
+    expect(vocabularyPageTwo.items[0].id).not.toBe(firstPageId);
     const levelFilter = page.getByLabel("CEFR");
     for (const level of ["A1", "A2", "B1", "B2", "C1", "C2"]) {
       const responsePromise = page.waitForResponse((response) => response.url().includes("/api/content/vocabulary?") && response.status() === 200);
@@ -194,6 +217,17 @@ test.describe.serial("production acceptance", () => {
       await expect(page.getByRole("button", { name: `Play British pronunciation of ${spokenWord}`, exact: true }).first()).toBeVisible();
       await expect(page.getByRole("button", { name: `Play American pronunciation of ${spokenWord}`, exact: true }).first()).toBeVisible();
     }
+    const consoleErrorCountBeforeExpectedFailure = consoleErrors.length;
+    const failedRequestCountBeforeExpectedFailure = failedRequests.length;
+    await page.route("**/api/content/vocabulary?**", async (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Vocabulary is temporarily unavailable." }) }));
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "Something went wrong" })).toBeVisible();
+    await expect(page.getByText("Vocabulary is temporarily unavailable.")).toBeVisible();
+    await expect(page.getByText("No matching words")).toHaveCount(0);
+    await page.unroute("**/api/content/vocabulary?**");
+    expect(failedRequests).toHaveLength(failedRequestCountBeforeExpectedFailure);
+    expect(consoleErrors.slice(consoleErrorCountBeforeExpectedFailure)).toEqual(["Failed to load resource: the server responded with a status of 503 (Service Unavailable)"]);
+    consoleErrors.splice(consoleErrorCountBeforeExpectedFailure);
 
     const stateResponse = await page.evaluate(async () => {
       const response = await fetch("/api/state");

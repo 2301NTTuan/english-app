@@ -26,6 +26,7 @@ suite("PostgreSQL migration and ownership", () => {
   let queryVocabularyPage: typeof import("@/lib/content/database")["queryVocabularyPage"];
   let queryExpressionsPage: typeof import("@/lib/content/database")["queryExpressionsPage"];
   let queryGrammarCatalogue: typeof import("@/lib/content/database")["queryGrammarCatalogue"];
+  let queryGrammarLesson: typeof import("@/lib/content/database")["queryGrammarLesson"];
   let queryPlacementBank: typeof import("@/lib/content/database")["queryPlacementBank"];
   let loadLearningState: typeof import("@/lib/learning/state-projection")["loadLearningState"];
   let saveLearningPreferences: typeof import("@/lib/learning/persistence")["saveLearningPreferences"];
@@ -45,7 +46,7 @@ suite("PostgreSQL migration and ownership", () => {
     ({ completeStudySession, completePlacement, importLegacyLearningState, saveLearningPreferences, resetLearningData } = await import("@/lib/learning/persistence"));
     ({ loadLearningState } = await import("@/lib/learning/state-projection"));
     ({ issuePasswordReset, consumePasswordReset, issueEmailVerification, consumeEmailVerification } = await import("@/lib/auth/recovery"));
-    ({ queryVocabularyPage, queryExpressionsPage, queryGrammarCatalogue, queryPlacementBank } = await import("@/lib/content/database"));
+    ({ queryVocabularyPage, queryExpressionsPage, queryGrammarCatalogue, queryGrammarLesson, queryPlacementBank } = await import("@/lib/content/database"));
     ({ consumeRateLimit } = await import("@/lib/auth/rate-limit"));
     ({ registerAccount, prepareVerificationResend, verifyCredentials } = await import("@/lib/auth/account"));
     ({ createDatabaseSession, verifiedUserForSessionToken } = await import("@/lib/auth/server"));
@@ -327,6 +328,23 @@ suite("PostgreSQL migration and ownership", () => {
     expect(metadata.rows[0]).toEqual({ exact_ranks: 4_130, validated: 6_000, active: 6_000, core: 192, foundations: 106, published_at: null });
   });
 
+  it("keeps production publication strict unless validated-preview is explicit", async () => {
+    try {
+      vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("CONTENT_RELEASE_CHANNEL", "");
+      expect(await queryVocabularyPage({ page: 1, pageSize: 24 })).toMatchObject({ items: [], total: 0, page: 1, pageSize: 24 });
+
+      vi.stubEnv("CONTENT_RELEASE_CHANNEL", "validated-preview");
+      const preview = await queryVocabularyPage({ page: 2, pageSize: 24 });
+      expect(preview.items).toHaveLength(24);
+      expect(preview.total).toBe(6_000);
+      expect(preview.pageCount).toBe(250);
+      expect(preview.items[0].id).not.toBe((await queryVocabularyPage({ page: 1, pageSize: 24 })).items[0].id);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("serves the complete seeded grammar catalogue outside the former detailed subset", async () => {
     const catalogue = await queryGrammarCatalogue();
     expect(catalogue.total).toBe(138);
@@ -334,6 +352,8 @@ suite("PostgreSQL migration and ownership", () => {
     expect(catalogue.items.map((item) => item.id)).toEqual(grammarTopics.map((item) => item.id));
     expect(catalogue.items.find((item) => item.id === "advanced-cohesive-devices")).toMatchObject({ id: "advanced-cohesive-devices", level: "C2" });
     expect(catalogue.items.find((item) => item.id === "advanced-cohesive-devices")?.examples).toHaveLength(3);
+    expect(await queryGrammarLesson("advanced-cohesive-devices")).toMatchObject({ id: "advanced-cohesive-devices", title: "Advanced cohesive devices", level: "C2" });
+    expect(await queryGrammarLesson("not-a-real-lesson")).toBeUndefined();
     const counts = await client.query(`select
       (select count(*)::int from grammar_topics where active) topics,
       (select count(*)::int from grammar_lessons l join grammar_topics t on t.id=l.grammar_topic_id where t.active) lessons`);
